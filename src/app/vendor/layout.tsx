@@ -21,6 +21,7 @@ import {
   Menu,
   X,
   ChevronDown,
+  Eye,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 
@@ -85,41 +86,38 @@ export default function VendorLayout({
     verifyVendorApproval();
   }, [pathname, hideSidebar, router]);
 
-  if (isLoading) return <div className="h-screen flex items-center justify-center bg-slate-50 text-slate-500">Loading Dashboard...</div>;
-  
-  // If they are on a protected route and not authorized, they are being redirected
-  if (!isAuthorized && !hideSidebar) return null;
+  if (isLoading || !isAuthorized) {
+    if (hideSidebar) return <>{children}</>;
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
-  // If this is a setup route, do not render the dashboard sidebar!
+  // If we are on a page that hides the sidebar, just render children
   if (hideSidebar) {
     return <>{children}</>;
   }
 
-  const NavLinks = () => {
-    return (
-      <div className="w-full space-y-1">
-        {navConfig.map((item, index) => {
-          const isActive = pathname === item.href || (item.href !== '/vendor' && pathname.startsWith(item.href));
-          return (
-            <div key={index} className="px-1">
-              <Link
-                href={item.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                  isActive
-                    ? 'bg-blue-600 text-white font-medium'
-                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
-                }`}
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
+  const NavLinks = () => (
+    <nav className="flex-1 space-y-1 px-4 py-4">
+      {navConfig.map((item) => {
+        const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              isActive
+                ? 'bg-blue-600 text-white font-medium'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <item.icon className="h-5 w-5" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
 
   return (
     <div className="flex h-screen bg-slate-50">
@@ -133,7 +131,6 @@ export default function VendorLayout({
         </button>
       </div>
 
-      {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 text-slate-300 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
@@ -141,12 +138,21 @@ export default function VendorLayout({
       >
         <div className="flex h-full flex-col">
           {/* Logo / Header */}
-          <div className="flex h-16 items-center px-6 bg-slate-950 border-b border-slate-800">
+          <div className="flex h-16 items-center px-6 bg-slate-950 border-b border-slate-800 shrink-0">
             <span className="text-xl font-bold text-white tracking-tight">Vendor Portal</span>
           </div>
 
+          <div className="p-4 shrink-0">
+            <Link href="/vendor/preview">
+              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 rounded-lg py-2 transition-colors font-medium text-sm">
+                <Eye className="h-4 w-4" />
+                Preview Store
+              </button>
+            </Link>
+          </div>
+
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar">
+          <nav className="flex-1 overflow-y-auto py-2 custom-scrollbar">
             <NavLinks />
           </nav>
 

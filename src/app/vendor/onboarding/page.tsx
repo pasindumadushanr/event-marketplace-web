@@ -32,7 +32,29 @@ export default function VendorOnboardingWizard() {
   const submitApplication = async () => {
     setIsSubmitting(true);
     try {
-      await api.post('/vendor/business/onboarding/wizard', formData);
+      // Clean up form data: remove empty strings so Prisma uses null/default
+      const payload: any = {};
+      Object.keys(formData).forEach((key) => {
+        const val = (formData as any)[key];
+        if (val !== '') {
+          payload[key] = val;
+        }
+      });
+
+      if (!payload.categoryId) {
+        toast.error('Please select a Business Category in Step 2.');
+        setIsSubmitting(false);
+        setStep(2);
+        return;
+      }
+      if (!payload.name || !payload.email || !payload.phone) {
+        toast.error('Please fill in all required fields in Step 1.');
+        setIsSubmitting(false);
+        setStep(1);
+        return;
+      }
+
+      await api.post('/vendor/business/onboarding/wizard', payload);
       toast.success('Application submitted successfully!');
       router.push('/vendor/status');
     } catch (error: any) {
