@@ -3,6 +3,8 @@
 import { Package } from '@/types/business-profile';
 import { Button } from '@/components/ui/button';
 import { Check, Clock } from 'lucide-react';
+import { useState } from 'react';
+import { BookingRequestModal } from './BookingRequestModal';
 
 interface BusinessPackagesProps {
   packages: Package[];
@@ -10,6 +12,8 @@ interface BusinessPackagesProps {
 }
 
 export function BusinessPackages({ packages, businessName }: BusinessPackagesProps) {
+  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+
   if (!packages || packages.length === 0) return null;
 
   return (
@@ -34,7 +38,7 @@ export function BusinessPackages({ packages, businessName }: BusinessPackagesPro
                   <p className="text-slate-600 text-sm leading-relaxed">{pkg.description}</p>
                 </div>
                 <div className="text-left md:text-right shrink-0">
-                  <p className="text-2xl font-bold text-primary">LKR {pkg.price.toLocaleString()}</p>
+                  <p className="text-2xl font-bold text-primary">LKR {Number(pkg.price).toLocaleString()}</p>
                   {pkg.duration && (
                     <p className="text-sm text-slate-500 font-medium flex items-center gap-1 md:justify-end mt-1">
                       <Clock className="h-4 w-4" /> {pkg.duration}
@@ -56,7 +60,10 @@ export function BusinessPackages({ packages, businessName }: BusinessPackagesPro
               </div>
 
               <div className="mt-6 flex justify-end">
-                <Button className="bg-slate-900 text-white hover:bg-primary font-semibold">
+                <Button 
+                  onClick={() => setSelectedPackage(pkg)}
+                  className="bg-slate-900 text-white hover:bg-primary font-semibold"
+                >
                   Request this Package
                 </Button>
               </div>
@@ -64,6 +71,13 @@ export function BusinessPackages({ packages, businessName }: BusinessPackagesPro
           </div>
         ))}
       </div>
+
+      <BookingRequestModal 
+        pkg={selectedPackage} 
+        isOpen={!!selectedPackage} 
+        onClose={() => setSelectedPackage(null)} 
+        businessName={businessName}
+      />
     </div>
   );
 }

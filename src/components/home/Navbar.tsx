@@ -3,10 +3,74 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Diamond } from 'lucide-react';
+import { Menu, X, Diamond, User as UserIcon, Heart, CalendarDays, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+function UserAccountNav() {
+  const { user, logout } = useAuth();
+  if (!user) return null;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-slate-200">
+          <Avatar className="h-10 w-10">
+            <AvatarImage src={user.profileImage} alt={user.firstName} />
+            <AvatarFallback className="bg-primary/10 text-primary font-medium">
+              {user.firstName?.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <div className="flex items-center justify-start gap-2 p-2">
+          <div className="flex flex-col space-y-1 leading-none">
+            <p className="font-medium">{user.firstName} {user.lastName}</p>
+            <p className="w-[200px] truncate text-sm text-muted-foreground">
+              {user.email}
+            </p>
+          </div>
+        </div>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/account/bookings" className="cursor-pointer flex items-center">
+            <CalendarDays className="mr-2 h-4 w-4" />
+            <span>My Bookings</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/account/favorites" className="cursor-pointer flex items-center">
+            <Heart className="mr-2 h-4 w-4" />
+            <span>Saved Favorites</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/account/settings" className="cursor-pointer flex items-center">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Account Settings</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600" onClick={logout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 export function Navbar() {
+  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -48,38 +112,74 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-8">
-            <div className="flex space-x-6">
-              {links.map((link) => (
-                <Link 
-                  key={link.name} 
-                  href={link.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    pathname === link.href 
-                      ? 'text-primary' 
-                      : isScrolled ? 'text-slate-600' : 'text-white/90'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
+          {/* Global Search Bar (Desktop) */}
+          <div className="hidden lg:flex flex-1 max-w-md mx-8">
+            <div className="relative w-full group">
+              <input
+                type="text"
+                placeholder="Search vendors, venues, categories..."
+                className={`w-full pl-5 pr-12 py-2.5 rounded-full border outline-none transition-all duration-300 shadow-sm
+                  ${isScrolled 
+                    ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10' 
+                    : 'bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40'
+                  }
+                `}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    window.location.href = `/search?q=${e.currentTarget.value}`;
+                  }
+                }}
+              />
+              <button 
+                className={`absolute right-1.5 top-1.5 p-1.5 rounded-full transition-colors
+                  ${isScrolled ? 'bg-primary text-white hover:bg-primary/90' : 'bg-white/20 text-white hover:bg-white/30'}
+                `}
+                onClick={(e) => {
+                  const input = e.currentTarget.previousSibling as HTMLInputElement;
+                  if (input.value) window.location.href = `/search?q=${input.value}`;
+                }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              </button>
             </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center space-x-6">
             
             <div className="flex items-center gap-4 pl-6 border-l border-slate-300/30">
-              <Link href="/sell" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
-                Become a Vendor
-              </Link>
-              <Link href="/login">
-                <Button variant={isScrolled ? "outline" : "secondary"} className={`font-medium ${!isScrolled && 'bg-white/10 text-white hover:bg-white/20 border-white/20'}`}>
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg">
-                  Join Now
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  {user.role === 'VENDOR' || user.role === 'ADMIN' ? (
+                    <Link href="/vendor">
+                      <Button variant={isScrolled ? "outline" : "secondary"} className={`font-medium ${!isScrolled && 'bg-white/10 text-white hover:bg-white/20 border-white/20'}`}>
+                        Dashboard
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Link href="/sell" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
+                      Become a Vendor
+                    </Link>
+                  )}
+                  <UserAccountNav />
+                </>
+              ) : (
+                <>
+                  <Link href="/sell" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
+                    Become a Vendor
+                  </Link>
+                  <Link href="/login">
+                    <Button variant={isScrolled ? "outline" : "secondary"} className={`font-medium ${!isScrolled && 'bg-white/10 text-white hover:bg-white/20 border-white/20'}`}>
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg">
+                      Join Now
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

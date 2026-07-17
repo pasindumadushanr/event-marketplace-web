@@ -48,7 +48,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else if (userData.roleName === 'VENDOR') {
       router.push('/vendor');
     } else {
-      router.push('/dashboard');
+      router.push('/account');
     }
   };
 

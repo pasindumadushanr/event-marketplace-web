@@ -40,6 +40,7 @@ export default function VendorPreviewPage() {
     try {
       const res = await api.get('/vendor/business');
       const blocksRes = await api.get('/vendor/business/content');
+      const packagesRes = await api.get('/vendor/packages');
       
       const dbData = res.data;
       setBlocks(blocksRes.data || []);
@@ -54,6 +55,7 @@ export default function VendorPreviewPage() {
         categoryName: dbData.category?.name || template.categoryName,
         categoryId: dbData.category?.id || template.categoryId,
         status: dbData.status,
+        packages: packagesRes.data?.length > 0 ? packagesRes.data : template.packages,
         contact: {
           ...template.contact,
           email: dbData.email || template.contact.email,
