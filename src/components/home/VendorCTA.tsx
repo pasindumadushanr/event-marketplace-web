@@ -32,7 +32,7 @@ export function VendorCTA() {
                 Register Your Business
               </Button>
             </Link>
-            <Link href="/about-vendors">
+            <Link href="/sell">
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-white text-slate-800 hover:bg-white/10 w-full sm:w-auto rounded-xl">
                 Learn More
               </Button>
