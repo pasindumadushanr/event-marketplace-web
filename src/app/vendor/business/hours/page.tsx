@@ -1,23 +1,69 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save } from 'lucide-react';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+type DaySchedule = {
+  day: string;
+  openTime: string;
+  closeTime: string;
+  isClosed: boolean;
+};
+
 export default function BusinessHoursPage() {
+  const { business, updateBusinessLocally } = useBusinessProfile();
   const [isLoading, setIsLoading] = useState(false);
+  const [schedule, setSchedule] = useState<DaySchedule[]>([]);
+
+  useEffect(() => {
+    if (business) {
+      if (business.profileSettings?.hours && Array.isArray(business.profileSettings.hours) && business.profileSettings.hours.length === 7) {
+        setSchedule(business.profileSettings.hours);
+      } else {
+        // Default schedule
+        setSchedule(days.map(day => ({
+          day,
+          openTime: '09:00',
+          closeTime: '18:00',
+          isClosed: day === 'Sunday'
+        })));
+      }
+    }
+  }, [business]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const payload = {
+        profileSettings: {
+          hours: schedule
+        }
+      };
+      await api.patch('/vendor/business', payload);
+      updateBusinessLocally(payload);
+      toast.success('Business hours saved!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save hours');
+    } finally {
       setIsLoading(false);
-      console.log('Saved Business Hours');
-    }, 1000);
+    }
   };
+
+  const updateDay = (index: number, updates: Partial<DaySchedule>) => {
+    const newSchedule = [...schedule];
+    newSchedule[index] = { ...newSchedule[index], ...updates };
+    setSchedule(newSchedule);
+  };
+
+  if (!business || schedule.length === 0) return null;
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
@@ -35,18 +81,35 @@ export default function BusinessHoursPage() {
         </div>
 
         <div className="divide-y divide-slate-100">
-          {days.map((day) => (
-            <div key={day} className="grid grid-cols-12 gap-4 p-4 items-center bg-white hover:bg-slate-50 transition-colors">
-              <div className="col-span-3 font-medium text-slate-900">{day}</div>
+          {schedule.map((dayData, idx) => (
+            <div key={dayData.day} className="grid grid-cols-12 gap-4 p-4 items-center bg-white hover:bg-slate-50 transition-colors">
+              <div className="col-span-3 font-medium text-slate-900">{dayData.day}</div>
               <div className="col-span-3">
-                <Input type="time" defaultValue="09:00" className="h-10" />
+                <Input 
+                  type="time" 
+                  value={dayData.openTime} 
+                  onChange={(e) => updateDay(idx, { openTime: e.target.value })}
+                  disabled={dayData.isClosed}
+                  className="h-10" 
+                />
               </div>
               <div className="col-span-3">
-                <Input type="time" defaultValue="18:00" className="h-10" />
+                <Input 
+                  type="time" 
+                  value={dayData.closeTime} 
+                  onChange={(e) => updateDay(idx, { closeTime: e.target.value })}
+                  disabled={dayData.isClosed}
+                  className="h-10" 
+                />
               </div>
               <div className="col-span-3 flex justify-center">
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" className="sr-only peer" defaultChecked={day !== 'Sunday'} />
+                  <input 
+                    type="checkbox" 
+                    className="sr-only peer" 
+                    checked={!dayData.isClosed} 
+                    onChange={(e) => updateDay(idx, { isClosed: !e.target.checked })}
+                  />
                   <div className="w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-primary/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>

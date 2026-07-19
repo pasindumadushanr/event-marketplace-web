@@ -1,23 +1,97 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Camera, Image as ImageIcon, Save } from 'lucide-react';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 
 export default function GeneralSettingsPage() {
+  const { business, updateBusinessLocally } = useBusinessProfile();
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    categoryId: '',
+    description: '',
+    languages: '',
+    highlights: '',
+    coverImage: '',
+    logo: ''
+  });
+
+  useEffect(() => {
+    if (business) {
+      setFormData({
+        name: business.name || '',
+        categoryId: business.categoryId || '',
+        description: business.description || '',
+        languages: business.profileSettings?.languages || '',
+        highlights: business.profileSettings?.highlights || '',
+        coverImage: business.coverImage || '',
+        logo: business.logo || ''
+      });
+    }
+  }, [business]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo' | 'coverImage') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error('Image size must be less than 5MB');
+    }
+
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    try {
+      toast.loading(`Uploading ${field}...`, { id: `upload-${field}` });
+      const res = await api.post('/vendor/business/upload', uploadData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setFormData(prev => ({ ...prev, [field]: res.data.url }));
+      toast.success('Upload complete', { id: `upload-${field}` });
+    } catch (error) {
+      toast.error('Upload failed', { id: `upload-${field}` });
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.name.trim()) return toast.error('Business name is required');
+    
     setIsLoading(true);
-    // Mock save
-    setTimeout(() => {
+    try {
+      const payload = {
+        name: formData.name,
+        categoryId: formData.categoryId,
+        description: formData.description,
+        coverImage: formData.coverImage,
+        logo: formData.logo,
+        profileSettings: {
+          languages: formData.languages,
+          highlights: formData.highlights,
+        }
+      };
+      
+      await api.patch('/vendor/business', payload);
+      updateBusinessLocally(payload);
+      toast.success('General settings saved!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save settings');
+    } finally {
       setIsLoading(false);
-      console.log('Saved General Settings');
-    }, 1000);
+    }
   };
+
+  if (!business) return null;
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
@@ -32,21 +106,33 @@ export default function GeneralSettingsPage() {
         
         <div className="space-y-4">
           <label className="text-sm font-medium text-slate-700">Cover Image</label>
-          <div className="h-48 bg-slate-200 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-primary/50 transition-colors cursor-pointer">
-            <ImageIcon className="h-8 w-8 text-slate-400 mb-2" />
-            <span className="text-sm text-slate-500 font-medium">Click to upload cover image (1920x1080)</span>
+          <div className="relative h-48 bg-slate-200 rounded-xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300 hover:border-primary/50 transition-colors cursor-pointer overflow-hidden">
+            {formData.coverImage ? (
+              <img src={formData.coverImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <>
+                <ImageIcon className="h-8 w-8 text-slate-400 mb-2" />
+                <span className="text-sm text-slate-500 font-medium">Click to upload cover image (1920x1080)</span>
+              </>
+            )}
+            <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'coverImage')} className="absolute inset-0 opacity-0 cursor-pointer" />
           </div>
         </div>
 
         <div className="space-y-4">
           <label className="text-sm font-medium text-slate-700">Business Logo</label>
           <div className="flex items-center gap-6">
-            <div className="h-24 w-24 rounded-2xl bg-slate-200 flex items-center justify-center border border-slate-300">
-              <Camera className="h-6 w-6 text-slate-400" />
+            <div className="relative h-24 w-24 rounded-2xl bg-slate-200 flex items-center justify-center border border-slate-300 overflow-hidden">
+              {formData.logo ? (
+                <img src={formData.logo} alt="Logo" className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <Camera className="h-6 w-6 text-slate-400" />
+              )}
+              <input type="file" accept="image/*" onChange={(e) => handleFileUpload(e, 'logo')} className="absolute inset-0 opacity-0 cursor-pointer" />
             </div>
             <div className="flex-1">
-              <Button type="button" variant="outline" className="mb-2">Change Logo</Button>
-              <p className="text-xs text-slate-500">Recommended size: 400x400px. JPG, PNG or WEBP.</p>
+              <p className="text-sm font-medium">Upload Logo</p>
+              <p className="text-xs text-slate-500 mt-1">Recommended size: 400x400px. JPG, PNG or WEBP.</p>
             </div>
           </div>
         </div>
@@ -55,40 +141,29 @@ export default function GeneralSettingsPage() {
       {/* Basic Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-slate-700">Business Name</label>
-          <Input defaultValue="The Grand Ballroom Colombo" className="h-12 bg-slate-50" />
+          <label className="text-sm font-medium text-slate-700">Business Name *</label>
+          <Input name="name" value={formData.name} onChange={handleChange} className="h-12 bg-slate-50" required />
         </div>
         
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Primary Category</label>
-          <select className="flex h-12 w-full items-center justify-between rounded-md border border-input bg-slate-50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-            <option value="1">Hotels & Venues</option>
-            <option value="2">Photographers</option>
-          </select>
-        </div>
-
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700">Years of Experience</label>
-          <Input type="number" defaultValue="15" className="h-12 bg-slate-50" />
-        </div>
-
         <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-medium text-slate-700">Business Description</label>
           <Textarea 
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
             className="min-h-[150px] bg-slate-50 resize-y" 
-            defaultValue="The Grand Ballroom Colombo is the epitome of luxury and elegance..."
           />
         </div>
         
         <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-medium text-slate-700">Languages Spoken (Comma separated)</label>
-          <Input defaultValue="English, Sinhala, Tamil" className="h-12 bg-slate-50" />
+          <Input name="languages" value={formData.languages} onChange={handleChange} className="h-12 bg-slate-50" />
           <p className="text-xs text-slate-500">Example: English, Sinhala, Tamil</p>
         </div>
 
         <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-medium text-slate-700">Business Highlights (Comma separated)</label>
-          <Input defaultValue="5-Star Luxury Venue, In-house International Chefs" className="h-12 bg-slate-50" />
+          <Input name="highlights" value={formData.highlights} onChange={handleChange} className="h-12 bg-slate-50" />
           <p className="text-xs text-slate-500">Short bullet points that stand out on your profile.</p>
         </div>
       </div>

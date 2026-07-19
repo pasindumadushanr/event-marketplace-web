@@ -24,6 +24,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
+import { BusinessProfileProvider } from '@/contexts/BusinessProfileContext';
 
 const navConfig = [
   { href: '/vendor', label: 'Dashboard', icon: LayoutDashboard },
@@ -107,8 +108,8 @@ export default function VendorLayout({
             onClick={() => setIsMobileMenuOpen(false)}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
               isActive
-                ? 'bg-blue-600 text-white font-medium'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                ? 'bg-primary text-primary-foreground font-medium'
+                : 'text-white/60 hover:bg-white/10 hover:text-white'
             }`}
           >
             <item.icon className="h-5 w-5" />
@@ -132,19 +133,19 @@ export default function VendorLayout({
       </div>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-slate-950 text-slate-300 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-secondary text-white/80 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
           isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex h-full flex-col">
           {/* Logo / Header */}
-          <div className="flex h-16 items-center px-6 bg-slate-950 border-b border-slate-800 shrink-0">
-            <span className="text-xl font-bold text-white tracking-tight">Vendor Portal</span>
+          <div className="flex h-16 items-center px-6 bg-secondary border-b border-white/10 shrink-0">
+            <span className="text-2xl font-serif font-bold text-primary tracking-tight">Vendor Portal</span>
           </div>
 
           <div className="p-4 shrink-0">
             <Link href="/vendor/preview">
-              <button className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-2 rounded-lg py-2 transition-colors font-medium text-sm">
+              <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 rounded-lg py-2 transition-colors font-medium text-sm">
                 <Eye className="h-4 w-4" />
                 Preview Store
               </button>
@@ -157,19 +158,19 @@ export default function VendorLayout({
           </nav>
 
           {/* User Footer */}
-          <div className="border-t border-slate-800 p-4">
+          <div className="border-t border-white/10 p-4">
             <div className="flex items-center gap-3 mb-4 px-2">
-              <div className="h-9 w-9 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold">
+              <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
                 {user?.firstName?.charAt(0) || 'V'}
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-medium text-white">{user?.firstName} {user?.lastName}</span>
-                <span className="text-xs text-slate-400">Vendor Account</span>
+                <span className="text-xs text-white/50">Vendor Account</span>
               </div>
             </div>
             <button
               onClick={logout}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-slate-400 transition-all hover:bg-slate-800 hover:text-white"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-white/60 transition-all hover:bg-white/10 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -191,7 +192,9 @@ export default function VendorLayout({
 
         {/* Page Content */}
         <div className="p-8 max-w-7xl mx-auto">
-          {children}
+          <BusinessProfileProvider>
+            {children}
+          </BusinessProfileProvider>
         </div>
       </main>
 

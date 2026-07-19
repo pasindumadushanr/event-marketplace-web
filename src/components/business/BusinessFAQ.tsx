@@ -11,11 +11,18 @@ interface BusinessFAQProps {
 export function BusinessFAQ({ faq }: BusinessFAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
-  if (!faq || faq.length === 0) return null;
+  if (!faq || faq.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 text-center py-10">
+        <h3 className="text-lg font-serif font-bold text-slate-900 mb-1">Got Questions?</h3>
+        <p className="text-slate-500 text-sm">Please contact the vendor directly for any specific inquiries.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8">
-      <h3 className="text-xl font-bold text-slate-900 mb-6">Frequently Asked Questions</h3>
+      <h3 className="text-2xl font-serif font-bold text-secondary mb-6">Frequently Asked Questions</h3>
       
       <div className="space-y-4">
         {faq.map((item, index) => (

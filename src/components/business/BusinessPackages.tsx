@@ -14,11 +14,24 @@ interface BusinessPackagesProps {
 export function BusinessPackages({ packages, businessName }: BusinessPackagesProps) {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
 
-  if (!packages || packages.length === 0) return null;
+  if (!packages || packages.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 text-center py-16">
+        <div className="bg-slate-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span className="text-slate-300 text-3xl font-serif font-bold">$</span>
+        </div>
+        <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">Custom Pricing Available</h3>
+        <p className="text-slate-500 max-w-md mx-auto mb-6">This vendor creates custom packages tailored specifically to your event's unique needs rather than set pricing tiers.</p>
+        <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
+          Request a Custom Quote
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8">
-      <h3 className="text-xl font-bold text-slate-900 mb-6">Service Packages</h3>
+      <h3 className="text-2xl font-serif font-bold text-secondary mb-6">Service Packages</h3>
       
       <div className="space-y-6">
         {packages.map((pkg) => (

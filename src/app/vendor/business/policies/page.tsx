@@ -1,23 +1,63 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Plus, Trash2 } from 'lucide-react';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 
 export default function PoliciesSettingsPage() {
+  const { business, updateBusinessLocally } = useBusinessProfile();
   const [isLoading, setIsLoading] = useState(false);
-  const [faqs, setFaqs] = useState([{ question: '', answer: '' }]);
+  const [policies, setPolicies] = useState({
+    bookingPolicy: '',
+    cancellationPolicy: '',
+    paymentPolicy: ''
+  });
+  const [faqs, setFaqs] = useState<{ question: string, answer: string }[]>([]);
+
+  useEffect(() => {
+    if (business) {
+      setPolicies({
+        bookingPolicy: business.profileSettings?.policies?.bookingPolicy || '',
+        cancellationPolicy: business.profileSettings?.policies?.cancellationPolicy || '',
+        paymentPolicy: business.profileSettings?.policies?.paymentPolicy || ''
+      });
+      if (business.profileSettings?.faqs && Array.isArray(business.profileSettings.faqs)) {
+        setFaqs(business.profileSettings.faqs);
+      } else {
+        setFaqs([{ question: '', answer: '' }]);
+      }
+    }
+  }, [business]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
+
+    const cleanedFaqs = faqs.filter(faq => faq.question.trim() !== '' && faq.answer.trim() !== '');
+
+    try {
+      const payload = {
+        profileSettings: {
+          policies,
+          faqs: cleanedFaqs
+        }
+      };
+      await api.patch('/vendor/business', payload);
+      updateBusinessLocally(payload);
+      toast.success('Policies & FAQ saved!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save policies');
+    } finally {
       setIsLoading(false);
-      console.log('Saved Policies & FAQ');
-    }, 1000);
+    }
   };
+
+  if (!business) return null;
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
@@ -32,17 +72,29 @@ export default function PoliciesSettingsPage() {
         
         <div className="space-y-4">
           <label className="text-sm font-medium text-slate-700">Booking Policy</label>
-          <Textarea className="bg-white" rows={2} placeholder="e.g. A 30% non-refundable deposit is required..." />
+          <Textarea 
+            value={policies.bookingPolicy}
+            onChange={(e) => setPolicies(p => ({ ...p, bookingPolicy: e.target.value }))}
+            className="bg-white" rows={2} placeholder="e.g. A 30% non-refundable deposit is required..." 
+          />
         </div>
         
         <div className="space-y-4">
           <label className="text-sm font-medium text-slate-700">Cancellation Policy</label>
-          <Textarea className="bg-white" rows={2} placeholder="e.g. Cancellations made 90 days prior receive a 50% refund..." />
+          <Textarea 
+            value={policies.cancellationPolicy}
+            onChange={(e) => setPolicies(p => ({ ...p, cancellationPolicy: e.target.value }))}
+            className="bg-white" rows={2} placeholder="e.g. Cancellations made 90 days prior receive a 50% refund..." 
+          />
         </div>
 
         <div className="space-y-4">
           <label className="text-sm font-medium text-slate-700">Payment Policy</label>
-          <Textarea className="bg-white" rows={2} placeholder="e.g. Final payment is due 14 days before the event..." />
+          <Textarea 
+            value={policies.paymentPolicy}
+            onChange={(e) => setPolicies(p => ({ ...p, paymentPolicy: e.target.value }))}
+            className="bg-white" rows={2} placeholder="e.g. Final payment is due 14 days before the event..." 
+          />
         </div>
       </div>
 

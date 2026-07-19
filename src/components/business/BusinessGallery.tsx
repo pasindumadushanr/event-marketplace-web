@@ -23,7 +23,15 @@ export function BusinessGallery({ gallery }: BusinessGalleryProps) {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
-  if (!gallery || gallery.length === 0) return null;
+  if (!gallery || gallery.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 overflow-hidden text-center py-16">
+        <ImageIcon className="h-16 w-16 text-slate-200 mx-auto mb-4" />
+        <h3 className="text-xl font-serif font-bold text-slate-900 mb-2">Portfolio Coming Soon</h3>
+        <p className="text-slate-500 max-w-md mx-auto">This vendor hasn't uploaded any photos or videos to their gallery yet. Check back later to see their work!</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 overflow-hidden">

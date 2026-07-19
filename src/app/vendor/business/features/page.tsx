@@ -1,39 +1,67 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save, Plus, Trash2 } from 'lucide-react';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 
 export default function FeaturesSettingsPage() {
+  const { business, updateBusinessLocally } = useBusinessProfile();
   const [isLoading, setIsLoading] = useState(false);
+  const [featureGroups, setFeatureGroups] = useState<{ id: string, groupName: string, features: string[] }[]>([]);
 
-  // Mock State for dynamic features
-  const [featureGroups, setFeatureGroups] = useState([
-    {
-      id: '1',
-      groupName: 'Venue Amenities',
-      features: ['Air Conditioning', 'Free WiFi', 'Valet Parking', 'Bridal Dressing Room']
-    },
-    {
-      id: '2',
-      groupName: 'Catering & Dining',
-      features: ['Buffet & Set Menus', 'Liquor License']
+  useEffect(() => {
+    if (business) {
+      if (business.profileSettings?.features && Array.isArray(business.profileSettings.features)) {
+        setFeatureGroups(business.profileSettings.features);
+      } else {
+        // Fallback to empty if not set
+        setFeatureGroups([
+          {
+            id: '1',
+            groupName: 'Venue Amenities',
+            features: ['']
+          }
+        ]);
+      }
     }
-  ]);
+  }, [business]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clean up empty features before saving
+    const cleanedGroups = featureGroups.map(group => ({
+      ...group,
+      features: group.features.filter(f => f.trim() !== '')
+    })).filter(group => group.groupName.trim() !== '' || group.features.length > 0);
+
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const payload = {
+        profileSettings: {
+          features: cleanedGroups
+        }
+      };
+      
+      await api.patch('/vendor/business', payload);
+      updateBusinessLocally(payload);
+      toast.success('Features saved successfully!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save features');
+    } finally {
       setIsLoading(false);
-      console.log('Saved Features:', featureGroups);
-    }, 1000);
+    }
   };
 
   const addGroup = () => {
     setFeatureGroups([...featureGroups, { id: Math.random().toString(), groupName: '', features: [''] }]);
   };
+
+  if (!business) return null;
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
@@ -60,8 +88,12 @@ export default function FeaturesSettingsPage() {
                 }}
                 placeholder="Group Name (e.g., Equipment, Amenities)" 
                 className="font-bold bg-white"
+                required
               />
-              <Button type="button" variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0">
+              <Button type="button" variant="ghost" onClick={() => {
+                const newGroups = featureGroups.filter((_, idx) => idx !== gIndex);
+                setFeatureGroups(newGroups);
+              }} className="text-red-500 hover:text-red-600 hover:bg-red-50 shrink-0">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -78,7 +110,11 @@ export default function FeaturesSettingsPage() {
                     placeholder="Feature (e.g., Drone Coverage)" 
                     className="bg-white"
                   />
-                  <Button type="button" variant="ghost" size="icon" className="text-slate-400 hover:text-red-500 shrink-0">
+                  <Button type="button" variant="ghost" size="icon" onClick={() => {
+                    const newGroups = [...featureGroups];
+                    newGroups[gIndex].features = newGroups[gIndex].features.filter((_, idx) => idx !== fIndex);
+                    setFeatureGroups(newGroups);
+                  }} className="text-slate-400 hover:text-red-500 shrink-0">
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
