@@ -115,7 +115,7 @@ export default function SearchPage() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-slate-500 font-medium whitespace-nowrap">Sort by:</span>
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select value={sortBy} onValueChange={(val) => val && setSortBy(val)}>
                 <SelectTrigger className="w-[180px] bg-white">
                   <SelectValue placeholder="Sort order" />
                 </SelectTrigger>
