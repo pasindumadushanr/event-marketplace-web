@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 import { VendorCard } from '@/components/discovery/VendorCard';
@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   
@@ -157,5 +157,13 @@ export default function SearchPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading search results...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }
