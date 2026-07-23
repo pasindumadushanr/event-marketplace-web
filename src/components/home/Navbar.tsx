@@ -21,7 +21,7 @@ function UserAccountNav() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-slate-200">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.profileImage} alt={user.firstName} />
@@ -31,7 +31,7 @@ function UserAccountNav() {
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent className="w-56" align="end">
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             <p className="font-medium">{user.firstName} {user.lastName}</p>
@@ -41,19 +41,19 @@ function UserAccountNav() {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem>
           <Link href="/account/bookings" className="cursor-pointer flex items-center">
             <CalendarDays className="mr-2 h-4 w-4" />
             <span>My Bookings</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem>
           <Link href="/account/favorites" className="cursor-pointer flex items-center">
             <Heart className="mr-2 h-4 w-4" />
             <span>Saved Favorites</span>
           </Link>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem>
           <Link href="/account/settings" className="cursor-pointer flex items-center">
             <Settings className="mr-2 h-4 w-4" />
             <span>Account Settings</span>
@@ -150,7 +150,7 @@ export function Navbar() {
             <div className="flex items-center gap-4 pl-6 border-l border-slate-300/30">
               {user ? (
                 <>
-                  {user.role === 'VENDOR' || user.role === 'ADMIN' ? (
+                  {user.roleName === 'VENDOR' || user.roleName === 'ADMIN' ? (
                     <Link href="/vendor">
                       <Button variant={isScrolled ? "outline" : "secondary"} className={`font-medium ${!isScrolled && 'bg-white/10 text-white hover:bg-white/20 border-white/20'}`}>
                         Dashboard
