@@ -42,7 +42,7 @@ export default function VendorPackagesPage() {
   const [isSaving, setIsSaving] = useState(false);
 
   const { register, control, handleSubmit, reset, formState: { errors } } = useForm<PackageFormValues>({
-    resolver: zodResolver(packageSchema),
+    resolver: zodResolver(packageSchema) as any,
     defaultValues: {
       name: '',
       description: '',
