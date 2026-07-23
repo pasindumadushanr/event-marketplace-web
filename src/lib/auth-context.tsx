@@ -9,6 +9,9 @@ interface User {
   firstName: string;
   lastName: string;
   roleId: string;
+  roleName?: string;
+  profileImage?: string;
+  phone?: string;
 }
 
 interface AuthContextType {
