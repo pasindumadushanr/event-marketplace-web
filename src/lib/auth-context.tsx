@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
 interface User {
@@ -39,7 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const login = (accessToken: string, refreshToken: string, userData: any) => {
+  const login = useCallback((accessToken: string, refreshToken: string, userData: any) => {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
     localStorage.setItem('user', JSON.stringify(userData));
@@ -51,17 +51,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } else if (userData.roleName === 'VENDOR') {
       router.push('/vendor');
     } else {
-      router.push('/account');
+      router.push('/account'); // default fallback if dashboard doesn't exist for customer
     }
-  };
+  }, [router]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
     router.push('/login');
-  };
+  }, [router]);
 
   return (
     <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, logout, isLoading }}>
