@@ -5,7 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { toast } from 'sonner';
 
-export default function AuthCallbackPage() {
+import { Suspense } from 'react';
+
+function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
@@ -14,14 +16,7 @@ export default function AuthCallbackPage() {
     const accessToken = searchParams.get('accessToken');
     const refreshToken = searchParams.get('refreshToken');
     
-    // In a real scenario, the backend might just send tokens and we fetch the user profile.
-    // For this implementation, since our context requires a user object but we didn't pass it in the URL,
-    // we should ideally fetch the current user profile here.
-    // But as a quick fix, since the context `login` function saves tokens, we'll just pass a minimal user
-    // and let a subsequent API call or dashboard redirect fetch the real data if needed.
-    
     if (accessToken && refreshToken) {
-      // Decode the JWT to get basic user info for the context
       try {
         const payload = JSON.parse(atob(accessToken.split('.')[1]));
         const user = {
@@ -45,11 +40,18 @@ export default function AuthCallbackPage() {
     }
   }, [router, searchParams, login]);
 
+  return null;
+}
+
+export default function AuthCallbackPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50">
       <div className="flex flex-col items-center space-y-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zinc-900"></div>
         <p className="text-zinc-600 font-medium">Authenticating...</p>
+        <Suspense fallback={null}>
+          <AuthCallbackContent />
+        </Suspense>
       </div>
     </div>
   );
