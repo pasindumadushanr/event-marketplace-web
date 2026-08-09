@@ -1,20 +1,40 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Save, CalendarDays, FileText, Phone } from 'lucide-react';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
+import { toast } from 'sonner';
+import api from '@/lib/api';
 
 export default function BookingSettingsPage() {
+  const { business, updateBusinessLocally } = useBusinessProfile();
   const [isLoading, setIsLoading] = useState(false);
   const [bookingMethod, setBookingMethod] = useState('REQUEST_QUOTE');
+
+  useEffect(() => {
+    if (business && business.profileSettings?.bookingMethod) {
+      setBookingMethod(business.profileSettings.bookingMethod);
+    }
+  }, [business]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const payload = {
+        profileSettings: {
+          bookingMethod
+        }
+      };
+      await api.patch('/vendor/business', payload);
+      updateBusinessLocally(payload);
+      toast.success('Booking settings saved successfully!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to save settings');
+    } finally {
       setIsLoading(false);
-      console.log('Saved Booking Settings', bookingMethod);
-    }, 1000);
+    }
   };
 
   const methods = [
