@@ -58,7 +58,7 @@ export default function AdminReportsPage() {
         'Date': format(new Date(p.updatedAt), 'yyyy-MM-dd HH:mm:ss'),
         'Customer Name': `${p.customer?.firstName} ${p.customer?.lastName}`,
         'Customer Email': p.customer?.email,
-        'Vendor Business': p.business?.businessName,
+        'Vendor Business': p.business?.name,
         'Gross Amount (LKR)': p.totalAmount,
         'Platform Commission (LKR)': Number(p.totalAmount) * 0.1,
         'Status': p.paymentStatus
@@ -85,7 +85,7 @@ export default function AdminReportsPage() {
         'Event Date': format(new Date(b.date), 'yyyy-MM-dd'),
         'Event Time': b.time,
         'Customer Email': b.customer?.email,
-        'Vendor Business': b.business?.businessName,
+        'Vendor Business': b.business?.name,
         'Package Name': b.package?.name || 'Custom',
         'Total Amount (LKR)': b.totalAmount,
         'Status': b.status,

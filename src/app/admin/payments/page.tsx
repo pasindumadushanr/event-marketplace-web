@@ -40,7 +40,7 @@ export default function AdminPaymentsPage() {
     return (
       p.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.business?.businessName?.toLowerCase().includes(searchTerm.toLowerCase())
+      p.business?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
 
@@ -149,7 +149,7 @@ export default function AdminPaymentsPage() {
                         <div className="text-xs text-slate-500">{payment.customer?.email}</div>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium text-sm text-blue-600">{payment.business?.businessName}</div>
+                        <div className="font-medium text-sm text-blue-600">{payment.business?.name}</div>
                       </TableCell>
                       <TableCell className="font-semibold">
                         LKR {amount.toLocaleString()}

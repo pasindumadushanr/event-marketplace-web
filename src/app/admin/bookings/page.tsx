@@ -59,7 +59,7 @@ export default function AdminBookingsPage() {
   const filteredBookings = bookings.filter((b) => {
     const matchesSearch = 
       b.customer?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.business?.businessName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      b.business?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       b.id.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter ? b.status === statusFilter : true;
@@ -159,7 +159,7 @@ export default function AdminBookingsPage() {
                     <div className="text-xs text-slate-500">{booking.customer?.email}</div>
                   </TableCell>
                   <TableCell>
-                    <div className="font-medium">{booking.business?.businessName}</div>
+                    <div className="font-medium">{booking.business?.name}</div>
                     <div className="text-xs text-slate-500">{booking.package?.name || 'Custom Package'}</div>
                   </TableCell>
                   <TableCell>
