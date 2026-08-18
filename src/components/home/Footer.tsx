@@ -4,8 +4,9 @@ import { NewsletterForm } from './NewsletterForm';
 
 async function getFooterSettings() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/cms/public/settings/FOOTER_CONTENT`, {
-      next: { revalidate: 60 } // revalidate every 60 seconds
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/settings/FOOTER_CONTENT`, {
+      next: { revalidate: 60 }, // revalidate every 60 seconds
+      signal: AbortSignal.timeout(5000) // Prevent build hangs if API is unreachable
     });
     if (!res.ok) return null;
     const data = await res.json();

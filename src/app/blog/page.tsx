@@ -5,8 +5,9 @@ import { Footer } from '@/components/home/Footer';
 
 async function getBlogPosts() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/cms/public/blog`, {
-      next: { revalidate: 60 } // Revalidate every 60 seconds
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/blog`, {
+      next: { revalidate: 60 }, // Revalidate every 60 seconds
+      signal: AbortSignal.timeout(5000) // Prevent build hangs if API is unreachable
     });
     if (!res.ok) return [];
     return res.json();
