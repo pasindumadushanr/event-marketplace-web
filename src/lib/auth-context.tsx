@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-interface User {
+export interface User {
   id: string;
   email: string;
   firstName: string;
@@ -12,6 +12,7 @@ interface User {
   roleName?: string;
   profileImage?: string;
   phone?: string;
+  authProvider?: string;
 }
 
 interface AuthContextType {

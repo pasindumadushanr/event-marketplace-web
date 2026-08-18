@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { CreditCard, ShieldCheck, AlertCircle, RefreshCw } from 'lucide-react';
 
-export default function MockCheckoutPage() {
+function MockCheckoutContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const router = useRouter();
@@ -150,5 +150,20 @@ export default function MockCheckoutPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function MockCheckoutPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary mb-4" />
+          <p className="text-slate-500">Loading secure checkout...</p>
+        </div>
+      </div>
+    }>
+      <MockCheckoutContent />
+    </Suspense>
   );
 }

@@ -120,7 +120,7 @@ export default function VendorRevenuePage() {
                   tickFormatter={(value) => `LKR ${value}`}
                 />
                 <Tooltip 
-                  formatter={(value: number) => [`LKR ${value.toLocaleString()}`, 'Revenue']}
+                  formatter={(value: any) => [`LKR ${Number(value || 0).toLocaleString()}`, 'Revenue']}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
                 <Area 
