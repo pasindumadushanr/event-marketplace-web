@@ -21,7 +21,7 @@ function UserAccountNav() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-slate-200">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.profileImage} alt={user.firstName} />

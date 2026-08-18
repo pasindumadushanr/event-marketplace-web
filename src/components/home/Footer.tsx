@@ -1,11 +1,28 @@
-'use client';
-
 import Link from 'next/link';
 import { Diamond, Mail, Globe, Camera, MessageCircle, Briefcase } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { NewsletterForm } from './NewsletterForm';
 
-export function Footer() {
+async function getFooterSettings() {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/cms/public/settings/FOOTER_CONTENT`, {
+      next: { revalidate: 60 } // revalidate every 60 seconds
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.value;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function Footer() {
+  const cms = await getFooterSettings();
+
+  const description = cms?.description || 'The premier destination for luxury events. Discover, compare, and book the finest vendors and venues with ease and security.';
+  const copyright = cms?.copyright || `© ${new Date().getFullYear()} LuxeEvents Marketplace. All rights reserved.`;
+  const subtext = cms?.subtext || 'Designed for Premium Events';
+  const socials = cms?.socials || { website: '#', instagram: '#', facebook: '#', linkedin: '#' };
+
   return (
     <footer className="bg-slate-950 text-slate-300 pt-20 pb-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -16,19 +33,7 @@ export function Footer() {
             <h3 className="text-2xl font-bold text-white mb-2">Subscribe to our Newsletter</h3>
             <p className="text-slate-400">Get the latest wedding trends, event tips, and exclusive offers.</p>
           </div>
-          <div className="flex w-full md:w-auto max-w-md gap-2">
-            <div className="relative w-full">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
-              <Input 
-                type="email" 
-                placeholder="Enter your email" 
-                className="pl-10 h-12 bg-slate-950 border-slate-800 text-white focus-visible:ring-primary w-full"
-              />
-            </div>
-            <Button className="h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6">
-              Subscribe
-            </Button>
-          </div>
+          <NewsletterForm />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
@@ -43,19 +48,19 @@ export function Footer() {
               </span>
             </Link>
             <p className="text-slate-400 leading-relaxed mb-6 max-w-sm">
-              The premier destination for luxury events. Discover, compare, and book the finest vendors and venues with ease and security.
+              {description}
             </p>
             <div className="flex gap-4">
-              <a href="#" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <a href={socials.website} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                 <Globe className="h-5 w-5" />
               </a>
-              <a href="#" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                 <Camera className="h-5 w-5" />
               </a>
-              <a href="#" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <a href={socials.facebook} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                 <MessageCircle className="h-5 w-5" />
               </a>
-              <a href="#" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+              <a href={socials.linkedin} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
                 <Briefcase className="h-5 w-5" />
               </a>
             </div>
@@ -94,9 +99,9 @@ export function Footer() {
         </div>
 
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500">
-          <p>© {new Date().getFullYear()} LuxeEvents Marketplace. All rights reserved.</p>
+          <p>{copyright}</p>
           <div className="flex gap-6 mt-4 md:mt-0">
-            <span>Designed for Premium Events</span>
+            <span>{subtext}</span>
           </div>
         </div>
 

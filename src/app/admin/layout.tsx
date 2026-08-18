@@ -58,6 +58,7 @@ const navConfig = [
       { href: '/admin/cms/faq', label: 'FAQ' },
       { href: '/admin/cms/terms', label: 'Terms & Conditions' },
       { href: '/admin/cms/privacy', label: 'Privacy Policy' },
+      { href: '/admin/cms/settings', label: 'Global Settings' },
     ]
   },
   {
@@ -74,6 +75,7 @@ const navConfig = [
   },
   { href: '/admin/payments', label: 'Payments', icon: CreditCard },
   { href: '/admin/reports', label: 'Reports', icon: BarChart },
+  { href: '/admin/support', label: 'Support Inbox', icon: Bell },
   { href: '/admin/notifications', label: 'Notifications', icon: Bell },
   { href: '/admin/security', label: 'Security', icon: Shield },
 ];
