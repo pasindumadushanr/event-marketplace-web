@@ -18,11 +18,18 @@ function AuthCallbackContent() {
     
     if (accessToken && refreshToken) {
       try {
-        const payload = JSON.parse(atob(accessToken.split('.')[1]));
+        let base64Url = accessToken.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        // Pad the base64 string
+        while (base64.length % 4) {
+          base64 += '=';
+        }
+        const payload = JSON.parse(atob(base64));
         const user = {
           id: payload.sub,
           email: payload.email,
-          role: { name: payload.role },
+          roleId: payload.roleId || '',
+          roleName: payload.role, // Essential for routing!
           firstName: payload.firstName || '',
           lastName: payload.lastName || ''
         };

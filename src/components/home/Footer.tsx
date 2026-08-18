@@ -1,23 +1,27 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Diamond, Mail, Globe, Camera, MessageCircle, Briefcase } from 'lucide-react';
 import { NewsletterForm } from './NewsletterForm';
 
-async function getFooterSettings() {
-  try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/settings/FOOTER_CONTENT`, {
-      next: { revalidate: 60 }, // revalidate every 60 seconds
-      signal: AbortSignal.timeout(5000) // Prevent build hangs if API is unreachable
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.value;
-  } catch (error) {
-    return null;
-  }
-}
+export function Footer() {
+  const [cms, setCms] = useState<any>(null);
 
-export async function Footer() {
-  const cms = await getFooterSettings();
+  useEffect(() => {
+    async function getFooterSettings() {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/settings/FOOTER_CONTENT`);
+        if (res.ok) {
+          const data = await res.json();
+          setCms(data.value);
+        }
+      } catch (error) {
+        console.error('Failed to fetch footer settings:', error);
+      }
+    }
+    getFooterSettings();
+  }, []);
 
   const description = cms?.description || 'The premier destination for luxury events. Discover, compare, and book the finest vendors and venues with ease and security.';
   const copyright = cms?.copyright || `© ${new Date().getFullYear()} LuxeEvents Marketplace. All rights reserved.`;
