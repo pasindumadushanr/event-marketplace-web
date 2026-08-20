@@ -48,6 +48,15 @@ const navConfig = [
     ]
   },
   {
+    label: 'Memberships',
+    icon: CreditCard,
+    value: 'memberships',
+    children: [
+      { href: '/admin/subscriptions/plans', label: 'Plans & Pricing' },
+      { href: '/admin/subscriptions/vendors', label: 'Vendor Subscriptions' },
+    ]
+  },
+  {
     label: 'CMS',
     icon: FileText,
     value: 'cms',
