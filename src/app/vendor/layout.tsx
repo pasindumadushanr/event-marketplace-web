@@ -58,6 +58,7 @@ export default function VendorLayout({
   // Routes that should NOT show the dashboard sidebar (just auth stuff now)
   const hideSidebar = [
     '/vendor/register', 
+    '/vendor/login',
     '/vendor/verify-email'
   ].includes(pathname);
 
@@ -72,10 +73,15 @@ export default function VendorLayout({
   ];
 
   useEffect(() => {
-    // We still want to skip verification on the register page itself
-    if (pathname === '/vendor/register') {
+    // We still want to skip verification on the register and login page
+    if (pathname === '/vendor/register' || pathname === '/vendor/login') {
       setIsAuthorized(true);
       setIsLoading(false);
+      return;
+    }
+
+    if (!isLoading && !isAuthenticated) {
+      router.push('/vendor/login');
       return;
     }
 

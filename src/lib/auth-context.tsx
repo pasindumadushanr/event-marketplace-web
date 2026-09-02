@@ -58,12 +58,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   const logout = useCallback(() => {
+    const wasVendor = user?.roleName === 'VENDOR' || (user as any)?.role?.name === 'VENDOR';
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
-    router.push('/login');
-  }, [router]);
+    if (wasVendor) {
+      router.push('/vendor/login');
+    } else {
+      router.push('/login');
+    }
+  }, [router, user]);
 
   const updateUser = useCallback((updatedFields: Partial<User>) => {
     setUser((prev) => {
