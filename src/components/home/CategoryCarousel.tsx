@@ -4,6 +4,7 @@ import React, { useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Link from 'next/link';
 import { mockCategories } from '@/data/mock/categories';
 
 export function CategoryCarousel() {
@@ -64,26 +65,28 @@ export function CategoryCarousel() {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 className="flex-[0_0_80%] sm:flex-[0_0_40%] md:flex-[0_0_25%] min-w-0 pl-4"
               >
-                <div className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer">
-                  {/* Image */}
-                  <img 
-                    src={category.coverImage} 
-                    alt={category.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  />
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
-                  
-                  {/* Content */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <h3 className="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors">
-                      {category.name}
-                    </h3>
-                    <p className="text-slate-300 text-sm font-medium">
-                      {category.businessCount} Professionals
-                    </p>
+                <Link href={`/categories/${category.slug}`}>
+                  <div className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer">
+                    {/* Image */}
+                    <img 
+                      src={category.coverImage} 
+                      alt={category.name}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
+                    
+                    {/* Content */}
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <h3 className="text-xl font-bold text-white mb-1 group-hover:text-primary transition-colors">
+                        {category.name}
+                      </h3>
+                      <p className="text-slate-300 text-sm font-medium">
+                        {category.businessCount} Professionals
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               </motion.div>
             ))}
           </div>
