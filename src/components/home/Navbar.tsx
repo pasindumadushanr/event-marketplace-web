@@ -141,7 +141,7 @@ export function Navbar() {
                       </Button>
                     </Link>
                   ) : (
-                    <Link href="/sell" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
+                    <Link href="/vendor/register" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
                       Become a Vendor
                     </Link>
                   )}
@@ -149,7 +149,7 @@ export function Navbar() {
                 </>
               ) : (
                 <>
-                  <Link href="/sell" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
+                  <Link href="/vendor/register" className={`text-sm font-medium hover:text-primary ${isScrolled ? 'text-slate-600' : 'text-white/90'}`}>
                     Become a Vendor
                   </Link>
                   <Link href="/login">
@@ -193,7 +193,7 @@ export function Navbar() {
             </Link>
           ))}
           <div className="flex flex-col gap-4 pt-4">
-            <Link href="/sell">
+            <Link href="/vendor/register">
               <Button variant="outline" className="w-full text-lg h-12">Become a Vendor</Button>
             </Link>
             <div className="grid grid-cols-2 gap-4">

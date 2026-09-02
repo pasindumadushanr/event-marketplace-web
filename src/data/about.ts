@@ -20,7 +20,7 @@ export const aboutData = {
     primaryCTA: 'Explore Vendors',
     primaryLink: '/search',
     secondaryCTA: 'Become a Vendor',
-    secondaryLink: '/register?role=VENDOR'
+    secondaryLink: '/vendor/register'
   },
   
   story: {
@@ -121,6 +121,6 @@ export const aboutData = {
     primaryCTA: 'Start Planning',
     primaryLink: '/search',
     secondaryCTA: 'Join as a Vendor',
-    secondaryLink: '/register?role=VENDOR'
+    secondaryLink: '/vendor/register'
   }
 };
