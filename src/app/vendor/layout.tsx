@@ -51,7 +51,7 @@ export default function VendorLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated, isLoading: authLoading } = useAuth();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -80,7 +80,7 @@ export default function VendorLayout({
       return;
     }
 
-    if (!isLoading && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated) {
       router.push('/vendor/login');
       return;
     }
@@ -129,7 +129,7 @@ export default function VendorLayout({
       }
     };
     verifyVendorApproval();
-  }, [pathname, hideSidebar, router]);
+  }, [pathname, hideSidebar, router, isAuthenticated, authLoading]);
 
   if (isLoading || !isAuthorized) {
     if (hideSidebar) return <>{children}</>;
