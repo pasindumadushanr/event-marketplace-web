@@ -5,9 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Shield, Bell, Key } from 'lucide-react';
+import api from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function CustomerSettingsPage() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <div className="max-w-3xl space-y-8 animate-in fade-in duration-500">
@@ -87,7 +89,22 @@ export default function CustomerSettingsPage() {
             <h3 className="text-lg font-bold text-red-900">Danger Zone</h3>
           </div>
           <p className="text-sm text-red-700 mb-6">Once you delete your account, there is no going back. Please be certain.</p>
-          <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700">Delete Account</Button>
+          <Button 
+            variant="outline" 
+            className="text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700"
+            onClick={async () => {
+              if (window.confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.')) {
+                try {
+                  await api.delete('/users/me');
+                  logout();
+                } catch (error) {
+                  toast.error('Failed to delete account. You may have active bookings.');
+                }
+              }
+            }}
+          >
+            Delete Account
+          </Button>
         </div>
       </div>
     </div>
