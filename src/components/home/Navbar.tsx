@@ -89,6 +89,7 @@ export function Navbar() {
     { name: 'Vendors', href: '/vendors' },
     { name: 'Packages', href: '/packages' },
     { name: 'About', href: '/about' },
+    { name: 'Contact', href: '/contact' },
   ];
 
   return (
@@ -112,36 +113,19 @@ export function Navbar() {
             </span>
           </Link>
 
-          {/* Global Search Bar (Desktop) */}
-          <div className="hidden lg:flex flex-1 max-w-md mx-8">
-            <div className="relative w-full group">
-              <input
-                type="text"
-                placeholder="Search vendors, venues, categories..."
-                className={`w-full pl-5 pr-12 py-2.5 rounded-full border outline-none transition-all duration-300 shadow-sm
-                  ${isScrolled 
-                    ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/10' 
-                    : 'bg-white/10 border-white/20 text-white placeholder:text-white/60 focus:bg-white/20 focus:border-white/40'
-                  }
-                `}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    window.location.href = `/search?q=${e.currentTarget.value}`;
-                  }
-                }}
-              />
-              <button 
-                className={`absolute right-1.5 top-1.5 p-1.5 rounded-full transition-colors
-                  ${isScrolled ? 'bg-primary text-white hover:bg-primary/90' : 'bg-white/20 text-white hover:bg-white/30'}
-                `}
-                onClick={(e) => {
-                  const input = e.currentTarget.previousSibling as HTMLInputElement;
-                  if (input.value) window.location.href = `/search?q=${input.value}`;
-                }}
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex flex-1 justify-center gap-8 font-medium">
+            {links.map((link) => (
+              <Link 
+                key={link.name} 
+                href={link.href}
+                className={`text-sm hover:text-primary transition-colors ${
+                  isScrolled ? 'text-slate-600' : 'text-white/90 drop-shadow-sm'
+                }`}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-              </button>
-            </div>
+                {link.name}
+              </Link>
+            ))}
           </div>
 
           {/* Desktop Navigation */}

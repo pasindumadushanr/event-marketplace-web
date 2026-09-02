@@ -27,9 +27,7 @@ export function Hero() {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="space-y-6"
         >
-          <span className="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/20 text-white/90 text-sm font-medium backdrop-blur-md mb-2">
-            The Premier Destination for Luxury Events
-          </span>
+
           <h1 className="text-5xl md:text-7xl font-extrabold text-white tracking-tight drop-shadow-xl leading-tight">
             Everything You Need for Your <span className="text-primary italic">Perfect Event</span>
           </h1>
