@@ -1,6 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Building2, 
   ImageIcon, 
@@ -9,15 +11,39 @@ import {
   CheckCircle2, 
   CircleDashed,
   ArrowRight,
-  Eye
+  Eye,
+  Clock,
+  XCircle,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
+import api from '@/lib/api';
 
 export default function VendorDashboardPage() {
-  const { business, isLoading } = useBusinessProfile();
+  const router = useRouter();
+  const { business, isLoading: businessLoading } = useBusinessProfile();
+  
+  const [status, setStatus] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState<string | null>(null);
+  const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
-  if (isLoading || !business) {
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const { data } = await api.get('/vendor/business/onboarding/status');
+        setStatus(data.vendorStatus);
+        setRejectionReason(data.rejectionReason);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsLoadingStatus(false);
+      }
+    };
+    fetchStatus();
+  }, []);
+
+  if (businessLoading || isLoadingStatus) {
     return (
       <div className="space-y-8 animate-pulse">
         <div className="h-12 w-64 bg-slate-200 rounded-lg"></div>
@@ -26,13 +52,70 @@ export default function VendorDashboardPage() {
     );
   }
 
+  // --- NOT STARTED STATE ---
+  if (status === 'NOT_STARTED') {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
+          <FileText className="h-12 w-12" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-900 mb-4">Welcome to Event Marketplace!</h2>
+        <p className="text-slate-500 mb-8 max-w-lg">
+          You are just a few steps away from joining our exclusive vendor network. Submit your application today to start connecting with premium clients.
+        </p>
+        <Link href="/vendor/onboarding">
+          <Button size="lg" className="bg-primary hover:bg-primary/90 text-white rounded-xl h-14 px-8 text-lg shadow-lg">
+            Submit Application
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  // --- UNDER REVIEW STATE ---
+  if (status === 'PENDING' || status === 'UNDER_REVIEW') {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-6">
+          <Clock className="h-12 w-12" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-900 mb-4">Application Under Review</h2>
+        <p className="text-slate-500 max-w-lg">
+          Your vendor application has been received and is currently being reviewed by our administrative team. We will notify you once your account is approved.
+        </p>
+      </div>
+    );
+  }
+
+  // --- REJECTED STATE ---
+  if (status === 'REJECTED') {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
+          <XCircle className="h-12 w-12" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-900 mb-4">Application Rejected</h2>
+        <p className="text-slate-500 mb-4 max-w-lg">Unfortunately, your application was not approved at this time.</p>
+        {rejectionReason && (
+          <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-6 max-w-lg">
+            <strong>Reason:</strong> {rejectionReason}
+          </div>
+        )}
+        <Button onClick={() => router.push('/vendor/onboarding')} className="bg-slate-900 hover:bg-slate-800">
+          Update & Resubmit Application
+        </Button>
+      </div>
+    );
+  }
+
+  // --- APPROVED STATE (FULL DASHBOARD) ---
+  if (!business) return null; // Safety check
+
   // Dynamic completion logic based on business object
   const hasFeatures = business.profileSettings?.features?.length > 0 && business.profileSettings.features[0].groupName;
   const hasHours = business.profileSettings?.hours?.length === 7;
   const hasPolicies = business.profileSettings?.policies?.bookingPolicy;
   const hasSeo = business.profileSettings?.seo?.metaTitle;
-  
-  // Note: /vendor/business/booking is in the UI but backend doesn't have it yet, we just tie it to a default false.
   
   const completionTasks = [
     { 

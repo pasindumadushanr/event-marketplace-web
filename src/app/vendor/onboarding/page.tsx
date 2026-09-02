@@ -56,7 +56,7 @@ export default function VendorOnboardingWizard() {
 
       await api.post('/vendor/business/onboarding/wizard', payload);
       toast.success('Application submitted successfully!');
-      router.push('/vendor/status');
+      router.push('/vendor');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to submit application');
     } finally {
@@ -73,8 +73,8 @@ export default function VendorOnboardingWizard() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
+    <div className="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+      <div>
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold text-slate-900">Partner Onboarding</h2>
           <p className="mt-2 text-lg text-slate-600">Complete your profile to start accepting bookings.</p>

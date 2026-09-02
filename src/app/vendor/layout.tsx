@@ -55,12 +55,13 @@ export default function VendorLayout({
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Routes that should NOT show the dashboard sidebar
+  // Routes that should NOT show the dashboard sidebar (just auth stuff now)
   const hideSidebar = [
-    '/vendor/onboarding', 
     '/vendor/register', 
     '/vendor/verify-email'
   ].includes(pathname);
+
+  const [vendorStatus, setVendorStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (hideSidebar) {
@@ -72,19 +73,23 @@ export default function VendorLayout({
     const verifyVendorApproval = async () => {
       try {
         const { data } = await api.get('/vendor/business/onboarding/status');
-        if (data.vendorStatus === 'APPROVED') {
-          setIsAuthorized(true);
-        } else if (data.vendorStatus === 'NOT_STARTED') {
-          router.push('/vendor/onboarding');
-        } else {
-          if (pathname === '/vendor/status') {
-            setIsAuthorized(true);
-          } else {
-            router.push('/vendor/status');
+        setVendorStatus(data.vendorStatus);
+        
+        // We ALWAYS authorize them to see the dashboard layout.
+        // We will restrict their access to specific sub-pages if they aren't approved.
+        setIsAuthorized(true);
+        
+        if (data.vendorStatus !== 'APPROVED') {
+          // If they try to go anywhere other than /vendor or /vendor/onboarding, send them to /vendor
+          if (pathname !== '/vendor' && pathname !== '/vendor/onboarding') {
+            router.push('/vendor');
           }
         }
       } catch (error) {
-        router.push('/vendor/onboarding');
+        setIsAuthorized(true);
+        if (pathname !== '/vendor' && pathname !== '/vendor/onboarding') {
+          router.push('/vendor');
+        }
       } finally {
         setIsLoading(false);
       }
