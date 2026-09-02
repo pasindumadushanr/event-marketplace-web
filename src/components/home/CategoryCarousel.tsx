@@ -65,7 +65,7 @@ export function CategoryCarousel() {
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 className="flex-[0_0_80%] sm:flex-[0_0_40%] md:flex-[0_0_25%] min-w-0 pl-4"
               >
-                <Link href={`/categories/${category.slug}`}>
+                <Link href={`/search?q=${category.name}`}>
                   <div className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer">
                     {/* Image */}
                     <img 
