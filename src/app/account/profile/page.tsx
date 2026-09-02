@@ -1,16 +1,93 @@
 'use client';
 
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
+import api from '@/lib/api';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Camera, User } from 'lucide-react';
+import { Camera, RefreshCw } from 'lucide-react';
 
 export default function CustomerProfilePage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
+  
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (user) {
+      setFirstName(user.firstName || '');
+      setLastName(user.lastName || '');
+      setPhone(user.phone || '');
+    }
+  }, [user]);
 
   if (!user) return null;
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      const res = await api.patch('/users/me', {
+        firstName,
+        lastName,
+        phone
+      });
+      // Update local auth context
+      if (updateUser) {
+        updateUser(res.data);
+      }
+      toast.success('Profile updated successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be under 5MB');
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const res = await api.post('/users/me/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (updateUser) {
+        updateUser(res.data);
+      }
+      toast.success('Profile picture updated!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to upload image');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      const res = await api.patch('/users/me', { profileImage: null });
+      if (updateUser) updateUser(res.data);
+      toast.success('Profile picture removed');
+    } catch (error) {
+      toast.error('Failed to remove profile picture');
+    }
+  };
 
   return (
     <div className="max-w-3xl space-y-8 animate-in fade-in duration-500">
@@ -30,16 +107,36 @@ export default function CustomerProfilePage() {
                 {user.firstName?.charAt(0)}
               </AvatarFallback>
             </Avatar>
-            <button className="absolute bottom-0 right-0 p-2 bg-slate-900 rounded-full text-white hover:bg-primary transition-colors shadow-lg">
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+              className="absolute bottom-0 right-0 p-2 bg-slate-900 rounded-full text-white hover:bg-primary transition-colors shadow-lg disabled:opacity-50"
+            >
               <Camera className="h-4 w-4" />
             </button>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              className="hidden" 
+              accept="image/jpeg,image/png,image/webp" 
+              onChange={handleAvatarUpload}
+            />
           </div>
           <div>
-            <h3 className="text-lg font-bold text-slate-900">Profile Picture</h3>
+            <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              Profile Picture
+              {isUploading && <RefreshCw className="h-4 w-4 animate-spin text-slate-400" />}
+            </h3>
             <p className="text-sm text-slate-500 mb-3">Upload a new photo (JPEG or PNG under 5MB)</p>
             <div className="flex gap-3">
-              <Button variant="outline" size="sm">Upload new</Button>
-              <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50">Remove</Button>
+              <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                Upload new
+              </Button>
+              {user.profileImage && (
+                <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={handleRemoveAvatar}>
+                  Remove
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -48,25 +145,31 @@ export default function CustomerProfilePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label>First Name</Label>
-            <Input defaultValue={user.firstName} />
+            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>Last Name</Label>
-            <Input defaultValue={user.lastName} />
+            <Input value={lastName} onChange={(e) => setLastName(e.target.value)} />
           </div>
           <div className="space-y-2">
             <Label>Email Address</Label>
-            <Input defaultValue={user.email} disabled className="bg-slate-50 text-slate-500" />
+            <Input value={user.email} disabled className="bg-slate-50 text-slate-500" />
             <p className="text-xs text-slate-400 mt-1">Email cannot be changed directly.</p>
           </div>
           <div className="space-y-2">
             <Label>Phone Number</Label>
-            <Input defaultValue={user.phone || ''} placeholder="+1 (555) 000-0000" />
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+1 (555) 000-0000" />
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t border-slate-100 flex justify-end">
-          <Button className="bg-slate-900 hover:bg-primary text-white px-8">Save Changes</Button>
+          <Button 
+            className="bg-slate-900 hover:bg-primary text-white px-8" 
+            onClick={handleSave} 
+            disabled={isSaving}
+          >
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </Button>
         </div>
       </div>
     </div>
