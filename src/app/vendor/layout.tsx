@@ -63,6 +63,14 @@ export default function VendorLayout({
 
   const [vendorStatus, setVendorStatus] = useState<string | null>(null);
 
+  const allowedRoutes = [
+    '/vendor',
+    '/vendor/onboarding',
+    '/vendor/settings',
+    '/vendor/notifications',
+    '/vendor/support'
+  ];
+
   useEffect(() => {
     if (hideSidebar) {
       setIsAuthorized(true);
@@ -74,20 +82,24 @@ export default function VendorLayout({
       try {
         const { data } = await api.get('/vendor/business/onboarding/status');
         setVendorStatus(data.vendorStatus);
-        
-        // We ALWAYS authorize them to see the dashboard layout.
-        // We will restrict their access to specific sub-pages if they aren't approved.
         setIsAuthorized(true);
         
         if (data.vendorStatus !== 'APPROVED') {
-          // If they try to go anywhere other than /vendor or /vendor/onboarding, send them to /vendor
-          if (pathname !== '/vendor' && pathname !== '/vendor/onboarding') {
+          // Check if pathname starts with any of the allowed routes, or exactly matches
+          const isAllowed = allowedRoutes.some(route => 
+            pathname === route || pathname.startsWith(route + '/')
+          );
+          
+          if (!isAllowed) {
             router.push('/vendor');
           }
         }
       } catch (error) {
         setIsAuthorized(true);
-        if (pathname !== '/vendor' && pathname !== '/vendor/onboarding') {
+        const isAllowed = allowedRoutes.some(route => 
+          pathname === route || pathname.startsWith(route + '/')
+        );
+        if (!isAllowed) {
           router.push('/vendor');
         }
       } finally {
@@ -107,28 +119,36 @@ export default function VendorLayout({
     return <>{children}</>;
   }
 
-  const NavLinks = () => (
-    <nav className="flex-1 space-y-1 px-4 py-4">
-      {navConfig.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setIsMobileMenuOpen(false)}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-              isActive
-                ? 'bg-primary text-primary-foreground font-medium'
-                : 'text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
-          >
-            <item.icon className="h-5 w-5" />
-            {item.label}
-          </Link>
-        );
-      })}
-    </nav>
-  );
+  const NavLinks = () => {
+    // If not approved, filter out links that require approval
+    const filteredNavConfig = navConfig.filter(item => {
+      if (vendorStatus === 'APPROVED') return true;
+      return allowedRoutes.includes(item.href);
+    });
+
+    return (
+      <nav className="flex-1 space-y-1 px-4 py-4">
+        {filteredNavConfig.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+                isActive
+                  ? 'bg-primary text-primary-foreground font-medium'
+                  : 'text-white/60 hover:bg-white/10 hover:text-white'
+              }`}
+            >
+              <item.icon className="h-5 w-5" />
+              {item.label}
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  };
 
   return (
     <div className="flex h-screen bg-slate-50">
