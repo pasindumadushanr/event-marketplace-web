@@ -96,10 +96,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    // If the path is /admin/login, we don't need to enforce auth here
+    if (pathname === '/admin/login') return;
+    
     if (!isLoading && !isAuthenticated) {
-      router.push('/login');
+      router.push('/admin/login');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, router, pathname]);
+
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
 
   if (isLoading || !isAuthenticated) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
