@@ -72,7 +72,8 @@ export default function VendorLayout({
   ];
 
   useEffect(() => {
-    if (hideSidebar) {
+    // We still want to skip verification on the register page itself
+    if (pathname === '/vendor/register') {
       setIsAuthorized(true);
       setIsLoading(false);
       return;
@@ -81,6 +82,21 @@ export default function VendorLayout({
     const verifyVendorApproval = async () => {
       try {
         const { data } = await api.get('/vendor/business/onboarding/status');
+        
+        // Handle Email Verification Logic
+        if (!data.emailVerified) {
+          if (pathname !== '/vendor/verify-email') {
+            router.push('/vendor/verify-email');
+          } else {
+            setIsAuthorized(true); // Allow them to stay on verify-email
+          }
+          return;
+        } else if (pathname === '/vendor/verify-email') {
+          // If already verified but on the verify page, push to dashboard
+          router.push('/vendor');
+          return;
+        }
+
         setVendorStatus(data.vendorStatus);
         setIsAuthorized(true);
         
