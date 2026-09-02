@@ -96,17 +96,10 @@ export default function VendorStatusPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="w-full bg-white border-b py-4 px-8 flex justify-between items-center shadow-sm">
-        <h1 className="text-xl font-bold text-slate-900 tracking-tight">Event Marketplace</h1>
-        <Button variant="ghost" onClick={logout}>Logout</Button>
-      </header>
-
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="max-w-xl w-full bg-white p-12 rounded-2xl shadow-xl border border-slate-100">
-          {renderContent()}
-        </div>
-      </main>
+    <div className="flex flex-col items-center justify-center mt-12">
+      <div className="max-w-xl w-full bg-white p-12 rounded-2xl shadow-xl border border-slate-100">
+        {renderContent()}
+      </div>
     </div>
   );
 }

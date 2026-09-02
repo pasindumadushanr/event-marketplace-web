@@ -27,12 +27,12 @@ export function VendorCTA() {
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/sell">
+            <Link href="/vendor/register">
               <Button size="lg" className="h-14 px-8 text-lg bg-slate-900 text-white hover:bg-slate-800 w-full sm:w-auto rounded-xl">
                 Register Your Business
               </Button>
             </Link>
-            <Link href="/sell">
+            <Link href="/vendor/register">
               <Button size="lg" variant="outline" className="h-14 px-8 text-lg border-white text-slate-800 hover:bg-white/10 w-full sm:w-auto rounded-xl">
                 Learn More
               </Button>

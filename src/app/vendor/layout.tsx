@@ -58,7 +58,6 @@ export default function VendorLayout({
   // Routes that should NOT show the dashboard sidebar
   const hideSidebar = [
     '/vendor/onboarding', 
-    '/vendor/status', 
     '/vendor/register', 
     '/vendor/verify-email'
   ].includes(pathname);
@@ -78,7 +77,11 @@ export default function VendorLayout({
         } else if (data.vendorStatus === 'NOT_STARTED') {
           router.push('/vendor/onboarding');
         } else {
-          router.push('/vendor/status');
+          if (pathname === '/vendor/status') {
+            setIsAuthorized(true);
+          } else {
+            router.push('/vendor/status');
+          }
         }
       } catch (error) {
         router.push('/vendor/onboarding');
