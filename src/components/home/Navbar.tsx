@@ -85,11 +85,9 @@ export function Navbar() {
 
   const links = [
     { name: 'Home', href: '/' },
-    { name: 'Categories', href: '/categories' },
-    { name: 'Vendors', href: '/vendors' },
-    { name: 'Packages', href: '/packages' },
-    { name: 'About', href: '/about' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Categories', href: '/#categories' },
+    { name: 'Vendors', href: '/search' },
+    { name: 'Packages', href: '/#packages' }
   ];
 
   return (
