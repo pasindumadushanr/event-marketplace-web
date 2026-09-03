@@ -31,6 +31,7 @@ interface User {
     name: string;
   };
   createdAt: string;
+  vendorSubscriptions?: { status: string }[];
 }
 
 interface UserTableProps {
@@ -68,6 +69,26 @@ export function UserTable({ roles }: UserTableProps) {
     }
   };
 
+  const handleGrantSubscription = async (userId: string) => {
+    try {
+      // Fetch plans first
+      const plansRes = await api.get('/subscriptions/plans');
+      if (plansRes.data.length === 0) {
+        toast.error('No subscription plans exist in the system.');
+        return;
+      }
+      // Grant the first available plan
+      const planId = plansRes.data[0].id;
+      await api.post(`/subscriptions/vendors/${userId}/grant-free`, { planId });
+      toast.success('Granted free subscription to vendor!');
+      fetchUsers();
+    } catch (error) {
+      toast.error('Failed to grant subscription');
+    }
+  };
+
+  const isVendorTable = roles?.includes('VENDOR');
+
   return (
     <div className="rounded-md border bg-white shadow-sm">
       <Table>
@@ -76,6 +97,7 @@ export function UserTable({ roles }: UserTableProps) {
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
+            {isVendorTable && <TableHead>Subscription</TableHead>}
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
             <TableHead className="w-[80px]"></TableHead>
@@ -84,18 +106,22 @@ export function UserTable({ roles }: UserTableProps) {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-24 text-center">
+              <TableCell colSpan={isVendorTable ? 7 : 6} className="h-24 text-center">
                 Loading users...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="h-24 text-center">
+              <TableCell colSpan={isVendorTable ? 7 : 6} className="h-24 text-center">
                 No users found.
               </TableCell>
             </TableRow>
           ) : (
-            users.map((user) => (
+            users.map((user) => {
+              const latestSub = user.vendorSubscriptions?.[0];
+              const isSubActive = latestSub?.status === 'ACTIVE';
+              
+              return (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">
                   {user.firstName} {user.lastName}
@@ -106,6 +132,17 @@ export function UserTable({ roles }: UserTableProps) {
                     {user.role?.name || 'UNKNOWN'}
                   </Badge>
                 </TableCell>
+                {isVendorTable && (
+                  <TableCell>
+                    {latestSub ? (
+                       <Badge variant={isSubActive ? 'default' : 'secondary'} className={isSubActive ? 'bg-primary' : ''}>
+                         {latestSub.status}
+                       </Badge>
+                    ) : (
+                      <Badge variant="secondary">NONE</Badge>
+                    )}
+                  </TableCell>
+                )}
                 <TableCell>
                   <Badge 
                     variant={user.status === 'ACTIVE' ? 'default' : 'destructive'}
@@ -125,6 +162,11 @@ export function UserTable({ roles }: UserTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
+                      {isVendorTable && (
+                        <DropdownMenuItem onClick={() => handleGrantSubscription(user.id)}>
+                          Grant Free Sub
+                        </DropdownMenuItem>
+                      )}
                       {user.status === 'ACTIVE' ? (
                         <DropdownMenuItem 
                           onClick={() => handleStatusChange(user.id, 'SUSPENDED')}
@@ -144,7 +186,7 @@ export function UserTable({ roles }: UserTableProps) {
                   </DropdownMenu>
                 </TableCell>
               </TableRow>
-            ))
+            )})
           )}
         </TableBody>
       </Table>
