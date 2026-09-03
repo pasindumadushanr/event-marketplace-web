@@ -74,9 +74,9 @@ export function Footer() {
           <div>
             <h4 className="text-white font-bold mb-6">Explore</h4>
             <ul className="space-y-4">
-              <li><Link href="/categories" className="hover:text-primary transition-colors">Categories</Link></li>
-              <li><Link href="/vendors" className="hover:text-primary transition-colors">Vendors</Link></li>
-              <li><Link href="/packages" className="hover:text-primary transition-colors">Packages</Link></li>
+              <li><Link href="/#categories" className="hover:text-primary transition-colors">Categories</Link></li>
+              <li><Link href="/search" className="hover:text-primary transition-colors">Vendors</Link></li>
+              <li><Link href="/#packages" className="hover:text-primary transition-colors">Packages</Link></li>
               <li><Link href="/locations" className="hover:text-primary transition-colors">Locations</Link></li>
             </ul>
           </div>
@@ -85,7 +85,7 @@ export function Footer() {
             <h4 className="text-white font-bold mb-6">Company</h4>
             <ul className="space-y-4">
               <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="/sell" className="hover:text-primary transition-colors">Become a Vendor</Link></li>
+              <li><Link href="/vendor/register" className="hover:text-primary transition-colors">Become a Vendor</Link></li>
               <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
               <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
               <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
