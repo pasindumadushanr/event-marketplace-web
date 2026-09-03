@@ -184,14 +184,16 @@ export default function VendorPreviewPage() {
             <BusinessPolicies policies={business.policies} />
             
             {blocks.filter(b => b.position === 'AT_BOTTOM').map(b => (
-              <BlockRenderer key={b.id} block={b} />
+              <div key={b.id} className="mt-8">
+                <BlockRenderer block={b} />
+              </div>
             ))}
           </div>
 
-          {/* Sticky Sidebar Column (30%) */}
+          {/* Right Column - Sticky Sidebar */}
           <div className="lg:col-span-4">
-            <div className="sticky top-24 space-y-6">
-              <BusinessCTA bookingMethod={business.bookingMethod} startingPrice={business.startingPrice} />
+            <div className="sticky top-28 space-y-6">
+              <BusinessCTA businessId={business.id} bookingMethod={business.bookingMethod} startingPrice={business.startingPrice} />
               <BusinessAvailability />
               <BusinessHours hours={business.businessHours} />
               <BusinessContact contact={business.contact} />

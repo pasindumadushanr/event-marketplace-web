@@ -131,7 +131,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ slug
 
           <div className="lg:col-span-4">
             <div className="sticky top-28 space-y-6">
-              <BusinessCTA bookingMethod={business.bookingMethod} startingPrice={business.startingPrice} />
+              <BusinessCTA businessId={business.id} bookingMethod={business.bookingMethod} startingPrice={business.startingPrice} />
               <BusinessAvailability />
               <BusinessHours hours={business.businessHours} />
               <BusinessContact contact={business.contact} />
