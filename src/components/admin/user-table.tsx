@@ -21,9 +21,19 @@ import {
   DropdownMenuSubContent,
   DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal } from 'lucide-react';
+import { MoreHorizontal, Mail } from 'lucide-react';
 
 interface User {
   id: string;
@@ -47,6 +57,13 @@ export function UserTable({ roles }: UserTableProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Contact Modal State
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+  const [selectedUserForContact, setSelectedUserForContact] = useState<User | null>(null);
+  const [contactSubject, setContactSubject] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
+  const [isSendingContact, setIsSendingContact] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -87,6 +104,35 @@ export function UserTable({ roles }: UserTableProps) {
     } catch (error: any) {
       toast.error(`Failed to grant subscription: ${error?.response?.data?.message || error.message}`);
     }
+  };
+
+  const handleContactSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUserForContact || !contactSubject || !contactMessage) return;
+    
+    setIsSendingContact(true);
+    try {
+      await api.post(`/users/${selectedUserForContact.id}/contact`, {
+        subject: contactSubject,
+        message: contactMessage,
+        method: 'EMAIL'
+      });
+      toast.success('Message sent successfully!');
+      setIsContactModalOpen(false);
+      setContactSubject('');
+      setContactMessage('');
+    } catch (error: any) {
+      toast.error(`Failed to send message: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsSendingContact(false);
+    }
+  };
+
+  const openContactModal = (user: User) => {
+    setSelectedUserForContact(user);
+    setContactSubject('');
+    setContactMessage('');
+    setIsContactModalOpen(true);
   };
 
   const isVendorTable = roles?.includes('VENDOR');
@@ -172,6 +218,10 @@ export function UserTable({ roles }: UserTableProps) {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
+                      <DropdownMenuItem onClick={() => openContactModal(user)}>
+                        <Mail className="mr-2 h-4 w-4" />
+                        Contact User
+                      </DropdownMenuItem>
                       {isVendorTable && (
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>Grant Free Sub</DropdownMenuSubTrigger>
@@ -216,6 +266,49 @@ export function UserTable({ roles }: UserTableProps) {
           )}
         </TableBody>
       </Table>
+
+      {/* Contact Modal */}
+      <Dialog open={isContactModalOpen} onOpenChange={setIsContactModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Contact User</DialogTitle>
+            <DialogDescription>
+              Send an email directly to {selectedUserForContact?.firstName} {selectedUserForContact?.lastName} ({selectedUserForContact?.email}).
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleContactSubmit}>
+            <div className="grid gap-4 py-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Subject</label>
+                <Input
+                  placeholder="e.g. Missing Application Details"
+                  value={contactSubject}
+                  onChange={(e) => setContactSubject(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Message</label>
+                <Textarea
+                  placeholder="Type your message here..."
+                  className="min-h-[120px]"
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsContactModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSendingContact}>
+                {isSendingContact ? 'Sending...' : 'Send Message'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
