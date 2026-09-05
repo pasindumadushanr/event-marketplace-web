@@ -16,6 +16,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuPortal,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -40,48 +44,45 @@ interface UserTableProps {
 
 export function UserTable({ roles }: UserTableProps) {
   const [users, setUsers] = useState<User[]>([]);
+  const [plans, setPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     setIsLoading(true);
     try {
       const query = roles && roles.length > 0 ? `?roles=${roles.join(',')}` : '';
-      const response = await api.get(`/users${query}`);
-      setUsers(response.data);
+      const [usersRes, plansRes] = await Promise.all([
+        api.get(`/users${query}`),
+        roles?.includes('VENDOR') ? api.get('/subscriptions/plans') : Promise.resolve({ data: [] })
+      ]);
+      setUsers(usersRes.data);
+      if (plansRes.data) setPlans(plansRes.data);
     } catch (error) {
-      toast.error('Failed to load users');
+      toast.error('Failed to load data');
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchData();
   }, [roles]);
 
   const handleStatusChange = async (userId: string, newStatus: string) => {
     try {
       await api.patch(`/users/${userId}/status`, { status: newStatus });
       toast.success(`User status updated to ${newStatus}`);
-      fetchUsers(); // Refresh data
+      fetchData(); // Refresh data
     } catch (error) {
       toast.error('Failed to update status');
     }
   };
 
-  const handleGrantSubscription = async (userId: string) => {
+  const handleGrantSubscription = async (userId: string, planId: string) => {
     try {
-      // Fetch plans first
-      const plansRes = await api.get('/subscriptions/plans');
-      if (plansRes.data.length === 0) {
-        toast.error('No subscription plans exist in the system.');
-        return;
-      }
-      // Grant the first available plan
-      const planId = plansRes.data[0].id;
       await api.post(`/subscriptions/vendors/${userId}/grant-free`, { planId });
       toast.success('Granted free subscription to vendor!');
-      fetchUsers();
+      fetchData();
     } catch (error) {
       toast.error('Failed to grant subscription');
     }
@@ -163,9 +164,25 @@ export function UserTable({ roles }: UserTableProps) {
                     <DropdownMenuContent align="end">
                       <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
                       {isVendorTable && (
-                        <DropdownMenuItem onClick={() => handleGrantSubscription(user.id)}>
-                          Grant Free Sub
-                        </DropdownMenuItem>
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger>Grant Free Sub</DropdownMenuSubTrigger>
+                          <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                              {plans.length === 0 ? (
+                                <DropdownMenuItem disabled>No plans available</DropdownMenuItem>
+                              ) : (
+                                plans.map(plan => (
+                                  <DropdownMenuItem 
+                                    key={plan.id}
+                                    onClick={() => handleGrantSubscription(user.id, plan.id)}
+                                  >
+                                    {plan.name} ({plan.durationDays} days)
+                                  </DropdownMenuItem>
+                                ))
+                              )}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuPortal>
+                        </DropdownMenuSub>
                       )}
                       {user.status === 'ACTIVE' ? (
                         <DropdownMenuItem 
