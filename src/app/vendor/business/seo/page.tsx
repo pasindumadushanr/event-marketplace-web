@@ -54,7 +54,7 @@ export default function SEOSettingsPage() {
       });
       setFormData(prev => ({ ...prev, ogImage: res.data.url }));
       toast.success('Upload complete', { id: 'upload-og' });
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Upload failed', { id: 'upload-og' });
     }
   };

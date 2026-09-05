@@ -58,7 +58,7 @@ export default function ContentBuilderPage() {
     try {
       const res = await api.get('/vendor/business/content');
       setBlocks(res.data);
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Failed to load content blocks');
     } finally {
       setIsLoading(false);
@@ -80,7 +80,7 @@ export default function ContentBuilderPage() {
         blockIds: newBlocks.map((b) => b.id)
       });
       toast.success('Blocks reordered successfully');
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Failed to save new order');
       fetchBlocks(); // Revert on failure
     }
@@ -144,7 +144,7 @@ export default function ContentBuilderPage() {
       await api.delete(`/vendor/business/content/${id}`);
       toast.success('Block deleted successfully');
       fetchBlocks();
-    } catch (error) {
+    } catch (error: any) {
       toast.error('Failed to delete block');
     }
   };

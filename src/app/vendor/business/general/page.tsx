@@ -58,8 +58,8 @@ export default function GeneralSettingsPage() {
       });
       setFormData(prev => ({ ...prev, [field]: res.data.url }));
       toast.success('Upload complete', { id: `upload-${field}` });
-    } catch (error) {
-      toast.error('Upload failed', { id: `upload-${field}` });
+    } catch (error: any) {
+      toast.error(`Upload failed: ${error.response?.data?.message || error.message}`, { id: `upload-${field}` });
     }
   };
 
@@ -69,9 +69,8 @@ export default function GeneralSettingsPage() {
     
     setIsLoading(true);
     try {
-      const payload = {
+      const payload: any = {
         name: formData.name,
-        categoryId: formData.categoryId,
         description: formData.description,
         coverImage: formData.coverImage,
         logo: formData.logo,
@@ -80,6 +79,10 @@ export default function GeneralSettingsPage() {
           highlights: formData.highlights,
         }
       };
+      
+      if (formData.categoryId !== '') {
+        payload.categoryId = formData.categoryId;
+      }
       
       await api.patch('/vendor/business', payload);
       updateBusinessLocally(payload);
