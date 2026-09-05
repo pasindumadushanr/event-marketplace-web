@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/lib/auth-context';
 import {
   Table,
   TableBody,
@@ -56,7 +56,7 @@ interface UserTableProps {
 
 export function UserTable({ roles }: UserTableProps) {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role?.name === 'SUPER_ADMIN';
+  const isSuperAdmin = user?.roleName === 'SUPER_ADMIN';
 
   const [users, setUsers] = useState<User[]>([]);
   const [plans, setPlans] = useState<any[]>([]);

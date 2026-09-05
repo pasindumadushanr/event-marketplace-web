@@ -10,11 +10,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth } from '@/lib/auth-context';
 
 export default function AdminSubscriptionPlansPage() {
   const { user } = useAuth();
-  const isSuperAdmin = user?.role?.name === 'SUPER_ADMIN';
+  const isSuperAdmin = user?.roleName === 'SUPER_ADMIN';
 
   const [plans, setPlans] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
