@@ -36,6 +36,7 @@ interface User {
   };
   createdAt: string;
   vendorSubscriptions?: { status: string }[];
+  businesses?: { createdAt: string }[];
 }
 
 interface UserTableProps {
@@ -161,7 +162,7 @@ export function UserTable({ roles }: UserTableProps) {
                     hour: '2-digit',
                     minute: '2-digit',
                     hour12: true
-                  }).format(new Date(user.createdAt))}
+                  }).format(new Date(isVendorTable && user.businesses?.[0]?.createdAt ? user.businesses[0].createdAt : user.createdAt))}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
