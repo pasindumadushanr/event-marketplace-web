@@ -152,8 +152,16 @@ export function UserTable({ roles }: UserTableProps) {
                     {user.status}
                   </Badge>
                 </TableCell>
-                <TableCell>
-                  {new Date(user.createdAt).toLocaleDateString()}
+                <TableCell className="whitespace-nowrap">
+                  {new Intl.DateTimeFormat('en-US', {
+                    timeZone: 'Asia/Colombo',
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                  }).format(new Date(user.createdAt))}
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
