@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/use-auth';
 import {
   Table,
   TableBody,
@@ -54,6 +55,9 @@ interface UserTableProps {
 }
 
 export function UserTable({ roles }: UserTableProps) {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role?.name === 'SUPER_ADMIN';
+
   const [users, setUsers] = useState<User[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -222,7 +226,7 @@ export function UserTable({ roles }: UserTableProps) {
                         <Mail className="mr-2 h-4 w-4" />
                         Contact User
                       </DropdownMenuItem>
-                      {isVendorTable && (
+                      {isVendorTable && isSuperAdmin && (
                         <DropdownMenuSub>
                           <DropdownMenuSubTrigger>Grant Free Sub</DropdownMenuSubTrigger>
                           <DropdownMenuPortal>
@@ -243,20 +247,22 @@ export function UserTable({ roles }: UserTableProps) {
                           </DropdownMenuPortal>
                         </DropdownMenuSub>
                       )}
-                      {user.status === 'ACTIVE' ? (
-                        <DropdownMenuItem 
-                          onClick={() => handleStatusChange(user.id, 'SUSPENDED')}
-                          className="text-red-600 focus:text-red-600"
-                        >
-                          Suspend User
-                        </DropdownMenuItem>
-                      ) : (
-                        <DropdownMenuItem 
-                          onClick={() => handleStatusChange(user.id, 'ACTIVE')}
-                          className="text-green-600 focus:text-green-600"
-                        >
-                          Activate User
-                        </DropdownMenuItem>
+                      {isSuperAdmin && (
+                        user.status === 'ACTIVE' ? (
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(user.id, 'SUSPENDED')}
+                            className="text-red-600 focus:text-red-600"
+                          >
+                            Suspend User
+                          </DropdownMenuItem>
+                        ) : (
+                          <DropdownMenuItem 
+                            onClick={() => handleStatusChange(user.id, 'ACTIVE')}
+                            className="text-green-600 focus:text-green-600"
+                          >
+                            Activate User
+                          </DropdownMenuItem>
+                        )
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -10,8 +10,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function AdminSubscriptionPlansPage() {
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role?.name === 'SUPER_ADMIN';
+
   const [plans, setPlans] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<any>({
@@ -59,12 +63,14 @@ export default function AdminSubscriptionPlansPage() {
           <h1 className="text-3xl font-bold tracking-tight">Subscription Plans</h1>
           <p className="text-muted-foreground">Manage the membership packages available to vendors.</p>
         </div>
-        <Button onClick={() => {
-          setCurrentPlan({ name: '', description: '', price: 0, durationDays: 30, features: [''], isActive: true });
-          setIsEditing(true);
-        }}>
-          <Plus className="mr-2 h-4 w-4" /> Add Plan
-        </Button>
+        {isSuperAdmin && (
+          <Button onClick={() => {
+            setCurrentPlan({ name: '', description: '', price: 0, durationDays: 30, features: [''], isActive: true });
+            setIsEditing(true);
+          }}>
+            <Plus className="mr-2 h-4 w-4" /> Add Plan
+          </Button>
+        )}
       </div>
 
       {isEditing ? (
@@ -119,9 +125,11 @@ export default function AdminSubscriptionPlansPage() {
               <CardHeader>
                 <CardTitle className="flex justify-between items-center">
                   {plan.name}
-                  <Button variant="ghost" size="icon" onClick={() => { setCurrentPlan(plan); setIsEditing(true); }}>
-                    <Edit className="h-4 w-4" />
-                  </Button>
+                  {isSuperAdmin && (
+                    <Button variant="ghost" size="icon" onClick={() => { setCurrentPlan(plan); setIsEditing(true); }}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  )}
                 </CardTitle>
                 <CardDescription>{plan.durationDays} Days</CardDescription>
               </CardHeader>
