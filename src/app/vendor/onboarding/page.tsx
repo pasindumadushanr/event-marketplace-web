@@ -19,6 +19,7 @@ export default function VendorOnboardingWizard() {
     name: '', description: '', email: '', phone: '', website: '',
     categoryId: '',
     address: '', city: '', district: '', province: '', zipCode: '',
+    logo: '', coverImage: ''
   });
 
   useEffect(() => {
@@ -27,6 +28,29 @@ export default function VendorOnboardingWizard() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'logo' | 'coverImage') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error('Image size must be less than 5MB');
+    }
+
+    const uploadData = new FormData();
+    uploadData.append('file', file);
+
+    try {
+      toast.loading(`Uploading ${field}...`, { id: `upload-${field}` });
+      const res = await api.post('/vendor/business/upload', uploadData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      setFormData(prev => ({ ...prev, [field]: res.data.url }));
+      toast.success('Upload complete', { id: `upload-${field}` });
+    } catch (error) {
+      toast.error('Upload failed', { id: `upload-${field}` });
+    }
   };
 
   const submitApplication = async () => {
@@ -150,10 +174,47 @@ export default function VendorOnboardingWizard() {
           {step === 4 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
               <h3 className="text-xl font-bold border-b pb-4">Step 4: Branding (Optional for now)</h3>
-              <div className="border-2 border-dashed rounded-xl p-8 text-center text-slate-500 bg-slate-50">
-                <UploadCloud className="h-10 w-10 mx-auto text-blue-500 mb-2" />
-                <p>Upload Logo & Cover Image</p>
-                <p className="text-xs mt-2">You can easily update this later in your dashboard gallery!</p>
+              
+              <div className="space-y-6">
+                <div>
+                  <label className="text-sm font-medium text-slate-700 block mb-2">Business Logo</label>
+                  <div className="relative border-2 border-dashed rounded-xl p-6 text-center text-slate-500 bg-slate-50 hover:bg-slate-100 transition-colors">
+                    {formData.logo ? (
+                      <img src={formData.logo} alt="Logo" className="mx-auto h-24 w-24 object-cover rounded-xl" />
+                    ) : (
+                      <>
+                        <UploadCloud className="h-8 w-8 mx-auto text-blue-500 mb-2" />
+                        <p className="text-sm">Upload Logo</p>
+                      </>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => handleFileUpload(e, 'logo')} 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm font-medium text-slate-700 block mb-2">Cover Image</label>
+                  <div className="relative border-2 border-dashed rounded-xl p-6 text-center text-slate-500 bg-slate-50 hover:bg-slate-100 transition-colors">
+                    {formData.coverImage ? (
+                      <img src={formData.coverImage} alt="Cover" className="mx-auto h-32 w-full object-cover rounded-xl" />
+                    ) : (
+                      <>
+                        <UploadCloud className="h-8 w-8 mx-auto text-blue-500 mb-2" />
+                        <p className="text-sm">Upload Cover Image</p>
+                      </>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => handleFileUpload(e, 'coverImage')} 
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           )}

@@ -83,8 +83,8 @@ export function UserTable({ roles }: UserTableProps) {
       await api.post(`/subscriptions/vendors/${userId}/grant-free`, { planId });
       toast.success('Granted free subscription to vendor!');
       fetchData();
-    } catch (error) {
-      toast.error('Failed to grant subscription');
+    } catch (error: any) {
+      toast.error(`Failed to grant subscription: ${error?.response?.data?.message || error.message}`);
     }
   };
 
