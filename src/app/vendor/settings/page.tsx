@@ -38,7 +38,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function VendorSettingsPage() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { business, updateBusinessLocally } = useBusinessProfile();
   const [isSaving, setIsSaving] = useState(false);
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
@@ -85,26 +85,21 @@ export default function VendorSettingsPage() {
   });
 
   useEffect(() => {
-    const fetchMe = async () => {
-      try {
-        const res = await api.get('/auth/me');
-        resetProfile({
-          firstName: res.data.firstName,
-          lastName: res.data.lastName,
-          email: res.data.email,
-          phone: res.data.phone || '',
-        });
-      } catch (error) {
-        toast.error('Failed to load profile data');
-      }
-    };
-    fetchMe();
-  }, [resetProfile]);
+    if (user) {
+      resetProfile({
+        firstName: user.firstName || '',
+        lastName: user.lastName || '',
+        email: user.email || '',
+        phone: user.phone || '',
+      });
+    }
+  }, [user, resetProfile]);
 
   const onSubmitProfile = async (data: ProfileFormValues) => {
     setIsSaving(true);
     try {
-      await api.patch('/users/me', data);
+      const res = await api.patch('/users/me', data);
+      if (updateUser) updateUser(res.data);
       toast.success('Profile updated successfully');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to update profile');
