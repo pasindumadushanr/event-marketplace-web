@@ -23,6 +23,7 @@ import {
   ChevronDown,
   Eye,
   CreditCard,
+  MessageCircle,
 } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { BusinessProfileProvider } from '@/contexts/BusinessProfileContext';
@@ -36,6 +37,7 @@ const navConfig = [
   { href: '/vendor/calendar', label: 'Calendar', icon: CalendarRange },
   { href: '/vendor/reviews', label: 'Reviews', icon: Star },
   { href: '/vendor/revenue', label: 'Revenue & Analytics', icon: LineChart },
+  { href: '/vendor/messages', label: 'Messages', icon: MessageCircle },
   { href: '/vendor/notifications', label: 'Notifications', icon: Bell },
   { href: '/vendor/documents', label: 'Documents', icon: FileText },
   { href: '/vendor/subscription', label: 'Membership Plan', icon: CreditCard },
