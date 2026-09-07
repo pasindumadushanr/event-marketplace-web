@@ -228,11 +228,39 @@ export default function VendorDashboardPage() {
           <div className="bg-secondary rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
             <h3 className="font-serif font-semibold text-primary mb-6">Profile Status</h3>
-            {progressPercentage === 100 ? (
+            {business.status === 'ACTIVE' ? (
+              <>
+                <p className="text-2xl font-bold text-emerald-400 mb-2">Live & Active</p>
+                <p className="text-sm text-slate-400 font-medium mb-6">Your business is visible to customers.</p>
+                <Button 
+                  onClick={async () => {
+                    try {
+                      await api.post('/vendor/business/unpublish');
+                      window.location.reload();
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                  className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border-0"
+                >
+                  Unpublish Business
+                </Button>
+              </>
+            ) : progressPercentage === 100 ? (
               <>
                 <p className="text-2xl font-bold text-emerald-400 mb-2">Ready to Publish</p>
                 <p className="text-sm text-slate-400 font-medium mb-6">Your profile is 100% complete.</p>
-                <Button className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-0">
+                <Button 
+                  onClick={async () => {
+                    try {
+                      await api.post('/vendor/business/publish');
+                      window.location.reload();
+                    } catch (e) {
+                      console.error(e);
+                    }
+                  }}
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-0"
+                >
                   Publish Business
                 </Button>
               </>

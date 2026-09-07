@@ -193,7 +193,7 @@ export default function VendorPackagesPage() {
                 <div className="flex items-center gap-4 mt-3 text-sm text-slate-500 font-medium">
                   <span className="flex items-center gap-1 text-slate-900 font-bold text-lg">
                     <Banknote className="h-4 w-4 text-slate-400" />
-                    ${Number(pkg.price).toLocaleString()}
+                    LKR {Number(pkg.price).toLocaleString()}
                   </span>
                   {pkg.duration && (
                     <span className="flex items-center gap-1">
@@ -255,8 +255,8 @@ export default function VendorPackagesPage() {
                 {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Price (USD) <span className="text-red-500">*</span></label>
-                <Input type="number" placeholder="500" {...register('price')} />
+                <label className="text-sm font-medium">Price (LKR) <span className="text-red-500">*</span></label>
+                <Input type="number" placeholder="50000" {...register('price')} />
                 {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
               </div>
             </div>
