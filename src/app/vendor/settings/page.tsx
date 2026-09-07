@@ -7,10 +7,12 @@ import * as z from 'zod';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
-import { UserCircle, Shield, KeyRound, Loader2 } from 'lucide-react';
+import { UserCircle, Shield, KeyRound, Loader2, Bell } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -37,8 +39,42 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function VendorSettingsPage() {
   const { user } = useAuth();
+  const { business, updateBusinessLocally } = useBusinessProfile();
   const [isSaving, setIsSaving] = useState(false);
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
+  
+  const [emailNotifs, setEmailNotifs] = useState(true);
+
+  useEffect(() => {
+    if (business && business.profileSettings) {
+      if (business.profileSettings.emailNotifications?.messages === false) {
+        setEmailNotifs(false);
+      } else {
+        setEmailNotifs(true);
+      }
+    }
+  }, [business]);
+
+  const toggleEmailNotifs = async (checked: boolean) => {
+    setEmailNotifs(checked);
+    try {
+      const payload = {
+        profileSettings: {
+          ...business?.profileSettings,
+          emailNotifications: {
+            ...business?.profileSettings?.emailNotifications,
+            messages: checked
+          }
+        }
+      };
+      await api.patch('/vendor/business', payload);
+      updateBusinessLocally(payload);
+      toast.success('Notification preferences updated');
+    } catch (error) {
+      toast.error('Failed to update preferences');
+      setEmailNotifs(!checked); // revert on failure
+    }
+  };
 
   const { register: registerProfile, handleSubmit: handleSubmitProfile, reset: resetProfile, formState: { errors: profileErrors } } = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
@@ -176,6 +212,27 @@ export default function VendorSettingsPage() {
               </form>
             </div>
           )}
+
+          {/* Email Notifications Section */}
+          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+            <div className="p-6 border-b border-slate-100 flex items-center gap-3">
+              <Bell className="h-6 w-6 text-slate-400" />
+              <h3 className="text-lg font-bold text-slate-900">Notification Preferences</h3>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <h4 className="text-sm font-medium text-slate-900">New Customer Messages</h4>
+                  <p className="text-sm text-slate-500">Receive an email when a customer sends you a direct message.</p>
+                </div>
+                <Switch 
+                  checked={emailNotifs}
+                  onCheckedChange={toggleEmailNotifs}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Sidebar Info */}
