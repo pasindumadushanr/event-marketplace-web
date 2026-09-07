@@ -52,7 +52,7 @@ export function BusinessHero({ business }: BusinessHeroProps) {
             </h1>
             <div className="flex flex-wrap items-center text-slate-500 gap-4 text-sm font-medium">
               <span className="flex items-center gap-1">
-                <MapPin className="h-4 w-4" /> {business.location.city}, {business.location.district}
+                <MapPin className="h-4 w-4" /> {[business.location.city, business.location.district].filter(Boolean).join(', ')}
               </span>
               <span className="flex items-center gap-1 text-primary">
                 <Star className="h-4 w-4 fill-primary" /> {business.rating} ({business.reviewCount} Reviews)
@@ -64,9 +64,11 @@ export function BusinessHero({ business }: BusinessHeroProps) {
           </div>
 
           <div className="flex flex-col items-start md:items-end bg-slate-50 p-4 rounded-2xl border border-slate-100 w-full md:w-auto">
-            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">Starting From</p>
+            <p className="text-xs text-slate-500 font-semibold uppercase tracking-wider mb-1">
+              {business.startingPrice > 0 ? 'Starting From' : 'Pricing'}
+            </p>
             <p className="text-2xl font-bold text-slate-900">
-              LKR {business.startingPrice.toLocaleString()}
+              {business.startingPrice > 0 ? `LKR ${business.startingPrice.toLocaleString()}` : 'Custom Quote'}
             </p>
           </div>
 

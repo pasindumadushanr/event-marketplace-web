@@ -17,7 +17,9 @@ export function BusinessAvailability() {
       </h3>
       
       <div className="mb-4 text-center">
-        <span className="font-semibold text-slate-700">October 2024</span>
+        <span className="font-semibold text-slate-700">
+          {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
+        </span>
       </div>
 
       <div className="grid grid-cols-7 gap-1 text-center mb-4">

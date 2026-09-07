@@ -25,8 +25,8 @@ function UserAccountNav() {
         <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-slate-200">
           <Avatar className="h-10 w-10">
             <AvatarImage src={user.profileImage} alt={user.firstName} />
-            <AvatarFallback className="bg-primary/10 text-primary font-medium">
-              {user.firstName?.charAt(0)}
+            <AvatarFallback className="bg-slate-100 text-slate-500 font-medium">
+              {user.firstName ? user.firstName.charAt(0) : <UserIcon className="h-5 w-5" />}
             </AvatarFallback>
           </Avatar>
         </Button>

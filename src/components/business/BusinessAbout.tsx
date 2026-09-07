@@ -16,19 +16,21 @@ export function BusinessAbout({ business }: BusinessAboutProps) {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Highlights</h4>
-          <ul className="space-y-3">
-            {business.highlights.map((highlight, index) => (
-              <li key={index} className="flex items-start gap-3">
-                <div className="mt-0.5 bg-primary/10 p-1 rounded-full text-primary">
-                  <Check className="h-3 w-3" />
-                </div>
-                <span className="text-slate-700 font-medium">{highlight}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        {business.highlights && business.highlights.length > 0 && (
+          <div>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Highlights</h4>
+            <ul className="space-y-3">
+              {business.highlights.map((highlight, index) => (
+                <li key={index} className="flex items-start gap-3">
+                  <div className="mt-0.5 bg-primary/10 p-1 rounded-full text-primary">
+                    <Check className="h-3 w-3" />
+                  </div>
+                  <span className="text-slate-700 font-medium">{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         
         <div>
           <div className="mb-6">

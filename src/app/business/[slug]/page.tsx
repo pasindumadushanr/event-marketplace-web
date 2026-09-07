@@ -163,7 +163,9 @@ function mapBusinessData(data: any) {
     isVerified: data.isVerified,
     rating: data.rating,
     reviewCount: data.reviewCount,
-    startingPrice: data.startingPrice,
+    startingPrice: data.startingPrice > 0 
+      ? data.startingPrice 
+      : (data.packages?.length > 0 ? Math.min(...data.packages.map((p: any) => Number(p.price))) : 0),
     yearsOfExperience: data.profileSettings?.yearsOfExperience || 1,
     responseTime: 'Within 24 hours',
     memberSince: new Date(data.createdAt).getFullYear().toString(),
