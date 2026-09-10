@@ -2,155 +2,436 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { CreditCard, CheckCircle, ShieldCheck, Loader2, ArrowLeft } from 'lucide-react';
+import { 
+  CreditCard, 
+  CheckCircle2, 
+  ShieldCheck, 
+  Loader2, 
+  ArrowLeft, 
+  CalendarDays, 
+  Building2, 
+  Lock, 
+  Sparkles, 
+  Check, 
+  HelpCircle,
+  Tag
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Navbar } from '@/components/home/Navbar';
+import { Footer } from '@/components/home/Footer';
 import api from '@/lib/api';
 import { toast } from 'sonner';
+import { format } from 'date-fns';
+import Link from 'next/link';
 
-export default function MockCheckoutPage() {
+export default function CheckoutPage() {
   const params = useParams();
   const router = useRouter();
   const bookingId = params.bookingId as string;
-  
+
+  const [booking, setBooking] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const handlePay = async () => {
+  // Form State
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvc, setCvc] = useState('');
+  const [cardName, setCardName] = useState('');
+
+  useEffect(() => {
+    const fetchBooking = async () => {
+      try {
+        const res = await api.get(`/bookings/${bookingId}`);
+        setBooking(res.data);
+      } catch (err: any) {
+        console.error('Failed to load booking:', err);
+        toast.error('Could not load booking details.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (bookingId) {
+      fetchBooking();
+    }
+  }, [bookingId]);
+
+  // Demo card autofill helper
+  const handleFillDemo = () => {
+    setCardNumber('4242 •••• •••• 4242');
+    setExpiry('12/28');
+    setCvc('789');
+    setCardName('Test Client');
+    toast.info('Demo card details filled');
+  };
+
+  const handlePay = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsProcessing(true);
     try {
-      // Simulate network delay for payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      // Simulate realistic payment gateway processing latency
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
       await api.post(`/bookings/${bookingId}/payment/confirm`);
       setIsSuccess(true);
-      toast.success('Payment successful!');
-      
+      toast.success('Advance payment completed! Date secured.');
+
       setTimeout(() => {
         router.push('/account/bookings');
-      }, 3000);
-      
-    } catch (error) {
-      toast.error('Payment failed. Please try again.');
+      }, 2500);
+    } catch (error: any) {
+      console.error('Payment confirmation error:', error);
+      const msg = error.response?.data?.message || 'Payment failed. Please try again.';
+      toast.error(msg);
       setIsProcessing(false);
     }
   };
 
+  // Calculations
+  const totalAmount = booking?.totalAmount ? Number(booking.totalAmount) : 0;
+  const advanceAmount = Math.round(totalAmount * 0.15); // 15% advance deposit
+  const remainingAmount = totalAmount - advanceAmount; // 85% paid on event day
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+        <Navbar />
+        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-slate-500 font-medium">Preparing your secure checkout...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-xl text-center space-y-6 animate-in zoom-in duration-500">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-10 w-10 text-green-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Payment Successful!</h1>
-          <p className="text-slate-500">Your date is now secured. The vendor has been notified.</p>
-          <div className="pt-6 border-t border-slate-100">
-            <p className="text-sm text-slate-400">Redirecting to your bookings...</p>
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+        <Navbar />
+        <div className="max-w-xl mx-auto px-4 py-20 w-full animate-in zoom-in-95 duration-400">
+          <div className="bg-white rounded-3xl p-8 sm:p-10 shadow-2xl border border-slate-100 text-center space-y-6">
+            <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+              <CheckCircle2 className="h-10 w-10" />
+            </div>
+            <div>
+              <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 mb-3 px-3 py-1 font-semibold">
+                Booking Confirmed
+              </Badge>
+              <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                Date Successfully Locked!
+              </h1>
+              <p className="text-slate-500 mt-2 text-sm leading-relaxed">
+                Your 15% advance deposit of <strong className="text-slate-900">LKR {advanceAmount.toLocaleString()}</strong> has been secured. The vendor has been formally notified to hold your date.
+              </p>
+            </div>
+
+            <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 text-left space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Vendor:</span>
+                <span className="font-semibold text-slate-900">{booking?.business?.name}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Package:</span>
+                <span className="font-semibold text-slate-900">{booking?.package?.name || 'Custom Package'}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-500">Event Date:</span>
+                <span className="font-semibold text-slate-900">
+                  {booking?.date ? format(new Date(booking.date), 'MMMM do, yyyy') : 'N/A'}
+                </span>
+              </div>
+              <div className="pt-3 border-t border-slate-200 flex justify-between text-xs text-slate-500">
+                <span>Remaining 85% Balance:</span>
+                <span className="font-bold text-slate-700">LKR {remainingAmount.toLocaleString()} (on event day)</span>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Link href="/account/bookings">
+                <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20">
+                  View in My Bookings
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-3xl mx-auto px-4">
-        <button onClick={() => router.back()} className="flex items-center text-sm font-semibold text-slate-500 hover:text-slate-900 mb-8 transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" /> Back
-        </button>
+    <div className="min-h-screen bg-slate-50/50 flex flex-col justify-between">
+      <Navbar />
 
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
-          {/* Order Summary */}
-          <div className="w-full md:w-2/5 bg-slate-900 text-white p-8">
-            <h2 className="text-xl font-bold mb-6">Order Summary</h2>
-            
-            <div className="space-y-4 mb-8 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-400">Booking Advance</span>
-                <span className="font-semibold">LKR 15,000</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400">Platform Fee</span>
-                <span className="font-semibold">LKR 500</span>
-              </div>
-              <div className="pt-4 border-t border-slate-700 flex justify-between">
-                <span className="font-bold">Total to Pay</span>
-                <span className="font-bold text-lg text-primary">LKR 15,500</span>
-              </div>
-            </div>
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 w-full">
+        {/* Navigation & Trust Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <Link
+            href="/account/bookings"
+            className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back to My Bookings
+          </Link>
+          <div className="flex items-center gap-2 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-3 py-1.5 rounded-full self-start sm:self-auto">
+            <Lock className="h-3.5 w-3.5" /> 256-Bit SSL Encrypted & Secured
+          </div>
+        </div>
 
-            <div className="bg-slate-800 rounded-xl p-4 flex items-start gap-3">
-              <ShieldCheck className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-              <p className="text-xs text-slate-300 leading-relaxed">
-                <strong className="text-white block mb-1">LuxeEvents Guarantee</strong>
-                Your money is protected. If the vendor cancels, you receive a 100% refund of this advance payment.
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          {/* Left: Payment Form (7 Cols) */}
+          <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-6 sm:p-8 space-y-6">
+            <div className="border-b border-slate-100 pb-5">
+              <div className="flex items-center justify-between mb-2">
+                <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+                  Secure Checkout
+                </h1>
+                <Badge variant="outline" className="border-primary/40 text-primary font-bold px-2.5 py-1">
+                  15% Advance
+                </Badge>
+              </div>
+              <p className="text-sm text-slate-500">
+                Lock your event date with an advance deposit. The remaining 85% is payable directly to the vendor on the event date.
               </p>
             </div>
-          </div>
 
-          {/* Payment Details */}
-          <div className="w-full md:w-3/5 p-8">
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Secure Checkout</h1>
-              <p className="text-sm text-slate-500">Enter your card details to lock your date.</p>
+            {/* Demo Testing Helper Pill */}
+            <div className="bg-primary/10 border border-primary/20 rounded-2xl p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5 text-xs text-slate-800">
+                <Sparkles className="h-4 w-4 text-primary shrink-0" />
+                <span>
+                  <strong>Test Mode Active:</strong> Click autofill to test without real money.
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleFillDemo}
+                className="text-xs font-bold text-primary hover:underline shrink-0 bg-white px-3 py-1.5 rounded-lg border border-primary/20 shadow-xs"
+              >
+                Autofill Demo
+              </button>
             </div>
 
-            <div className="space-y-5">
+            <form onSubmit={handlePay} className="space-y-5">
+              {/* Payment Method Selector */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Card Information</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <CreditCard className="h-5 w-5 text-slate-400" />
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">
+                  Payment Method
+                </label>
+                <div className="p-3.5 border-2 border-primary bg-primary/5 rounded-2xl flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 rounded-xl bg-white border border-primary/30 flex items-center justify-center text-primary shadow-xs">
+                      <CreditCard className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm text-slate-900">Credit / Debit Card</p>
+                      <p className="text-xs text-slate-500">Visa, Mastercard, Amex, Genie</p>
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="1234 5678 9101 1121"
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all mb-2"
-                  />
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="MM/YY"
-                      className="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    />
-                    <input
-                      type="text"
-                      placeholder="CVC"
-                      className="w-1/2 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    />
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="text-xs font-semibold text-emerald-700">Instant Verification</span>
                   </div>
                 </div>
               </div>
 
+              {/* Card Number */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Name on Card</label>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Card Number
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    required
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value)}
+                    placeholder="4242 •••• •••• 4242"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
+                  />
+                  <div className="absolute right-3.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                    <span className="text-[10px] font-extrabold bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">VISA</span>
+                    <span className="text-[10px] font-extrabold bg-slate-200 text-slate-700 px-1.5 py-0.5 rounded">MC</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Expiry & CVC */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    Expiry Date
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={expiry}
+                    onChange={(e) => setExpiry(e.target.value)}
+                    placeholder="MM / YY"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm text-center"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                    CVC / CVV
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={cvc}
+                    onChange={(e) => setCvc(e.target.value)}
+                    placeholder="123"
+                    maxLength={4}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm text-center"
+                  />
+                </div>
+              </div>
+
+              {/* Cardholder Name */}
+              <div>
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">
+                  Cardholder Name
+                </label>
                 <input
                   type="text"
-                  placeholder="John Doe"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  required
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value)}
+                  placeholder="Full Name as on Card"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
                 />
               </div>
 
-              <div className="pt-4">
-                <Button 
-                  onClick={handlePay}
+              {/* Pay Button */}
+              <div className="pt-3">
+                <Button
+                  type="submit"
                   disabled={isProcessing}
-                  className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20 text-lg transition-transform active:scale-[0.98]"
+                  className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-extrabold rounded-2xl shadow-xl shadow-primary/25 text-lg transition-transform active:scale-[0.99] flex items-center justify-center gap-2"
                 >
                   {isProcessing ? (
-                    <><Loader2 className="mr-2 h-5 w-5 animate-spin" /> Processing...</>
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Securing Your Date...
+                    </>
                   ) : (
-                    'Pay LKR 15,500'
+                    <>
+                      <Lock className="h-5 w-5" />
+                      Pay Advance • LKR {advanceAmount.toLocaleString()}
+                    </>
                   )}
                 </Button>
-                <p className="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
-                  <ShieldCheck className="h-3 w-3" /> Payments are secure and encrypted
-                </p>
               </div>
+
+              <div className="flex items-center justify-center gap-2 text-xs text-slate-400 pt-1">
+                <ShieldCheck className="h-4 w-4 text-emerald-600" />
+                <span>Zero Risk Guarantee • 100% Refundable if Vendor Cancels</span>
+              </div>
+            </form>
+          </div>
+
+          {/* Right: Order Summary Card (5 Cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-6 sm:p-7 space-y-6">
+              <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2 border-b border-slate-100 pb-4">
+                <Building2 className="h-5 w-5 text-primary" /> Booking Summary
+              </h2>
+
+              {/* Vendor & Event Info */}
+              <div className="flex items-start gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center text-slate-400 font-bold">
+                  {booking?.business?.logo ? (
+                    <img src={booking.business.logo} alt="" className="h-full w-full object-cover" />
+                  ) : (
+                    <Building2 className="h-7 w-7 text-slate-400" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <span className="text-[11px] font-bold text-primary uppercase tracking-wider">
+                    {booking?.business?.category?.name || 'Event Vendor'}
+                  </span>
+                  <h3 className="font-extrabold text-slate-900 text-base truncate">
+                    {booking?.business?.name || 'Selected Vendor'}
+                  </h3>
+                  <p className="text-xs text-slate-500">{booking?.business?.city || 'Sri Lanka'}</p>
+                </div>
+              </div>
+
+              {/* Package & Date pills */}
+              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-2.5 text-xs font-semibold">
+                <div className="flex items-center justify-between text-slate-700">
+                  <span className="flex items-center gap-1.5 text-slate-500">
+                    <Tag className="h-3.5 w-3.5" /> Package
+                  </span>
+                  <span className="text-slate-900 font-bold">{booking?.package?.name || 'Custom Package'}</span>
+                </div>
+                <div className="flex items-center justify-between text-slate-700">
+                  <span className="flex items-center gap-1.5 text-slate-500">
+                    <CalendarDays className="h-3.5 w-3.5" /> Event Date
+                  </span>
+                  <span className="text-slate-900 font-bold">
+                    {booking?.date ? format(new Date(booking.date), 'MMMM do, yyyy') : 'N/A'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Price Breakdown */}
+              <div className="space-y-3 text-sm pt-2">
+                <div className="flex justify-between text-slate-600">
+                  <span>Total Agreed Package Price</span>
+                  <span className="font-bold text-slate-900">LKR {totalAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-slate-600">
+                  <span className="flex items-center gap-1">
+                    Advance Lock Deposit (15%)
+                  </span>
+                  <span className="font-bold text-slate-900">LKR {advanceAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-emerald-600">
+                  <span>Platform Fee</span>
+                  <span className="font-bold">LKR 0 (Free)</span>
+                </div>
+
+                <div className="pt-4 border-t-2 border-dashed border-slate-200 flex justify-between items-baseline">
+                  <div>
+                    <span className="text-base font-black text-slate-900 block">Due Today</span>
+                    <span className="text-xs text-slate-400 font-medium">To formally secure the date</span>
+                  </div>
+                  <span className="text-2xl font-black text-primary">
+                    LKR {advanceAmount.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Settlement Notice */}
+              <div className="bg-amber-50/70 border border-amber-200/60 rounded-2xl p-4 text-xs text-amber-900 leading-relaxed">
+                <p className="font-bold mb-1 flex items-center gap-1 text-amber-950">
+                  <span>ℹ️</span> Remaining Balance (85%):
+                </p>
+                The balance of <strong className="text-amber-950">LKR {remainingAmount.toLocaleString()}</strong> will be paid directly to {booking?.business?.name || 'the vendor'} on the day of your event.
+              </div>
+            </div>
+
+            {/* LuxeEvents Guarantee Card */}
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-xl space-y-3">
+              <div className="flex items-center gap-2.5 text-primary">
+                <ShieldCheck className="h-6 w-6" />
+                <span className="font-black text-sm uppercase tracking-wider text-white">
+                  LuxeEvents Guarantee
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                By paying your deposit through our platform, you are 100% protected. If the vendor fails to show or cancels, LuxeEvents refunds your deposit immediately.
+              </p>
             </div>
           </div>
         </div>
-      </div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
