@@ -125,11 +125,22 @@ export default function CustomerBookingsPage() {
                     </div>
                     
                     {/* Status Helper Text */}
-                    <p className="text-center text-sm text-slate-500 mt-6 font-medium">
-                      {step === 1 && "The vendor is reviewing your request. They will confirm availability soon."}
-                      {step === 2 && "The vendor has confirmed your booking! You're all set for the big day."}
-                      {step === 3 && "This event has been successfully completed. Thank you for using Event Marketplace!"}
-                    </p>
+                    <div className="text-center mt-6">
+                      <p className="text-sm text-slate-500 font-medium mb-4">
+                        {step === 1 && "The vendor is reviewing your request. They will confirm availability soon."}
+                        {step === 2 && booking.paymentStatus === 'PENDING' && "The vendor has approved your request! Please pay the advance to lock your date."}
+                        {step === 2 && booking.paymentStatus === 'PAID' && "Your date is locked! You're all set for the big day."}
+                        {step === 3 && "This event has been successfully completed. Thank you for using LuxeEvents!"}
+                      </p>
+                      
+                      {step === 2 && booking.paymentStatus === 'PENDING' && (
+                        <Link href={`/checkout/${booking.id}`}>
+                          <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-8 shadow-lg shadow-primary/20">
+                            Pay Advance to Lock Date
+                          </Button>
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 )}
 

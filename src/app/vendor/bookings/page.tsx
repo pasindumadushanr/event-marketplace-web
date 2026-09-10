@@ -133,9 +133,9 @@ export default function VendorBookingsPage() {
                     <>
                       <Button 
                         onClick={() => updateStatus(booking.id, 'CONFIRMED')}
-                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20"
                       >
-                        <CheckCircle2 className="h-4 w-4 mr-2" /> Accept Booking
+                        <CheckCircle2 className="h-4 w-4 mr-2" /> Approve & Request Advance
                       </Button>
                       <Button 
                         variant="outline"
@@ -146,13 +146,23 @@ export default function VendorBookingsPage() {
                       </Button>
                     </>
                   )}
-                  {booking.status === 'CONFIRMED' && (
-                    <Button 
-                      onClick={() => updateStatus(booking.id, 'COMPLETED')}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-                    >
-                      <CheckCircle2 className="h-4 w-4 mr-2" /> Mark as Completed
-                    </Button>
+                  {booking.status === 'CONFIRMED' && booking.paymentStatus === 'PENDING' && (
+                    <div className="text-center p-3 bg-amber-50 rounded-xl border border-amber-100">
+                      <p className="text-sm text-amber-800 font-medium">Waiting for customer to pay the advance deposit.</p>
+                    </div>
+                  )}
+                  {booking.status === 'CONFIRMED' && booking.paymentStatus === 'PAID' && (
+                    <>
+                      <div className="text-center p-3 mb-2 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <p className="text-sm text-emerald-800 font-medium">Advance Paid! Date is locked.</p>
+                      </div>
+                      <Button 
+                        onClick={() => updateStatus(booking.id, 'COMPLETED')}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-600/20"
+                      >
+                        <CheckCircle2 className="h-4 w-4 mr-2" /> Mark as Completed
+                      </Button>
+                    </>
                   )}
                   {(booking.status === 'COMPLETED' || booking.status === 'CANCELLED') && (
                     <p className="text-sm text-center text-slate-500 font-medium bg-slate-50 p-2 rounded-lg">
