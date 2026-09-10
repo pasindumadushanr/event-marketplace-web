@@ -56,7 +56,7 @@ export default function CustomerMessagesPage() {
                     <div className="flex justify-between items-center mb-1">
                       <h4 className="font-semibold text-sm text-slate-900 truncate">{conv.business.name}</h4>
                       <span className="text-xs text-slate-400 shrink-0">
-                        {formatDistanceToNow(new Date(conv.lastMessageAt), { addSuffix: true })}
+                        {conv.lastMessageAt ? formatDistanceToNow(new Date(conv.lastMessageAt), { addSuffix: true }) : 'Just now'}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate">

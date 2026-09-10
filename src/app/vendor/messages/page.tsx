@@ -11,7 +11,7 @@ export default function VendorMessagesPage() {
   const [activeId, setActiveId] = useState<string | null>(null);
 
   useEffect(() => {
-    api.get('/chat/conversations').then(res => {
+    api.get('/chat/conversations?mode=vendor').then(res => {
       setConversations(res.data);
       if (res.data.length > 0 && !activeId) {
         setActiveId(res.data[0].id);
@@ -61,7 +61,7 @@ export default function VendorMessagesPage() {
                         {conv.customer.firstName} {conv.customer.lastName}
                       </h4>
                       <span className="text-xs text-slate-400 shrink-0">
-                        {formatDistanceToNow(new Date(conv.lastMessageAt), { addSuffix: true })}
+                        {conv.lastMessageAt ? formatDistanceToNow(new Date(conv.lastMessageAt), { addSuffix: true }) : 'Just now'}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate">
