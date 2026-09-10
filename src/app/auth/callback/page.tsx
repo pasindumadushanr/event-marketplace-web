@@ -18,7 +18,7 @@ function AuthCallbackContent() {
     
     if (accessToken && refreshToken) {
       try {
-        let base64Url = accessToken.split('.')[1];
+        const base64Url = accessToken.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         // Pad the base64 string
         while (base64.length % 4) {
