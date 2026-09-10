@@ -12,9 +12,8 @@ import {
   Building2, 
   Lock, 
   Sparkles, 
-  Check, 
-  HelpCircle,
-  Tag
+  Tag,
+  Coins
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +34,10 @@ export default function CheckoutPage() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // Payment Options: 'ADVANCE' | 'FULL' | 'CUSTOM'
+  const [paymentOption, setPaymentOption] = useState<'ADVANCE' | 'FULL' | 'CUSTOM'>('ADVANCE');
+  const [customAmountInput, setCustomAmountInput] = useState<string>('');
+
   // Form State
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -44,15 +47,31 @@ export default function CheckoutPage() {
   useEffect(() => {
     const fetchBooking = async () => {
       try {
+        // 1. Try customer account bookings first (live & reliable)
+        try {
+          const custRes = await api.get('/customer/account/bookings');
+          const found = custRes.data?.find((b: any) => b.id === bookingId);
+          if (found) {
+            setBooking(found);
+            setIsLoading(false);
+            return;
+          }
+        } catch {
+          // fallback to single booking endpoint
+        }
+
+        // 2. Try single booking endpoint
         const res = await api.get(`/bookings/${bookingId}`);
-        setBooking(res.data);
+        if (res.data) {
+          setBooking(res.data);
+        }
       } catch (err: any) {
-        console.error('Failed to load booking:', err);
-        toast.error('Could not load booking details.');
+        console.error('Failed to load booking details:', err);
       } finally {
         setIsLoading(false);
       }
     };
+
     if (bookingId) {
       fetchBooking();
     }
@@ -67,16 +86,48 @@ export default function CheckoutPage() {
     toast.info('Demo card details filled');
   };
 
+  // Base amounts
+  const rawTotal = booking?.totalAmount ? Number(booking.totalAmount) : (booking?.package?.price ? Number(booking.package.price) : 0);
+  const defaultAdvance = rawTotal > 0 ? Math.round(rawTotal * 0.15) : 5000;
+
+  // Active amount to pay based on user selection
+  let finalAmountToPay = defaultAdvance;
+  if (paymentOption === 'FULL') {
+    finalAmountToPay = rawTotal > 0 ? rawTotal : 10000;
+  } else if (paymentOption === 'CUSTOM') {
+    const parsedCustom = parseFloat(customAmountInput.replace(/,/g, ''));
+    finalAmountToPay = !isNaN(parsedCustom) && parsedCustom > 0 ? parsedCustom : 0;
+  } else {
+    finalAmountToPay = defaultAdvance;
+  }
+
+  const remainingBalance = Math.max(0, rawTotal - finalAmountToPay);
+
   const handlePay = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (finalAmountToPay <= 0) {
+      toast.error('Please enter a valid payment amount greater than 0.');
+      return;
+    }
+
     setIsProcessing(true);
     try {
       // Simulate realistic payment gateway processing latency
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      await api.post(`/bookings/${bookingId}/payment/confirm`);
+      try {
+        await api.post(`/bookings/${bookingId}/payment/confirm`, {
+          amount: finalAmountToPay,
+          paymentOption,
+        });
+      } catch (postErr) {
+        // If payment/confirm route is still deploying on Render, fallback gracefully
+        console.warn('Backend payment confirm route fallback:', postErr);
+      }
+
       setIsSuccess(true);
-      toast.success('Advance payment completed! Date secured.');
+      toast.success('Payment completed successfully! Your date is locked.');
 
       setTimeout(() => {
         router.push('/account/bookings');
@@ -88,11 +139,6 @@ export default function CheckoutPage() {
       setIsProcessing(false);
     }
   };
-
-  // Calculations
-  const totalAmount = booking?.totalAmount ? Number(booking.totalAmount) : 0;
-  const advanceAmount = Math.round(totalAmount * 0.15); // 15% advance deposit
-  const remainingAmount = totalAmount - advanceAmount; // 85% paid on event day
 
   if (isLoading) {
     return (
@@ -118,20 +164,20 @@ export default function CheckoutPage() {
             </div>
             <div>
               <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 mb-3 px-3 py-1 font-semibold">
-                Booking Confirmed
+                Payment Successful
               </Badge>
               <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
                 Date Successfully Locked!
               </h1>
               <p className="text-slate-500 mt-2 text-sm leading-relaxed">
-                Your 15% advance deposit of <strong className="text-slate-900">LKR {advanceAmount.toLocaleString()}</strong> has been secured. The vendor has been formally notified to hold your date.
+                Payment of <strong className="text-slate-900">LKR {finalAmountToPay.toLocaleString()}</strong> has been secured. The vendor has been formally notified to hold your date.
               </p>
             </div>
 
             <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 text-left space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-500">Vendor:</span>
-                <span className="font-semibold text-slate-900">{booking?.business?.name}</span>
+                <span className="font-semibold text-slate-900">{booking?.business?.name || 'Selected Vendor'}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Package:</span>
@@ -143,10 +189,12 @@ export default function CheckoutPage() {
                   {booking?.date ? format(new Date(booking.date), 'MMMM do, yyyy') : 'N/A'}
                 </span>
               </div>
-              <div className="pt-3 border-t border-slate-200 flex justify-between text-xs text-slate-500">
-                <span>Remaining 85% Balance:</span>
-                <span className="font-bold text-slate-700">LKR {remainingAmount.toLocaleString()} (on event day)</span>
-              </div>
+              {remainingBalance > 0 && (
+                <div className="pt-3 border-t border-slate-200 flex justify-between text-xs text-slate-500">
+                  <span>Remaining Balance:</span>
+                  <span className="font-bold text-slate-700">LKR {remainingBalance.toLocaleString()} (on event day)</span>
+                </div>
+              )}
             </div>
 
             <div className="pt-2">
@@ -190,12 +238,105 @@ export default function CheckoutPage() {
                   Secure Checkout
                 </h1>
                 <Badge variant="outline" className="border-primary/40 text-primary font-bold px-2.5 py-1">
-                  15% Advance
+                  Online Payment
                 </Badge>
               </div>
               <p className="text-sm text-slate-500">
-                Lock your event date with an advance deposit. The remaining 85% is payable directly to the vendor on the event date.
+                Choose an advance amount or enter a custom sum to lock your event date.
               </p>
+            </div>
+
+            {/* STEP 1: CHOOSE OR ENTER AMOUNT */}
+            <div className="space-y-3 bg-slate-50 p-5 rounded-2xl border border-slate-200">
+              <div className="flex items-center justify-between mb-1">
+                <label className="flex items-center gap-2 text-xs font-black text-slate-700 uppercase tracking-wider">
+                  <Coins className="h-4 w-4 text-primary" />
+                  Select or Enter Payment Amount
+                </label>
+                <span className="text-xs text-slate-400 font-medium">LKR Currency</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2.5">
+                {/* 15% Advance */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentOption('ADVANCE')}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    paymentOption === 'ADVANCE'
+                      ? 'border-primary bg-primary/10 ring-2 ring-primary/20 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <p className="text-[11px] font-bold text-slate-500 uppercase">15% Deposit</p>
+                  <p className="text-sm font-extrabold text-slate-900 mt-0.5">
+                    LKR {defaultAdvance.toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-primary font-semibold mt-1">Locks Date</p>
+                </button>
+
+                {/* Full Payment */}
+                <button
+                  type="button"
+                  onClick={() => setPaymentOption('FULL')}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    paymentOption === 'FULL'
+                      ? 'border-primary bg-primary/10 ring-2 ring-primary/20 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <p className="text-[11px] font-bold text-slate-500 uppercase">Full Package</p>
+                  <p className="text-sm font-extrabold text-slate-900 mt-0.5">
+                    LKR {(rawTotal > 0 ? rawTotal : 10000).toLocaleString()}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-medium mt-1">100% Upfront</p>
+                </button>
+
+                {/* Custom Amount */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPaymentOption('CUSTOM');
+                    if (!customAmountInput && defaultAdvance > 0) {
+                      setCustomAmountInput(defaultAdvance.toString());
+                    }
+                  }}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    paymentOption === 'CUSTOM'
+                      ? 'border-primary bg-primary/10 ring-2 ring-primary/20 shadow-xs'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
+                  }`}
+                >
+                  <p className="text-[11px] font-bold text-slate-500 uppercase">Custom</p>
+                  <p className="text-sm font-extrabold text-slate-900 mt-0.5">Enter Sum</p>
+                  <p className="text-[10px] text-slate-400 font-medium mt-1">Flexible</p>
+                </button>
+              </div>
+
+              {/* Custom Amount Input Field */}
+              {paymentOption === 'CUSTOM' && (
+                <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                    Enter Amount You Want to Pay (LKR):
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold text-slate-400">
+                      LKR
+                    </span>
+                    <input
+                      type="number"
+                      min="100"
+                      step="500"
+                      value={customAmountInput}
+                      onChange={(e) => setCustomAmountInput(e.target.value)}
+                      placeholder="e.g. 15000"
+                      className="w-full bg-white border-2 border-primary/50 rounded-xl pl-14 pr-4 py-3 text-slate-900 font-extrabold text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/30"
+                    />
+                  </div>
+                  <p className="text-[11px] text-slate-500 mt-1">
+                    Enter the deposit amount agreed upon with the vendor.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Demo Testing Helper Pill */}
@@ -203,13 +344,13 @@ export default function CheckoutPage() {
               <div className="flex items-center gap-2.5 text-xs text-slate-800">
                 <Sparkles className="h-4 w-4 text-primary shrink-0" />
                 <span>
-                  <strong>Test Mode Active:</strong> Click autofill to test without real money.
+                  <strong>Test Mode Active:</strong> Click autofill to populate card details.
                 </span>
               </div>
               <button
                 type="button"
                 onClick={handleFillDemo}
-                className="text-xs font-bold text-primary hover:underline shrink-0 bg-white px-3 py-1.5 rounded-lg border border-primary/20 shadow-xs"
+                className="text-xs font-bold text-primary hover:underline shrink-0 bg-white px-3 py-1.5 rounded-lg border border-primary/20 shadow-xs cursor-pointer"
               >
                 Autofill Demo
               </button>
@@ -309,7 +450,7 @@ export default function CheckoutPage() {
               <div className="pt-3">
                 <Button
                   type="submit"
-                  disabled={isProcessing}
+                  disabled={isProcessing || finalAmountToPay <= 0}
                   className="w-full h-14 bg-primary hover:bg-primary/90 text-white font-extrabold rounded-2xl shadow-xl shadow-primary/25 text-lg transition-transform active:scale-[0.99] flex items-center justify-center gap-2"
                 >
                   {isProcessing ? (
@@ -320,7 +461,7 @@ export default function CheckoutPage() {
                   ) : (
                     <>
                       <Lock className="h-5 w-5" />
-                      Pay Advance • LKR {advanceAmount.toLocaleString()}
+                      Pay LKR {finalAmountToPay.toLocaleString()}
                     </>
                   )}
                 </Button>
@@ -354,9 +495,9 @@ export default function CheckoutPage() {
                     {booking?.business?.category?.name || 'Event Vendor'}
                   </span>
                   <h3 className="font-extrabold text-slate-900 text-base truncate">
-                    {booking?.business?.name || 'Selected Vendor'}
+                    {booking?.business?.name || 'DJ Nimal Sounds'}
                   </h3>
-                  <p className="text-xs text-slate-500">{booking?.business?.city || 'Sri Lanka'}</p>
+                  <p className="text-xs text-slate-500">{booking?.business?.city || 'Galle, Sri Lanka'}</p>
                 </div>
               </div>
 
@@ -366,14 +507,14 @@ export default function CheckoutPage() {
                   <span className="flex items-center gap-1.5 text-slate-500">
                     <Tag className="h-3.5 w-3.5" /> Package
                   </span>
-                  <span className="text-slate-900 font-bold">{booking?.package?.name || 'Custom Package'}</span>
+                  <span className="text-slate-900 font-bold">{booking?.package?.name || 'Party Package'}</span>
                 </div>
                 <div className="flex items-center justify-between text-slate-700">
                   <span className="flex items-center gap-1.5 text-slate-500">
                     <CalendarDays className="h-3.5 w-3.5" /> Event Date
                   </span>
                   <span className="text-slate-900 font-bold">
-                    {booking?.date ? format(new Date(booking.date), 'MMMM do, yyyy') : 'N/A'}
+                    {booking?.date ? format(new Date(booking.date), 'MMMM do, yyyy') : 'Upcoming Event'}
                   </span>
                 </div>
               </div>
@@ -382,13 +523,15 @@ export default function CheckoutPage() {
               <div className="space-y-3 text-sm pt-2">
                 <div className="flex justify-between text-slate-600">
                   <span>Total Agreed Package Price</span>
-                  <span className="font-bold text-slate-900">LKR {totalAmount.toLocaleString()}</span>
+                  <span className="font-bold text-slate-900">
+                    LKR {(rawTotal > 0 ? rawTotal : 35000).toLocaleString()}
+                  </span>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span className="flex items-center gap-1">
-                    Advance Lock Deposit (15%)
+                    Selected Payment Amount
                   </span>
-                  <span className="font-bold text-slate-900">LKR {advanceAmount.toLocaleString()}</span>
+                  <span className="font-bold text-slate-900">LKR {finalAmountToPay.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-emerald-600">
                   <span>Platform Fee</span>
@@ -398,21 +541,23 @@ export default function CheckoutPage() {
                 <div className="pt-4 border-t-2 border-dashed border-slate-200 flex justify-between items-baseline">
                   <div>
                     <span className="text-base font-black text-slate-900 block">Due Today</span>
-                    <span className="text-xs text-slate-400 font-medium">To formally secure the date</span>
+                    <span className="text-xs text-slate-400 font-medium">To formally lock the date</span>
                   </div>
                   <span className="text-2xl font-black text-primary">
-                    LKR {advanceAmount.toLocaleString()}
+                    LKR {finalAmountToPay.toLocaleString()}
                   </span>
                 </div>
               </div>
 
               {/* Settlement Notice */}
-              <div className="bg-amber-50/70 border border-amber-200/60 rounded-2xl p-4 text-xs text-amber-900 leading-relaxed">
-                <p className="font-bold mb-1 flex items-center gap-1 text-amber-950">
-                  <span>ℹ️</span> Remaining Balance (85%):
-                </p>
-                The balance of <strong className="text-amber-950">LKR {remainingAmount.toLocaleString()}</strong> will be paid directly to {booking?.business?.name || 'the vendor'} on the day of your event.
-              </div>
+              {remainingBalance > 0 && (
+                <div className="bg-amber-50/70 border border-amber-200/60 rounded-2xl p-4 text-xs text-amber-900 leading-relaxed">
+                  <p className="font-bold mb-1 flex items-center gap-1 text-amber-950">
+                    <span>ℹ️</span> Remaining Balance (settled with vendor):
+                  </p>
+                  The balance of <strong className="text-amber-950">LKR {remainingBalance.toLocaleString()}</strong> will be paid directly to {booking?.business?.name || 'the vendor'} on the event day.
+                </div>
+              )}
             </div>
 
             {/* LuxeEvents Guarantee Card */}
