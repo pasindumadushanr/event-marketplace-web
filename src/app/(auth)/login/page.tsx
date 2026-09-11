@@ -97,7 +97,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form noValidate method="POST" onSubmit={(e) => { e.preventDefault(); handleSubmit(onSubmit)(e); }} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-zinc-700">Email</Label>
                 <Input
@@ -128,7 +128,7 @@ export default function LoginPage() {
                   <p className="text-sm text-red-500">{errors.password.message}</p>
                 )}
               </div>
-              <Button type="submit" className="w-full h-11 text-base font-medium shadow-sm transition-all hover:shadow-md" disabled={isLoading}>
+              <Button type="button" onClick={handleSubmit(onSubmit)} className="w-full h-11 text-base font-medium shadow-sm transition-all hover:shadow-md" disabled={isLoading}>
                 {isLoading ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

@@ -105,7 +105,7 @@ export default function VendorLoginPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-8">
+          <form noValidate method="POST" onSubmit={(e) => { e.preventDefault(); handleSubmit(onSubmit)(e); }} className="space-y-6 mt-8">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-slate-700 font-semibold">Business Email</Label>
               <Input id="email" type="email" className="h-12 bg-white border-slate-200 focus-visible:ring-primary" {...register('email')} />
@@ -120,7 +120,7 @@ export default function VendorLoginPage() {
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
             </div>
 
-            <Button type="submit" className="w-full h-12 text-lg bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 transition-all" disabled={isLoading}>
+            <Button type="button" onClick={handleSubmit(onSubmit)} className="w-full h-12 text-lg bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 transition-all" disabled={isLoading}>
               {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>

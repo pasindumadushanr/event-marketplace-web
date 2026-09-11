@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run --browser electron --headless",
+    "test:e2e": "cypress run"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -43,6 +46,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cypress": "^16.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
     "prettier": "^3.9.4",
