@@ -201,21 +201,35 @@ function mapBusinessData(data: any) {
     
     bookingMethod: data.profileSettings?.bookingMethod || 'DIRECT_BOOKING',
     
-    businessHours: data.profileSettings?.businessHours || {
-      monday: '9:00 AM - 5:00 PM',
-      tuesday: '9:00 AM - 5:00 PM',
-      wednesday: '9:00 AM - 5:00 PM',
-      thursday: '9:00 AM - 5:00 PM',
-      friday: '9:00 AM - 5:00 PM',
-      saturday: 'Closed',
-      sunday: 'Closed',
-    },
+    businessHours: (() => {
+      if (Array.isArray(data.profileSettings?.hours)) {
+        const obj: Record<string, string> = {};
+        data.profileSettings.hours.forEach((item: any) => {
+          const key = item.day?.toLowerCase();
+          if (key) {
+            obj[key] = item.isClosed
+              ? 'Closed'
+              : `${item.openTime || '9:00 AM'} - ${item.closeTime || '5:00 PM'}`;
+          }
+        });
+        return obj;
+      }
+      return data.profileSettings?.businessHours || {
+        monday: '9:00 AM - 5:00 PM',
+        tuesday: '9:00 AM - 5:00 PM',
+        wednesday: '9:00 AM - 5:00 PM',
+        thursday: '9:00 AM - 5:00 PM',
+        friday: '9:00 AM - 5:00 PM',
+        saturday: 'Closed',
+        sunday: 'Closed',
+      };
+    })(),
     
     location: {
       address: data.address,
       city: data.city,
       district: data.district,
-      mapEmbedUrl: data.profileSettings?.location?.mapEmbedUrl
+      mapEmbedUrl: data.googleMapLocation || data.profileSettings?.location?.mapEmbedUrl,
     },
     
     contact: {
@@ -224,15 +238,16 @@ function mapBusinessData(data: any) {
       website: data.website,
       facebook: data.facebook,
       instagram: data.instagram,
-      whatsapp: data.profileSettings?.contact?.whatsapp
+      whatsapp: data.profileSettings?.whatsapp || data.profileSettings?.contact?.whatsapp || data.phone,
     },
     
-    faq: data.profileSettings?.faq || [],
+    faq: data.profileSettings?.faqs || data.profileSettings?.faq || [],
     
-    policies: data.profileSettings?.policies || {
-      booking: 'Contact vendor for booking policies.',
-      cancellation: 'Contact vendor for cancellation policies.',
-      payment: 'Contact vendor for payment terms.'
+    policies: {
+      booking: data.profileSettings?.policies?.booking || data.profileSettings?.policies?.bookingPolicy || 'Contact vendor for booking policies.',
+      cancellation: data.profileSettings?.policies?.cancellation || data.profileSettings?.policies?.cancellationPolicy || 'Contact vendor for cancellation policies.',
+      payment: data.profileSettings?.policies?.payment || data.profileSettings?.policies?.paymentPolicy || 'Contact vendor for payment terms.',
+      terms: data.profileSettings?.policies?.terms || 'Standard vendor terms apply.',
     },
     
     reviews: data.reviews?.map((r: any) => ({
