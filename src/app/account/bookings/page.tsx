@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { format } from 'date-fns';
-import { Building2, CalendarDays, CheckCircle2, Clock, MapPin, SearchX } from 'lucide-react';
+import { Building2, CalendarDays, CheckCircle2, Clock, MapPin, SearchX, Star } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -137,6 +137,14 @@ export default function CustomerBookingsPage() {
                         <Link href={`/checkout/${booking.id}`}>
                           <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-8 shadow-lg shadow-primary/20">
                             Pay Advance to Lock Date
+                          </Button>
+                        </Link>
+                      )}
+
+                      {step === 3 && (
+                        <Link href={`/business/${booking.business.id}`}>
+                          <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-8 shadow-lg shadow-primary/20 inline-flex items-center gap-2">
+                            <Star className="h-4 w-4 fill-white" /> Leave a Review for {booking.business.name}
                           </Button>
                         </Link>
                       )}

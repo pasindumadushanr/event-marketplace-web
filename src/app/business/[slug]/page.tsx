@@ -124,7 +124,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ slug
             <BusinessFeatures featureGroups={business.featureGroups} />
             <BusinessGallery gallery={business.gallery} />
             <BusinessPackages packages={business.packages} businessName={business.name} />
-            <BusinessReviews reviews={business.reviews} rating={business.rating} reviewCount={business.reviewCount} />
+            <BusinessReviews businessId={business.id} reviews={business.reviews} rating={business.rating} reviewCount={business.reviewCount} />
             <BusinessFAQ faq={business.faq} />
             <BusinessPolicies policies={business.policies} />
           </div>
