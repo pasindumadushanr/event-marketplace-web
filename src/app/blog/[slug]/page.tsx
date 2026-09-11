@@ -3,6 +3,7 @@ import { Calendar, User, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Navbar } from '@/components/home/Navbar';
 import { Footer } from '@/components/home/Footer';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 async function getBlogPost(slug: string) {
   try {
@@ -69,7 +70,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
           {/* Render Rich HTML Content */}
           <div 
             className="prose prose-zinc lg:prose-lg mx-auto prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl"
-            dangerouslySetInnerHTML={{ __html: post.content }} 
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }} 
           />
         </article>
       </main>

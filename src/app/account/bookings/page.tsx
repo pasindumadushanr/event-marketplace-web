@@ -3,13 +3,17 @@
 import { useState, useEffect } from 'react';
 import api from '@/lib/api';
 import { format } from 'date-fns';
-import { Building2, CalendarDays, CheckCircle2, Clock, MapPin, SearchX, Star } from 'lucide-react';
+import { Building2, CalendarDays, CheckCircle2, Clock, MapPin, SearchX, Star, AlertCircle, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 export default function CustomerBookingsPage() {
   const [bookings, setBookings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [cancelModalBooking, setCancelModalBooking] = useState<any | null>(null);
+  const [cancelReason, setCancelReason] = useState('');
+  const [isCancelling, setIsCancelling] = useState(false);
 
   useEffect(() => {
     const fetchBookings = async () => {
@@ -24,6 +28,36 @@ export default function CustomerBookingsPage() {
     };
     fetchBookings();
   }, []);
+
+  const handleCancelBooking = async () => {
+    if (!cancelModalBooking) return;
+    setIsCancelling(true);
+    try {
+      await api.patch(`/bookings/${cancelModalBooking.id}/cancel`, {
+        reason: cancelReason.trim() || undefined,
+      });
+      toast.success('Booking request cancelled successfully');
+      setBookings((prev) =>
+        prev.map((b) =>
+          b.id === cancelModalBooking.id
+            ? {
+                ...b,
+                status: 'CANCELLED',
+                notes: cancelReason
+                  ? `${b.notes ? b.notes + ' | ' : ''}[Customer Cancellation: ${cancelReason}]`
+                  : b.notes,
+              }
+            : b,
+        ),
+      );
+      setCancelModalBooking(null);
+      setCancelReason('');
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Failed to cancel booking');
+    } finally {
+      setIsCancelling(false);
+    }
+  };
 
   const getStatusStep = (status: string) => {
     if (status === 'PENDING') return 1;
@@ -100,8 +134,15 @@ export default function CustomerBookingsPage() {
 
                 {/* Status Timeline or Cancelled State */}
                 {step === -1 ? (
-                  <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex items-center justify-center gap-2 font-medium">
-                    <SearchX className="h-5 w-5" /> This booking request was cancelled or declined.
+                  <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-100 flex flex-col items-center justify-center gap-1 font-medium text-sm">
+                    <div className="flex items-center gap-2">
+                      <SearchX className="h-5 w-5" /> This booking request was cancelled or declined.
+                    </div>
+                    {booking.notes && booking.notes.includes('[Customer Cancellation:') && (
+                      <span className="text-xs text-red-600/80 italic">
+                        {booking.notes.split('[Customer Cancellation:')[1]?.replace(']', '')?.trim()}
+                      </span>
+                    )}
                   </div>
                 ) : (
                   <div className="px-4">
@@ -165,6 +206,20 @@ export default function CustomerBookingsPage() {
                       </div>
                     )}
                   </div>
+
+                  {booking.status !== 'CANCELLED' && booking.status !== 'COMPLETED' && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setCancelModalBooking(booking);
+                        setCancelReason('');
+                      }}
+                      className="text-red-500 hover:text-red-700 hover:bg-red-50 text-xs font-semibold cursor-pointer"
+                    >
+                      Cancel Request
+                    </Button>
+                  )}
                 </div>
 
               </div>
@@ -172,6 +227,74 @@ export default function CustomerBookingsPage() {
           })}
         </div>
       )}
+
+      {/* Cancellation Confirmation Modal */}
+      {cancelModalBooking && (
+        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 relative animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setCancelModalBooking(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4 text-red-600">
+              <div className="p-2.5 bg-red-100 rounded-xl">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">Cancel Booking</h3>
+                <p className="text-xs text-slate-500">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-slate-600 mb-4">
+              Are you sure you want to cancel your booking request for{' '}
+              <strong className="text-slate-900">{cancelModalBooking.business?.name}</strong> on{' '}
+              <strong className="text-slate-900">{format(new Date(cancelModalBooking.date), 'MMMM do, yyyy')}</strong>?
+            </p>
+
+            <div className="mb-6">
+              <label className="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                Reason for cancellation (optional)
+              </label>
+              <textarea
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                placeholder="Let the vendor know why you need to cancel..."
+                rows={3}
+                className="w-full text-sm rounded-xl border border-slate-200 p-3 focus:outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500 resize-none"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setCancelModalBooking(null)}
+                disabled={isCancelling}
+                className="cursor-pointer"
+              >
+                Keep Booking
+              </Button>
+              <Button
+                onClick={handleCancelBooking}
+                disabled={isCancelling}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold cursor-pointer"
+              >
+                {isCancelling ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Cancelling...
+                  </>
+                ) : (
+                  'Confirm Cancellation'
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+

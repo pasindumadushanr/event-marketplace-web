@@ -47,6 +47,39 @@ describe('02 - Authentication & Route Guard Flows', () => {
     cy.contains(/Failed|Invalid|error|Unauthorized/i, { timeout: 8000 }).should('be.visible');
   });
 
+  it('handles the full two-step Forgot & Reset Password workflow', () => {
+    cy.intercept('POST', '**/auth/forgot-password', {
+      statusCode: 200,
+      body: { message: 'If that email is registered, an OTP code has been sent.' },
+    }).as('requestOtp');
+
+    cy.intercept('POST', '**/auth/reset-password', {
+      statusCode: 200,
+      body: { message: 'Password reset successfully. You can now log in.' },
+    }).as('resetPassword');
+
+    cy.visit('/login');
+    cy.contains(/Forgot password\?/i).click();
+    cy.url().should('include', '/forgot-password');
+
+    // Step 1: Request OTP
+    cy.get('input#email').type('customer@luxeevents.fun');
+    cy.contains('button', /Send Recovery Code/i).click();
+    cy.wait('@requestOtp');
+
+    // Step 2: Verification screen
+    cy.contains('Set New Password').should('be.visible');
+    cy.get('input#otp').type('123456');
+    cy.get('input#newPassword').type('NewSecurePassword99!');
+    cy.get('input#confirmPassword').type('NewSecurePassword99!');
+    cy.contains('button', /Reset Password/i).click();
+    cy.wait('@resetPassword');
+
+    // Step 3: Success state
+    cy.contains(/Password Changed!/i).should('be.visible');
+    cy.contains(/Sign In Now/i).should('be.visible');
+  });
+
   it('redirects unauthenticated users attempting to access protected vendor dashboard', () => {
     // Clear any existing tokens
     cy.clearLocalStorage();
@@ -57,3 +90,4 @@ describe('02 - Authentication & Route Guard Flows', () => {
     });
   });
 });
+

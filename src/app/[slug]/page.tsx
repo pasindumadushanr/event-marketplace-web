@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Navbar } from '@/components/home/Navbar';
 import { Footer } from '@/components/home/Footer';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 async function getPage(slug: string) {
   try {
@@ -46,7 +47,7 @@ export default async function DynamicCmsPage({ params }: { params: { slug: strin
           {/* Render Rich HTML Content */}
           <div 
             className="prose prose-zinc lg:prose-lg mx-auto prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl"
-            dangerouslySetInnerHTML={{ __html: page.content }} 
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content) }} 
           />
         </article>
       </main>

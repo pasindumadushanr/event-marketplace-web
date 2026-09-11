@@ -97,4 +97,29 @@ describe('03 - Vendor Business Management Dashboard', () => {
     cy.visit('/vendor/business/policies');
     cy.contains(/Polic/i).should('exist');
   });
+
+  it('renders vendor calendar with blackout management controls', () => {
+    cy.intercept('GET', '**/bookings/vendor', {
+      statusCode: 200,
+      body: [
+        {
+          id: 'booking-qa-1',
+          date: new Date().toISOString(),
+          status: 'CONFIRMED',
+          totalAmount: 75000,
+          customer: { firstName: 'Alice', lastName: 'Silva' },
+          package: { name: 'Wedding Photography Deluxe' }
+        }
+      ]
+    }).as('getVendorBookings');
+
+    cy.visit('/vendor/calendar');
+    cy.wait('@getVendorBookings');
+
+    cy.contains('Calendar & Blackouts').should('be.visible');
+    cy.contains('Confirmed Event').should('be.visible');
+    cy.contains('Blackout / Blocked').should('be.visible');
+    cy.contains('Today').should('be.visible');
+  });
 });
+

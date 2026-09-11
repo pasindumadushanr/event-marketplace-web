@@ -1,4 +1,5 @@
 import { CheckCircle } from 'lucide-react';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 export function BlockRenderer({ block }: { block: any }) {
   if (!block) return null;
@@ -15,7 +16,7 @@ export function BlockRenderer({ block }: { block: any }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div 
             className="prose prose-slate max-w-none text-slate-600 text-lg leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: block.description || '' }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(block.description) }}
           />
           
           {block.imageUrl && (

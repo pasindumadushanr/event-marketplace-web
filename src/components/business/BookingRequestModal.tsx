@@ -34,20 +34,29 @@ interface BookingRequestModalProps {
   isOpen: boolean;
   onClose: () => void;
   businessName: string;
+  blockedDates?: string[];
 }
 
-export function BookingRequestModal({ pkg, isOpen, onClose, businessName }: BookingRequestModalProps) {
+export function BookingRequestModal({ pkg, isOpen, onClose, businessName, blockedDates = [] }: BookingRequestModalProps) {
   const { user } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<BookingFormValues>({
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
   });
+
+  const selectedDate = watch('date');
+  const isDateBlocked = selectedDate && blockedDates.includes(selectedDate);
 
   if (!pkg) return null;
 
   const onSubmit = async (data: BookingFormValues) => {
+    if (blockedDates.includes(data.date)) {
+      toast.error('The selected date has been blacked out by the vendor. Please select an available date.');
+      return;
+    }
+
     if (!user) {
       toast.error('You must be logged in to request a booking.');
       router.push('/login');
@@ -62,6 +71,7 @@ export function BookingRequestModal({ pkg, isOpen, onClose, businessName }: Book
         date: data.date,
         notes: data.notes
       });
+
       
       // 2. Create the mock payment session
       const sessionRes = await api.post('/payments/create-session', {
@@ -109,8 +119,14 @@ export function BookingRequestModal({ pkg, isOpen, onClose, businessName }: Book
               type="date" 
               min={new Date().toISOString().split('T')[0]} 
               {...register('date')} 
+              className={isDateBlocked ? 'border-rose-500 bg-rose-50/50' : ''}
             />
             {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
+            {isDateBlocked && (
+              <p className="text-xs text-rose-600 font-semibold flex items-center gap-1">
+                ⚠️ This date is unavailable (blacked out by vendor). Please pick another date.
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -126,7 +142,11 @@ export function BookingRequestModal({ pkg, isOpen, onClose, businessName }: Book
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button 
+              type="submit" 
+              disabled={isSubmitting || Boolean(isDateBlocked)} 
+              className="bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50"
+            >
               {isSubmitting ? 'Sending Request...' : 'Submit Request'}
             </Button>
           </DialogFooter>

@@ -123,7 +123,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ slug
             <BusinessAbout business={business} />
             <BusinessFeatures featureGroups={business.featureGroups} />
             <BusinessGallery gallery={business.gallery} />
-            <BusinessPackages packages={business.packages} businessName={business.name} />
+            <BusinessPackages packages={business.packages} businessName={business.name} blockedDates={business.blockedDates} />
             <BusinessReviews businessId={business.id} reviews={business.reviews} rating={business.rating} reviewCount={business.reviewCount} />
             <BusinessFAQ faq={business.faq} />
             <BusinessPolicies policies={business.policies} />
@@ -132,7 +132,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ slug
           <div className="lg:col-span-4">
             <div className="sticky top-28 space-y-6">
               <BusinessCTA businessId={business.id} bookingMethod={business.bookingMethod} startingPrice={business.startingPrice} />
-              <BusinessAvailability />
+              <BusinessAvailability blockedDates={business.blockedDates} />
               <BusinessHours hours={business.businessHours} />
               <BusinessContact contact={business.contact} />
               <BusinessLocation location={business.location} />
@@ -200,6 +200,7 @@ function mapBusinessData(data: any) {
     })) || [],
     
     bookingMethod: data.profileSettings?.bookingMethod || 'DIRECT_BOOKING',
+    blockedDates: data.profileSettings?.blockedDates || [],
     
     businessHours: (() => {
       if (Array.isArray(data.profileSettings?.hours)) {

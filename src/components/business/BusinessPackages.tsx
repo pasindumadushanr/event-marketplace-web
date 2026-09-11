@@ -9,9 +9,10 @@ import { BookingRequestModal } from './BookingRequestModal';
 interface BusinessPackagesProps {
   packages: Package[];
   businessName: string;
+  blockedDates?: string[];
 }
 
-export function BusinessPackages({ packages, businessName }: BusinessPackagesProps) {
+export function BusinessPackages({ packages, businessName, blockedDates = [] }: BusinessPackagesProps) {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
 
   if (!packages || packages.length === 0) {
@@ -90,6 +91,7 @@ export function BusinessPackages({ packages, businessName }: BusinessPackagesPro
         isOpen={!!selectedPackage} 
         onClose={() => setSelectedPackage(null)} 
         businessName={businessName}
+        blockedDates={blockedDates}
       />
     </div>
   );
