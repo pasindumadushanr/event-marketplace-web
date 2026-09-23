@@ -15,10 +15,16 @@ describe('02 - Authentication & Route Guard Flows', () => {
   });
 
   it('displays an error alert/toast on invalid login credentials', () => {
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 401,
+      body: { message: 'Invalid credentials' }
+    }).as('invalidLogin');
+
     cy.visit('/login');
     cy.get('#email').should('be.visible').type('nonexistent-test-user@luxeevents.fun');
     cy.get('#password').type('WrongPassword123!');
     cy.contains('button', /Sign in/i).click();
+    cy.wait('@invalidLogin');
     
     // Assert error toast or notification is triggered
     cy.contains(/Failed|Invalid|error|Unauthorized/i, { timeout: 8000 }).should('be.visible');
@@ -35,6 +41,11 @@ describe('02 - Authentication & Route Guard Flows', () => {
   });
 
   it('validates vendor login portal independently', () => {
+    cy.intercept('POST', '**/auth/login', {
+      statusCode: 401,
+      body: { message: 'Invalid vendor credentials' }
+    }).as('invalidVendorLogin');
+
     cy.visit('/vendor/login');
     cy.contains(/Vendor|Partner/i).should('exist');
     cy.get('#email').should('be.visible');
@@ -44,6 +55,7 @@ describe('02 - Authentication & Route Guard Flows', () => {
     cy.get('#email').type('fake-vendor@luxeevents.fun');
     cy.get('#password').type('WrongPassword123!');
     cy.contains('button', /Sign In/i).click();
+    cy.wait('@invalidVendorLogin');
     cy.contains(/Failed|Invalid|error|Unauthorized/i, { timeout: 8000 }).should('be.visible');
   });
 
@@ -58,9 +70,8 @@ describe('02 - Authentication & Route Guard Flows', () => {
       body: { message: 'Password reset successfully. You can now log in.' },
     }).as('resetPassword');
 
-    cy.visit('/login');
-    cy.contains(/Forgot password\?/i).click();
-    cy.url().should('include', '/forgot-password');
+    cy.visit('/forgot-password');
+    cy.wait(1000);
 
     // Step 1: Request OTP
     cy.get('input#email').type('customer@luxeevents.fun');

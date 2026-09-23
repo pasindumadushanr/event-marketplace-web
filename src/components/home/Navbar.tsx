@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Diamond, User as UserIcon, Heart, CalendarDays, LogOut, Settings } from 'lucide-react';
+import { Menu, X, Diamond, User as UserIcon, Heart, CalendarDays, LogOut, Settings, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -41,20 +41,42 @@ function UserAccountNav() {
           </div>
         </div>
         <DropdownMenuSeparator />
+        {(user.roleName === 'ADMIN' || user.roleName === 'SUPER_ADMIN') && (
+          <>
+            <DropdownMenuItem>
+              <Link href="/admin" className="cursor-pointer flex items-center font-medium text-indigo-600 w-full">
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                <span>Admin Portal</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        {user.roleName === 'VENDOR' && (
+          <>
+            <DropdownMenuItem>
+              <Link href="/vendor" className="cursor-pointer flex items-center font-medium text-primary w-full">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Vendor Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
         <DropdownMenuItem>
-          <Link href="/account/bookings" className="cursor-pointer flex items-center">
+          <Link href="/account/bookings" className="cursor-pointer flex items-center w-full">
             <CalendarDays className="mr-2 h-4 w-4" />
             <span>My Bookings</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link href="/account/favorites" className="cursor-pointer flex items-center">
+          <Link href="/account/favorites" className="cursor-pointer flex items-center w-full">
             <Heart className="mr-2 h-4 w-4" />
             <span>Saved Favorites</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>
-          <Link href="/account/settings" className="cursor-pointer flex items-center">
+          <Link href="/account/settings" className="cursor-pointer flex items-center w-full">
             <Settings className="mr-2 h-4 w-4" />
             <span>Account Settings</span>
           </Link>
@@ -70,7 +92,7 @@ function UserAccountNav() {
 }
 
 export function Navbar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -134,7 +156,13 @@ export function Navbar() {
             <div className="flex items-center gap-4 pl-6 border-l border-slate-300/30">
               {user ? (
                 <>
-                  {user.roleName === 'VENDOR' || user.roleName === 'ADMIN' ? (
+                  {user.roleName === 'ADMIN' || user.roleName === 'SUPER_ADMIN' ? (
+                    <Link href="/admin">
+                      <Button variant={isScrolled ? "outline" : "secondary"} className={`font-medium ${!isScrolled && 'bg-white/10 text-white hover:bg-white/20 border-white/20'}`}>
+                        Admin Portal
+                      </Button>
+                    </Link>
+                  ) : user.roleName === 'VENDOR' ? (
                     <Link href="/vendor">
                       <Button variant={isScrolled ? "outline" : "secondary"} className={`font-medium ${!isScrolled && 'bg-white/10 text-white hover:bg-white/20 border-white/20'}`}>
                         Dashboard
@@ -193,17 +221,45 @@ export function Navbar() {
             </Link>
           ))}
           <div className="flex flex-col gap-4 pt-4">
-            <Link href="/vendor/register">
-              <Button variant="outline" className="w-full text-lg h-12">Become a Vendor</Button>
-            </Link>
-            <div className="grid grid-cols-2 gap-4">
-              <Link href="/login">
-                <Button variant="secondary" className="w-full h-12">Login</Button>
-              </Link>
-              <Link href="/register">
-                <Button className="w-full h-12 bg-primary">Join Now</Button>
-              </Link>
-            </div>
+            {user ? (
+              <>
+                {user.roleName === 'ADMIN' || user.roleName === 'SUPER_ADMIN' ? (
+                  <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full text-lg h-12 bg-indigo-600 hover:bg-indigo-700">Admin Portal</Button>
+                  </Link>
+                ) : user.roleName === 'VENDOR' ? (
+                  <Link href="/vendor" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full text-lg h-12 bg-primary">Vendor Dashboard</Button>
+                  </Link>
+                ) : (
+                  <Link href="/vendor/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full text-lg h-12">Become a Vendor</Button>
+                  </Link>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <Link href="/account/bookings" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" className="w-full h-12">My Bookings</Button>
+                  </Link>
+                  <Button variant="secondary" className="w-full h-12 text-red-600" onClick={() => { logout(); setIsMobileMenuOpen(false); }}>
+                    Log out
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link href="/vendor/register" onClick={() => setIsMobileMenuOpen(false)}>
+                  <Button variant="outline" className="w-full text-lg h-12">Become a Vendor</Button>
+                </Link>
+                <div className="grid grid-cols-2 gap-4">
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="secondary" className="w-full h-12">Login</Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button className="w-full h-12 bg-primary">Join Now</Button>
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

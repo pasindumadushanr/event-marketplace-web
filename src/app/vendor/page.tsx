@@ -19,10 +19,12 @@ import {
 import { Button } from '@/components/ui/button';
 import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 import api from '@/lib/api';
+import { toast } from 'sonner';
 
 export default function VendorDashboardPage() {
   const router = useRouter();
-  const { business, isLoading: businessLoading } = useBusinessProfile();
+  const { business, isLoading: businessLoading, updateBusinessLocally } = useBusinessProfile();
+  const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   
   const [status, setStatus] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
@@ -233,17 +235,22 @@ export default function VendorDashboardPage() {
                 <p className="text-2xl font-bold text-emerald-400 mb-2">Live & Active</p>
                 <p className="text-sm text-slate-400 font-medium mb-6">Your business is visible to customers.</p>
                 <Button 
+                  disabled={isTogglingStatus}
                   onClick={async () => {
+                    setIsTogglingStatus(true);
                     try {
-                      await api.post('/vendor/business/unpublish');
-                      window.location.reload();
-                    } catch (e) {
-                      console.error(e);
+                      await api.patch('/vendor/business/unpublish');
+                      updateBusinessLocally({ status: 'INACTIVE' });
+                      toast.success('Your business is now unpublished and hidden from public search.');
+                    } catch (e: any) {
+                      toast.error(e?.response?.data?.message || 'Failed to unpublish business');
+                    } finally {
+                      setIsTogglingStatus(false);
                     }
                   }}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border-0"
+                  className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border-0 cursor-pointer"
                 >
-                  Unpublish Business
+                  {isTogglingStatus ? 'Updating...' : 'Unpublish Business'}
                 </Button>
               </>
             ) : progressPercentage === 100 ? (
@@ -251,17 +258,22 @@ export default function VendorDashboardPage() {
                 <p className="text-2xl font-bold text-emerald-400 mb-2">Ready to Publish</p>
                 <p className="text-sm text-slate-400 font-medium mb-6">Your profile is 100% complete.</p>
                 <Button 
+                  disabled={isTogglingStatus}
                   onClick={async () => {
+                    setIsTogglingStatus(true);
                     try {
-                      await api.post('/vendor/business/publish');
-                      window.location.reload();
-                    } catch (e) {
-                      console.error(e);
+                      await api.patch('/vendor/business/publish');
+                      updateBusinessLocally({ status: 'ACTIVE' });
+                      toast.success('Your business is now live on the marketplace!');
+                    } catch (e: any) {
+                      toast.error(e?.response?.data?.message || 'Failed to publish business');
+                    } finally {
+                      setIsTogglingStatus(false);
                     }
                   }}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-0"
+                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-0 cursor-pointer"
                 >
-                  Publish Business
+                  {isTogglingStatus ? 'Publishing...' : 'Publish Business'}
                 </Button>
               </>
             ) : (
