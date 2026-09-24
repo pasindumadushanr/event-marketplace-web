@@ -20,27 +20,32 @@ import { Input } from '@/components/ui/input';
 function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
+  const initialCity = searchParams.get('city') || '';
   
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Filter States
   const [query, setQuery] = useState(initialQuery);
-  const [city, setCity] = useState('');
+  const [city, setCity] = useState(initialCity);
   const [sortBy, setSortBy] = useState('NEWEST');
   const [meta, setMeta] = useState<any>(null);
 
   useEffect(() => {
-    fetchResults();
-  }, [sortBy]); // Refetch when sort changes. We will manually trigger for text searches.
+    const q = searchParams.get('q') || '';
+    const c = searchParams.get('city') || '';
+    setQuery(q);
+    setCity(c);
+    fetchResults(q, c, sortBy);
+  }, [searchParams, sortBy]);
 
-  const fetchResults = async () => {
+  const fetchResults = async (searchQ = query, searchCity = city, sort = sortBy) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
-      if (query) params.append('q', query);
-      if (city) params.append('city', city);
-      if (sortBy) params.append('sortBy', sortBy);
+      if (searchQ) params.append('q', searchQ);
+      if (searchCity) params.append('city', searchCity);
+      if (sort) params.append('sortBy', sort);
       
       const res = await api.get(`/discovery/search?${params.toString()}`);
       setBusinesses(res.data.data);
@@ -54,7 +59,7 @@ function SearchContent() {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetchResults();
+    fetchResults(query, city, sortBy);
   };
 
   return (

@@ -12,6 +12,16 @@ describe('01 - Public Discovery & Marketing Pages', () => {
     // Check search input presence
     cy.get('input[type="text"], input[placeholder*="search" i], input[placeholder*="Search" i]').should('exist');
     
+    // Verify location dropdown contains all 25 districts across Sri Lanka
+    cy.get('select').should('contain', 'Any Location (All 25 Districts)');
+    cy.get('select').should('contain', 'Colombo');
+    cy.get('select').should('contain', 'Kandy');
+    cy.get('select').should('contain', 'Galle');
+    cy.get('select').should('contain', 'Jaffna');
+    cy.get('select').should('contain', 'Nuwara Eliya');
+    cy.get('select').should('contain', 'Badulla');
+    cy.get('select').should('contain', 'Trincomalee');
+
     // Check footer presence
     cy.get('footer').should('exist');
     cy.get('footer').contains(/Privacy|Terms|Contact/i).should('exist');
