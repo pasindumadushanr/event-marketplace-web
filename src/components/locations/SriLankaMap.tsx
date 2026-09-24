@@ -26,12 +26,18 @@ interface SriLankaMapProps {
 const SRI_LANKA_CENTER: [number, number] = [7.8731, 80.7718];
 const DEFAULT_ZOOM = 7.5;
 
-// Clean tile providers with NO API keys, NO credit card, and NO watermarks
+const cartoKey = process.env.NEXT_PUBLIC_CARTO_API_KEY;
+
+// Clean tile providers with optional CARTO key support and zero-watermark Esri/OSM fallbacks
 const TILE_PROVIDERS = {
   street: {
     name: 'Street Map',
-    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Sources: Esri, DeLorme, NAVTEQ, TomTom, USGS',
+    url: cartoKey 
+      ? `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?api_key=${cartoKey}`
+      : 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution: cartoKey
+      ? '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>'
+      : 'Tiles &copy; Esri &mdash; Sources: Esri, DeLorme, NAVTEQ, TomTom, USGS',
     subdomains: 'abc',
     maxZoom: 19,
   },
