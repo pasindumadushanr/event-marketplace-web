@@ -59,4 +59,27 @@ describe('01 - Public Discovery & Marketing Pages', () => {
       }
     });
   });
+
+  it('renders the interactive 25 Districts of Sri Lanka coverage map and directory', () => {
+    cy.visit('/locations');
+    cy.contains('25 Districts').should('be.visible');
+    cy.contains('Interactive Sri Lanka Coverage Map').should('be.visible');
+    cy.contains('Colombo').should('be.visible');
+    cy.contains('Kandy').should('be.visible');
+    cy.contains('Galle').should('be.visible');
+    cy.contains('Jaffna').should('be.visible');
+
+    // Filter by Northern province
+    cy.contains('button', 'Northern').click();
+    cy.contains('Jaffna').should('be.visible');
+    cy.contains('Kilinochchi').should('be.visible');
+    cy.contains('Mannar').should('be.visible');
+    cy.contains('Vavuniya').should('be.visible');
+    cy.contains('Mullaitivu').should('be.visible');
+
+    // Search for a district
+    cy.get('input[placeholder*="Search district"]').type('Galle');
+    cy.contains('Galle Fort').should('be.visible');
+    cy.contains('button', /Browse All Galle Vendors|Explore Galle Vendors/i).should('be.visible');
+  });
 });

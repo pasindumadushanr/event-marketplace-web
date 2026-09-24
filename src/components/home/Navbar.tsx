@@ -109,6 +109,7 @@ export function Navbar() {
     { name: 'Home', href: '/' },
     { name: 'Categories', href: '/#categories' },
     { name: 'Vendors', href: '/search' },
+    { name: 'Locations', href: '/locations' },
     { name: 'Packages', href: '/#packages' },
     { name: 'About', href: '/about' },
     { name: 'Contact', href: '/contact' }
