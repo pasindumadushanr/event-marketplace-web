@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Compass, RotateCcw, ZoomIn, ZoomOut, Layers } from 'lucide-react';
+import { Compass, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface DistrictMapItem {
@@ -24,27 +24,28 @@ interface SriLankaMapProps {
 }
 
 const SRI_LANKA_CENTER: [number, number] = [7.8731, 80.7718];
-const DEFAULT_ZOOM = 7.3;
+const DEFAULT_ZOOM = 7.5;
 
+// Clean tile providers with NO API keys, NO credit card, and NO watermarks
 const TILE_PROVIDERS = {
-  voyager: {
-    name: 'Modern Street',
-    url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank">CARTO</a>',
-    subdomains: 'abcd',
+  street: {
+    name: 'Street Map',
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Sources: Esri, DeLorme, NAVTEQ, TomTom, USGS',
+    subdomains: 'abc',
     maxZoom: 19,
   },
   satellite: {
     name: 'Satellite',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    attribution: 'Tiles &copy; Esri &mdash; Sources: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN',
     subdomains: 'abc',
     maxZoom: 18,
   },
   osm: {
     name: 'OpenStreetMap',
     url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors',
     subdomains: 'abc',
     maxZoom: 19,
   }
@@ -59,7 +60,7 @@ export default function SriLankaMap({
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markersRef = useRef<{ [id: string]: L.Marker }>({});
   const tileLayerRef = useRef<L.TileLayer | null>(null);
-  const [activeTile, setActiveTile] = useState<'voyager' | 'satellite' | 'osm'>('voyager');
+  const [activeTile, setActiveTile] = useState<'street' | 'satellite' | 'osm'>('street');
 
   // Initialize Map
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function SriLankaMap({
       zoom: DEFAULT_ZOOM,
       minZoom: 6.5,
       maxZoom: 16,
-      zoomControl: false, // We render custom stylish controls
+      zoomControl: false,
       maxBounds: [
         [5.2, 78.5],
         [10.5, 82.8],
@@ -93,7 +94,6 @@ export default function SriLankaMap({
 
     districts.forEach((d) => {
       const isSelected = d.id === activeDistrictId;
-
       const markerIcon = createMarkerIcon(d.name, isSelected);
 
       const marker = L.marker([d.lat, d.lng], {
@@ -102,9 +102,21 @@ export default function SriLankaMap({
         title: `${d.name} (${d.province} Province)`,
       }).addTo(map);
 
-      // Bind popup
+      // Clean Native Tooltip on hover
+      marker.bindTooltip(`
+        <div style="font-weight: 700; font-size: 11px; color: #0f172a;">
+          ${d.name} <span style="font-size: 10px; color: #0284c7; font-weight: 600;">(${d.province})</span>
+        </div>
+      `, {
+        direction: 'top',
+        offset: [0, -12],
+        opacity: 0.95,
+        className: 'custom-district-tooltip',
+      });
+
+      // Bind detailed click popup
       const popupHtml = `
-        <div style="font-family: inherit; min-width: 170px; padding: 2px;">
+        <div style="font-family: inherit; min-width: 175px; padding: 4px;">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 2px;">
             <strong style="font-size: 15px; color: #0f172a;">${d.name}</strong>
             <span style="font-size: 10px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 9999px;">${d.province}</span>
@@ -112,7 +124,7 @@ export default function SriLankaMap({
           <div style="font-size: 11px; color: #059669; font-weight: 600; margin-bottom: 6px;">${d.vendorCountEstimate}</div>
           <div style="font-size: 11px; color: #64748b; line-height: 1.3; margin-bottom: 8px;">Key towns: ${d.keyTowns.slice(0, 3).join(', ')}</div>
           <a href="/search?city=${encodeURIComponent(d.name)}" style="display: block; text-align: center; background: #0f172a; color: #ffffff; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 8px; text-decoration: none;">
-            Explore Vendors in ${d.name} &rarr;
+            Explore ${d.name} Vendors &rarr;
           </a>
         </div>
       `;
@@ -136,7 +148,7 @@ export default function SriLankaMap({
     };
   }, []);
 
-  // Update tile provider if changed
+  // Update tile provider when user clicks switcher
   useEffect(() => {
     if (!mapInstanceRef.current || !tileLayerRef.current) return;
 
@@ -147,7 +159,7 @@ export default function SriLankaMap({
     tileLayerRef.current.redraw();
   }, [activeTile]);
 
-  // Update Active Marker state & smoothly center
+  // Update Active Marker state & smoothly fly
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
@@ -161,7 +173,6 @@ export default function SriLankaMap({
       marker.setZIndexOffset(isSelected ? 1000 : 100);
 
       if (isSelected) {
-        // Fly gently to active district
         map.flyTo([d.lat, d.lng], Math.max(map.getZoom(), 8.8), {
           duration: 0.9,
           easeLinearity: 0.25,
@@ -172,9 +183,9 @@ export default function SriLankaMap({
 
   // Helper to build custom HTML pin icons
   function createMarkerIcon(name: string, isSelected: boolean) {
-    const html = isSelected
-      ? `
-        <div class="relative flex flex-col items-center cursor-pointer group">
+    if (isSelected) {
+      const html = `
+        <div class="relative flex flex-col items-center cursor-pointer">
           <div class="relative flex items-center justify-center">
             <span class="absolute w-8 h-8 rounded-full bg-emerald-500/30 animate-ping"></span>
             <span class="relative flex items-center justify-center w-7 h-7 rounded-full bg-emerald-600 text-white shadow-xl ring-2 ring-white border-2 border-emerald-400">
@@ -184,26 +195,34 @@ export default function SriLankaMap({
               </svg>
             </span>
           </div>
-          <span class="mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-slate-950 text-emerald-400 shadow-xl border border-emerald-500/40 whitespace-nowrap tracking-wide">
-            ${name}
-          </span>
-        </div>
-      `
-      : `
-        <div class="relative flex flex-col items-center cursor-pointer group transition-transform duration-200 hover:scale-110">
-          <div class="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white shadow-md group-hover:bg-amber-400"></div>
-          <span class="mt-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-slate-900/85 text-slate-100 shadow border border-slate-700/60 whitespace-nowrap backdrop-blur-sm group-hover:bg-slate-950 group-hover:text-amber-300">
+          <span class="mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-slate-950 text-emerald-400 shadow-xl border border-emerald-500/50 whitespace-nowrap tracking-wide">
             ${name}
           </span>
         </div>
       `;
 
+      return L.divIcon({
+        className: 'sri-lanka-marker-active',
+        html: html,
+        iconSize: [90, 52],
+        iconAnchor: [45, 14],
+        popupAnchor: [0, -14],
+      });
+    }
+
+    // Unselected: Clean, non-overlapping pin dot with hover badge
+    const html = `
+      <div class="relative flex flex-col items-center cursor-pointer group">
+        <div class="w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-md group-hover:scale-125 group-hover:bg-amber-400 transition-transform duration-200"></div>
+      </div>
+    `;
+
     return L.divIcon({
-      className: 'sri-lanka-custom-marker',
+      className: 'sri-lanka-marker-dot',
       html: html,
-      iconSize: isSelected ? [90, 52] : [70, 36],
-      iconAnchor: isSelected ? [45, 14] : [35, 7],
-      popupAnchor: [0, -14],
+      iconSize: [16, 16],
+      iconAnchor: [8, 8],
+      popupAnchor: [0, -10],
     });
   }
 
@@ -237,18 +256,18 @@ export default function SriLankaMap({
       />
 
       {/* Floating Top Controls Header */}
-      <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-2 bg-slate-950/80 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700/60 text-white shadow-lg pointer-events-auto">
+      <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-2 bg-slate-950/85 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700/60 text-white shadow-lg pointer-events-auto">
         <div className="flex items-center gap-2 text-xs font-semibold pr-2 border-r border-slate-700">
-          <Compass className="h-4 w-4 text-emerald-400 animate-spin-slow" />
-          <span>Real Sri Lanka GIS Map</span>
+          <Compass className="h-4 w-4 text-emerald-400" />
+          <span>Sri Lanka Coverage</span>
         </div>
 
         {/* Tile Provider Switcher */}
         <div className="flex items-center gap-1">
           <button
-            onClick={() => setActiveTile('voyager')}
+            onClick={() => setActiveTile('street')}
             className={`text-[11px] font-bold px-2 py-1 rounded-lg transition-all ${
-              activeTile === 'voyager'
+              activeTile === 'street'
                 ? 'bg-emerald-500 text-white shadow'
                 : 'text-slate-300 hover:text-white hover:bg-slate-800'
             }`}
@@ -273,7 +292,7 @@ export default function SriLankaMap({
                 : 'text-slate-300 hover:text-white hover:bg-slate-800'
             }`}
           >
-            Terrain
+            OpenStreetMap
           </button>
         </div>
       </div>
@@ -308,9 +327,9 @@ export default function SriLankaMap({
       </div>
 
       {/* Floating Hint Overlay */}
-      <div className="absolute bottom-5 left-5 z-[400] hidden sm:flex items-center gap-2 bg-slate-950/75 backdrop-blur-md text-[11px] text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800/80 pointer-events-none">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>Click any district pin or use controls to zoom & pan across Sri Lanka</span>
+      <div className="absolute bottom-5 left-5 z-[400] hidden sm:flex items-center gap-2 bg-slate-950/80 backdrop-blur-md text-[11px] text-slate-300 px-3 py-1.5 rounded-xl border border-slate-800/80 pointer-events-none">
+        <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span>Hover any pin for district name &bull; Click to zoom in</span>
       </div>
     </div>
   );
