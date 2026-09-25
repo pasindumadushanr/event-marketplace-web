@@ -22,13 +22,16 @@ import {
   Car,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  ArrowLeft,
+  Info,
+  CalendarCheck,
+  ShieldCheck
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 
@@ -72,7 +75,7 @@ type PackageFormValues = z.infer<typeof packageSchema>;
 export default function VendorPackagesPage() {
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'editor'>('list');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -91,8 +94,13 @@ export default function VendorPackagesPage() {
     }
   });
 
+  const currentName = watch('name');
+  const currentPrice = watch('price');
+  const currentDescription = watch('description');
   const currentImage = watch('image');
   const currentDuration = watch('duration');
+  const currentStatus = watch('status');
+  const currentFeatures = watch('features');
 
   const { fields, append, remove } = useFieldArray({
     name: "features",
@@ -125,7 +133,8 @@ export default function VendorPackagesPage() {
       status: 'ACTIVE',
       features: [{ value: '' }]
     });
-    setIsModalOpen(true);
+    setViewMode('editor');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleEdit = (pkg: any) => {
@@ -139,7 +148,8 @@ export default function VendorPackagesPage() {
       status: pkg.status,
       features: pkg.features?.length > 0 ? pkg.features.map((f: string) => ({ value: f })) : [{ value: '' }]
     });
-    setIsModalOpen(true);
+    setViewMode('editor');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -185,7 +195,6 @@ export default function VendorPackagesPage() {
   };
 
   const handleAddQuickSpec = (spec: string) => {
-    // If the only field is empty, populate it; otherwise append
     if (fields.length === 1 && !watch('features.0.value')) {
       setValue('features.0.value', spec, { shouldValidate: true, shouldDirty: true });
     } else {
@@ -209,7 +218,7 @@ export default function VendorPackagesPage() {
         await api.post('/vendor/packages', payload);
         toast.success('Package created successfully');
       }
-      setIsModalOpen(false);
+      setViewMode('list');
       fetchPackages();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to save package');
@@ -240,6 +249,485 @@ export default function VendorPackagesPage() {
     }
   };
 
+  // FULL-PAGE DEDICATED EDITOR VIEW
+  if (viewMode === 'editor') {
+    return (
+      <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-300">
+        {/* Navigation Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setViewMode('list')}
+              className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Packages & Fleet
+            </Button>
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
+                {editingId ? 'Edit Mode' : 'New Listing'}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={() => setViewMode('list')}
+              className="rounded-xl font-semibold text-slate-600"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button" 
+              disabled={isSaving || isUploadingImage}
+              onClick={handleSubmit(onSubmit)}
+              className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 shadow-md"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...
+                </>
+              ) : (
+                editingId ? 'Update Card' : 'Save & Publish Card'
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* Title Header */}
+        <div className="space-y-1">
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+            {editingId ? 'Edit Item / Package Card' : 'Create Item / Package Card'}
+          </h1>
+          <p className="text-slate-500 text-sm">
+            Showcase your cars, banquet halls, decor packages, or equipment with photos, pricing, and key specifications.
+          </p>
+        </div>
+
+        {/* Main 2-Column Responsive Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* LEFT COLUMN: Main Form Builder (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              
+              {/* SECTION 1: PHOTO UPLOAD */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-slate-900 text-white font-black text-sm flex items-center justify-center">
+                      1
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Vehicle / Item Photo</h3>
+                      <p className="text-xs text-slate-500">Upload a crisp photo from your device or paste a web link.</p>
+                    </div>
+                  </div>
+                  {currentImage && (
+                    <button 
+                      type="button" 
+                      onClick={() => setValue('image', '')} 
+                      className="text-xs text-red-600 hover:text-red-700 hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <X className="h-3.5 w-3.5" /> Remove
+                    </button>
+                  )}
+                </div>
+
+                {/* Preview Box or Dropzone */}
+                {currentImage ? (
+                  <div className="relative h-64 sm:h-72 w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 shadow-inner group">
+                    <img src={currentImage} alt="Item Preview" className="w-full h-full object-cover" />
+                    <div className="absolute top-4 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow flex items-center gap-1.5">
+                      <Check className="h-3.5 w-3.5" /> Photo Loaded & Ready
+                    </div>
+                    <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="secondary"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="text-xs font-bold shadow rounded-xl"
+                      >
+                        <Upload className="h-3.5 w-3.5 mr-1.5" /> Replace Photo
+                      </Button>
+                      <Button 
+                        type="button" 
+                        size="sm" 
+                        variant="destructive"
+                        onClick={() => setValue('image', '')}
+                        className="text-xs font-bold shadow rounded-xl"
+                      >
+                        <X className="h-3.5 w-3.5 mr-1.5" /> Remove Photo
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center bg-slate-50/50 hover:bg-slate-50 transition-colors">
+                    <div className="w-14 h-14 rounded-2xl bg-white shadow-xs border border-slate-200 flex items-center justify-center mx-auto mb-3 text-slate-400">
+                      <ImageIcon className="h-7 w-7" />
+                    </div>
+                    <p className="text-sm font-bold text-slate-800 mb-1">
+                      Upload photo from your computer or phone
+                    </p>
+                    <p className="text-xs text-slate-400 mb-4 max-w-sm mx-auto">
+                      Supports JPG, PNG, WEBP files up to 10MB. High quality landscape photos look best.
+                    </p>
+                    <Button 
+                      type="button" 
+                      disabled={isUploadingImage}
+                      onClick={() => fileInputRef.current?.click()}
+                      className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow rounded-xl px-5"
+                    >
+                      {isUploadingImage ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading to Cloud...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-4 w-4 mr-2" /> Select File from Device
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                )}
+
+                {/* Hidden input */}
+                <input 
+                  type="file" 
+                  ref={fileInputRef} 
+                  accept="image/*" 
+                  onChange={handleFileUpload} 
+                  className="hidden" 
+                />
+
+                {/* URL Input */}
+                <div className="pt-2">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                    Or paste an image web link (URL):
+                  </label>
+                  <Input 
+                    placeholder="https://images.unsplash.com/..." 
+                    className="text-xs bg-slate-50/50 h-10 rounded-xl border-slate-200"
+                    {...register('image')} 
+                  />
+                </div>
+
+                {/* Quick Presets for 1-Click Testing */}
+                <div className="pt-1">
+                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                    Or choose a sample photo for quick testing:
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {SAMPLE_PRESETS.map((preset, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setValue('image', preset.url, { shouldValidate: true, shouldDirty: true })}
+                        className="text-xs px-3 py-1.5 rounded-xl bg-slate-100/80 hover:bg-amber-100 hover:border-amber-300 border border-slate-200 text-slate-800 font-semibold transition-all shadow-2xs"
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: TITLE & PRICING */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-5">
+                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+                  <div className="w-8 h-8 rounded-xl bg-slate-900 text-white font-black text-sm flex items-center justify-center">
+                    2
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">Title & Pricing</h3>
+                    <p className="text-xs text-slate-500">Provide the item title and your rental rate in LKR.</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-800">
+                      Item / Package Title <span className="text-red-500">*</span>
+                    </label>
+                    <Input 
+                      placeholder="e.g. White Mercedes-Benz E-Class Wedding Car" 
+                      className="rounded-xl border-slate-200 h-11" 
+                      {...register('name')} 
+                    />
+                    {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-800">
+                      Price in Sri Lankan Rupees (LKR) <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-xs font-black text-slate-400">
+                        LKR
+                      </div>
+                      <Input 
+                        type="number" 
+                        placeholder="45000" 
+                        className="pl-14 rounded-xl border-slate-200 h-11 font-bold text-base" 
+                        {...register('price')} 
+                      />
+                    </div>
+                    {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-800">
+                      Rental Duration / Terms (Optional)
+                    </label>
+                    <Input 
+                      placeholder="e.g. 8 Hours / 100km, Full Day, Per Event" 
+                      className="rounded-xl border-slate-200 h-11" 
+                      {...register('duration')} 
+                    />
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {DURATION_PRESETS.map((dur, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setValue('duration', dur, { shouldValidate: true, shouldDirty: true })}
+                          className={`text-xs px-2.5 py-1 rounded-lg border font-semibold transition-colors ${currentDuration === dur ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                        >
+                          {dur}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold text-slate-800">
+                      Storefront Visibility Status
+                    </label>
+                    <select 
+                      className="w-full flex h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
+                      {...register('status')}
+                    >
+                      <option value="ACTIVE">🟢 Active (Visible to Customers)</option>
+                      <option value="INACTIVE">⚪ Draft (Hidden from Storefront)</option>
+                    </select>
+                    <p className="text-[11px] text-slate-400">
+                      You can change this visibility anytime.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-sm font-bold text-slate-800">
+                    Description & Inclusions (Optional)
+                  </label>
+                  <Textarea 
+                    placeholder="Describe vehicle condition, chauffeur attire, interior details, air conditioning, terms..." 
+                    className="resize-none h-24 rounded-xl border-slate-200 text-sm leading-relaxed" 
+                    {...register('description')} 
+                  />
+                </div>
+              </div>
+
+              {/* SECTION 3: SPECIFICATIONS CHECKLIST */}
+              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-slate-900 text-white font-black text-sm flex items-center justify-center">
+                      3
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-slate-900">Inclusions & Specifications</h3>
+                      <p className="text-xs text-slate-500">Key bullet points so customers know exactly what is included.</p>
+                    </div>
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => append({ value: '' })} 
+                    className="text-xs font-bold rounded-xl bg-slate-50"
+                  >
+                    <Plus className="h-3.5 w-3.5 mr-1" /> Add Custom
+                  </Button>
+                </div>
+
+                {/* Quick Suggestion Chips */}
+                <div>
+                  <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5">
+                    1-Click Suggestion Chips:
+                  </label>
+                  <div className="flex flex-wrap gap-1.5">
+                    {QUICK_SPECS.map((spec, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleAddQuickSpec(spec)}
+                        className="text-xs px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 hover:border-amber-400 hover:bg-amber-50 font-medium transition-colors shadow-2xs"
+                      >
+                        + {spec}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Inputs */}
+                <div className="space-y-2.5 pt-2">
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="flex items-center gap-2.5">
+                      <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
+                      <Input 
+                        placeholder="e.g. Uniformed Chauffeur, Full AC, White Ribbon..." 
+                        className="bg-white text-sm h-10 rounded-xl border-slate-200 font-medium"
+                        {...register(`features.${index}.value` as const)} 
+                      />
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-slate-400 hover:text-red-500 shrink-0 h-9 w-9 rounded-xl"
+                        onClick={() => remove(index)}
+                        disabled={fields.length === 1}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="flex items-center justify-between pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setViewMode('list')}
+                  className="rounded-xl font-semibold"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" /> Back
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isSaving || isUploadingImage}
+                  className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-8 h-12 shadow-lg text-base"
+                >
+                  {isSaving ? 'Saving...' : (editingId ? 'Update Card' : 'Save & Publish Card')}
+                </Button>
+              </div>
+            </form>
+          </div>
+
+          {/* RIGHT COLUMN: Live Storefront Mockup Preview (5 cols - Sticky) */}
+          <div className="lg:col-span-5 sticky top-6 space-y-4">
+            <div className="bg-slate-900 text-white rounded-3xl p-5 shadow-lg border border-slate-800">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-amber-400" />
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-400">Live Customer Preview</span>
+                </div>
+                <Badge variant="outline" className="text-white/80 border-white/20 text-[10px]">
+                  Real-Time
+                </Badge>
+              </div>
+              <p className="text-xs text-slate-400">
+                This is how your item card looks on your public storefront right now as you type.
+              </p>
+            </div>
+
+            {/* Mock Card Preview */}
+            <div className="border border-slate-200 rounded-3xl overflow-hidden bg-white shadow-xl flex flex-col">
+              {/* Photo Banner */}
+              <div className="relative h-60 w-full overflow-hidden bg-slate-100">
+                {currentImage ? (
+                  <img 
+                    src={currentImage} 
+                    alt={currentName || 'Item Photo'} 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-slate-100 flex flex-col items-center justify-center text-slate-400 gap-2">
+                    <ImageIcon className="h-10 w-10 text-slate-300" />
+                    <span className="text-xs font-semibold">Photo will appear here</span>
+                  </div>
+                )}
+                
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
+                
+                <div className="absolute top-3 left-3">
+                  <Badge variant="outline" className={currentStatus === 'ACTIVE' ? 'text-emerald-700 border-emerald-300 bg-white/95 backdrop-blur-md font-bold text-xs shadow-xs' : 'text-slate-500 bg-white/90 text-xs shadow-xs'}>
+                    {currentStatus === 'ACTIVE' ? '🟢 Active' : '⚪ Draft'}
+                  </Badge>
+                </div>
+                
+                <div className="absolute bottom-3 left-4 text-white font-black text-2xl drop-shadow">
+                  LKR {Number(currentPrice || 0).toLocaleString()}
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="p-5 flex-1 space-y-4">
+                <div>
+                  <h3 className="text-xl font-bold text-slate-900 leading-snug">
+                    {currentName || 'Mercedes-Benz Luxury Wedding Car'}
+                  </h3>
+                  {currentDuration && (
+                    <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 mt-1.5">
+                      <Clock className="h-3.5 w-3.5 text-slate-400" />
+                      {currentDuration}
+                    </p>
+                  )}
+                </div>
+
+                {currentDescription && (
+                  <p className="text-xs text-slate-600 line-clamp-3 leading-relaxed">
+                    {currentDescription}
+                  </p>
+                )}
+
+                {/* Features Checklist */}
+                <div className="space-y-2 pt-3 border-t border-slate-100">
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Included Features / Specs</h4>
+                  {currentFeatures && currentFeatures.length > 0 && currentFeatures.some(f => f.value.trim()) ? (
+                    currentFeatures.map((f, i) => f.value.trim() ? (
+                      <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                        <span className="line-clamp-1">{f.value}</span>
+                      </div>
+                    ) : null)
+                  ) : (
+                    <div className="text-xs text-slate-400 italic">
+                      Specifications you add will show here for customers.
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Customer Booking Button Preview */}
+              <div className="p-4 pt-0">
+                <Button disabled className="w-full bg-slate-900 text-white font-bold rounded-xl shadow-xs py-5">
+                  <CalendarCheck className="h-4 w-4 mr-2" /> Request this Package
+                </Button>
+              </div>
+            </div>
+
+            {/* Helper Hint */}
+            <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-900">
+              <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>
+                <strong>Pro Tip:</strong> Cards with high-definition photos and clear duration details receive up to 3x more customer inquiries.
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // DEFAULT LIST VIEW
   return (
     <div className="space-y-8 max-w-6xl pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -369,313 +857,6 @@ export default function VendorPackagesPage() {
           ))}
         </div>
       )}
-
-      {/* Editor Modal */}
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-3xl max-h-[92vh] overflow-y-auto p-6 sm:p-8 rounded-3xl border-slate-200 shadow-2xl">
-          <DialogHeader className="pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center shrink-0">
-                <Car className="h-5 w-5" />
-              </div>
-              <div>
-                <DialogTitle className="text-2xl font-bold text-slate-900">
-                  {editingId ? 'Edit Item / Package Card' : 'Create Item / Package Card'}
-                </DialogTitle>
-                <DialogDescription className="text-xs sm:text-sm text-slate-500 mt-0.5">
-                  Add photos and pricing for your cars, banquet rooms, decor packages, or equipment.
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 my-2">
-            
-            {/* STEP 1: PHOTO */}
-            <div className="bg-slate-50/80 p-5 rounded-2xl border border-slate-200/80 space-y-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
-                    <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center">1</span>
-                    Item Photo (Car, Venue, Room, or Setup)
-                  </h3>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Upload from your device or paste a web photo link.
-                  </p>
-                </div>
-                {currentImage && (
-                  <button 
-                    type="button" 
-                    onClick={() => setValue('image', '')} 
-                    className="text-xs text-red-600 hover:text-red-700 hover:underline flex items-center gap-1 font-semibold"
-                  >
-                    <X className="h-3.5 w-3.5" /> Remove Photo
-                  </button>
-                )}
-              </div>
-
-              {/* Live Preview Box */}
-              {currentImage ? (
-                <div className="relative h-56 w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 shadow-sm group">
-                  <img src={currentImage} alt="Item Preview" className="w-full h-full object-cover" />
-                  <div className="absolute top-3 left-3 bg-emerald-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow flex items-center gap-1">
-                    <Check className="h-3 w-3" /> Photo Ready
-                  </div>
-                  <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="text-xs font-bold shadow rounded-xl"
-                    >
-                      <Upload className="h-3.5 w-3.5 mr-1.5" /> Replace Photo
-                    </Button>
-                    <Button 
-                      type="button" 
-                      size="sm" 
-                      variant="destructive"
-                      onClick={() => setValue('image', '')}
-                      className="text-xs font-bold shadow rounded-xl"
-                    >
-                      <X className="h-3.5 w-3.5 mr-1.5" /> Remove
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center bg-white hover:border-slate-400 transition-colors">
-                  <ImageIcon className="h-10 w-10 mx-auto text-slate-400 mb-2" />
-                  <p className="text-sm font-semibold text-slate-800 mb-1">
-                    Upload photo from your computer or phone
-                  </p>
-                  <p className="text-xs text-slate-400 mb-4">
-                    Supports JPG, PNG, WEBP files up to 10MB
-                  </p>
-                  <Button 
-                    type="button" 
-                    disabled={isUploadingImage}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow rounded-xl px-5"
-                  >
-                    {isUploadingImage ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading to Cloud...
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" /> Select File from Device
-                      </>
-                    )}
-                  </Button>
-                </div>
-              )}
-
-              {/* Hidden file input */}
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                accept="image/*" 
-                onChange={handleFileUpload} 
-                className="hidden" 
-              />
-
-              {/* Direct Image URL input */}
-              <div className="pt-2">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
-                  Or paste an image web link (URL):
-                </label>
-                <Input 
-                  placeholder="https://images.unsplash.com/..." 
-                  className="text-xs bg-white h-9 rounded-xl border-slate-200"
-                  {...register('image')} 
-                />
-              </div>
-
-              {/* Quick sample demo presets for instant testing */}
-              <div className="pt-1">
-                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                  Or pick a sample photo for quick testing:
-                </label>
-                <div className="flex flex-wrap gap-1.5">
-                  {SAMPLE_PRESETS.map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => setValue('image', preset.url, { shouldValidate: true, shouldDirty: true })}
-                      className="text-xs px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:border-amber-400 hover:bg-amber-50 text-slate-700 font-medium transition-all shadow-2xs"
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* STEP 2: TITLE & PRICE */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center">2</span>
-                  Item / Package Title <span className="text-red-500">*</span>
-                </label>
-                <Input 
-                  placeholder="e.g. White Mercedes-Benz E-Class Wedding Car" 
-                  className="rounded-xl border-slate-200" 
-                  {...register('name')} 
-                />
-                {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-slate-900 text-white text-[11px] font-bold flex items-center justify-center">3</span>
-                  Price in Rupees (LKR) <span className="text-red-500">*</span>
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-xs font-bold text-slate-400">
-                    LKR
-                  </div>
-                  <Input 
-                    type="number" 
-                    placeholder="45000" 
-                    className="pl-12 rounded-xl border-slate-200 font-semibold" 
-                    {...register('price')} 
-                  />
-                </div>
-                {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
-              </div>
-            </div>
-
-            {/* STEP 3: DURATION & VISIBILITY */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-800">
-                  Rental Duration or Terms (Optional)
-                </label>
-                <Input 
-                  placeholder="e.g. 8 Hours / 100km, Full Day, Per Event" 
-                  className="rounded-xl border-slate-200" 
-                  {...register('duration')} 
-                />
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {DURATION_PRESETS.map((dur, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => setValue('duration', dur, { shouldValidate: true, shouldDirty: true })}
-                      className={`text-[11px] px-2 py-0.5 rounded-md border font-medium transition-colors ${currentDuration === dur ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
-                    >
-                      {dur}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold text-slate-800">
-                  Storefront Visibility
-                </label>
-                <select 
-                  className="w-full flex h-10 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium"
-                  {...register('status')}
-                >
-                  <option value="ACTIVE">🟢 Active (Visible to Customers)</option>
-                  <option value="INACTIVE">⚪ Draft (Hidden from Storefront)</option>
-                </select>
-                <p className="text-[11px] text-slate-400">
-                  You can toggle this on or off anytime.
-                </p>
-              </div>
-            </div>
-
-            {/* STEP 4: DESCRIPTION */}
-            <div className="space-y-1.5">
-              <label className="text-sm font-bold text-slate-800">
-                Description & Inclusions (Optional)
-              </label>
-              <Textarea 
-                placeholder="Describe the vehicle condition, chauffeur attire, decorations, fuel policy, or terms..." 
-                className="resize-none h-20 rounded-xl border-slate-200 text-sm leading-relaxed" 
-                {...register('description')} 
-              />
-            </div>
-
-            {/* STEP 5: SPECIFICATIONS CHECKLIST */}
-            <div className="space-y-2.5 bg-slate-50/80 p-4 rounded-2xl border border-slate-200/80">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
-                    Key Features / Inclusions Checklist
-                  </label>
-                  <p className="text-[11px] text-slate-500">
-                    Add bullet points so customers know exactly what is included.
-                  </p>
-                </div>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => append({ value: '' })} 
-                  className="text-xs font-bold rounded-lg bg-white shadow-2xs"
-                >
-                  <Plus className="h-3.5 w-3.5 mr-1" /> Add Custom
-                </Button>
-              </div>
-
-              {/* Quick Suggestion Chips */}
-              <div className="flex flex-wrap gap-1.5 pb-1">
-                {QUICK_SPECS.map((spec, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => handleAddQuickSpec(spec)}
-                    className="text-[11px] px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:border-amber-400 hover:bg-amber-50 font-medium transition-colors shadow-2xs"
-                  >
-                    + {spec}
-                  </button>
-                ))}
-              </div>
-              
-              <div className="space-y-2">
-                {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" />
-                    <Input 
-                      placeholder="e.g. Uniformed Chauffeur, Fuel Included, AC..." 
-                      className="bg-white text-xs rounded-xl border-slate-200"
-                      {...register(`features.${index}.value` as const)} 
-                    />
-                    <Button 
-                      type="button" 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-slate-400 hover:text-red-500 shrink-0 h-8 w-8 rounded-lg"
-                      onClick={() => remove(index)}
-                      disabled={fields.length === 1}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <DialogFooter className="pt-4 border-t border-slate-100 flex items-center justify-between sm:justify-end gap-3">
-              <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="rounded-xl">
-                Cancel
-              </Button>
-              <Button 
-                type="submit" 
-                disabled={isSaving || isUploadingImage} 
-                className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 shadow-md"
-              >
-                {isSaving ? 'Saving...' : (editingId ? 'Update Card' : 'Save & Publish Card')}
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
