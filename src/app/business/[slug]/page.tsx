@@ -195,6 +195,7 @@ function mapBusinessData(data: any) {
       name: p.name,
       price: Number(p.price),
       description: p.description,
+      image: p.image,
       features: p.features || [],
       duration: p.duration
     })) || [],

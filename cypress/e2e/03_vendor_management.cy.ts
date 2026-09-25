@@ -121,5 +121,69 @@ describe('03 - Vendor Business Management Dashboard', () => {
     cy.contains('Blackout / Blocked').should('be.visible');
     cy.contains('Today').should('be.visible');
   });
+
+  it('allows managing visual item cards and packages with images', () => {
+    const mockPackages = [
+      {
+        id: 'pkg-mercedes-1',
+        name: 'White Mercedes-Benz E-Class Wedding Car',
+        description: 'Chauffeured luxury sedan with floral decorations.',
+        price: 45000,
+        duration: '8 Hours / 100km',
+        status: 'ACTIVE',
+        image: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=600',
+        features: ['Uniformed Chauffeur', 'Ribbon & Flower Deco', 'Air Conditioned']
+      }
+    ];
+
+    cy.intercept('GET', 'http://localhost:3001/vendor/packages', {
+      statusCode: 200,
+      body: mockPackages,
+    }).as('getPackages');
+
+    cy.intercept('POST', 'http://localhost:3001/vendor/packages', (req) => {
+      req.reply({
+        statusCode: 201,
+        body: {
+          id: 'pkg-rolls-2',
+          ...req.body,
+        },
+      });
+    }).as('createPackage');
+
+    cy.visit('/vendor/packages');
+    cy.wait('@getPackages');
+
+    // Verify existing visual card renders image and details
+    cy.contains('Packages, Fleet & Services').should('be.visible');
+    cy.contains('White Mercedes-Benz E-Class Wedding Car').should('be.visible');
+    cy.contains('45,000').should('be.visible');
+    cy.get('img[alt="White Mercedes-Benz E-Class Wedding Car"]').should('be.visible');
+
+    // Open Add Modal
+    cy.contains('button', 'Add Item / Package Card').click();
+    cy.contains('Create Item / Package Card').should('be.visible');
+
+    // Fill in item card details with image URL
+    cy.get('input[name="name"]').type('Rolls-Royce Silver Cloud Vintage Car');
+    cy.get('input[name="price"]').clear().type('95000');
+    cy.get('input[name="duration"]').type('Full Day');
+    cy.get('textarea[name="description"]').type('Classic vintage automobile for grand wedding entry.');
+    cy.get('input[name="features.0.value"]').type('Uniformed Chauffeur & Ribbon Deco');
+    cy.get('input[name="image"]').type('https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800');
+
+    // Verify live preview is displayed
+    cy.get('img[alt="Item Preview"]').should('be.visible');
+
+    // Submit form
+    cy.contains('button', 'Save & Publish Card').click();
+    cy.wait('@createPackage').its('request.body').should((body) => {
+      expect(body.name).to.include('Rolls-Royce');
+      expect(body.price).to.eq(95000);
+      expect(body.image).to.include('unsplash');
+    });
+
+    cy.contains(/Package created successfully/i, { timeout: 6000 }).should('be.visible');
+  });
 });
 
