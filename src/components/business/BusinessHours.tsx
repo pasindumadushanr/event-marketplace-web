@@ -28,12 +28,13 @@ export function BusinessHours({ hours }: BusinessHoursProps) {
       
       <div className="space-y-3">
         {schedule.map(({ day, time }) => {
-          const isClosed = time.toLowerCase().includes('closed');
+          const displayTime = time || 'Closed';
+          const isClosed = displayTime.toLowerCase().includes('closed');
           return (
             <div key={day} className="flex justify-between items-center text-sm">
               <span className="font-medium text-slate-500">{day}</span>
               <span className={`font-semibold ${isClosed ? 'text-red-500' : 'text-slate-900'}`}>
-                {time}
+                {displayTime}
               </span>
             </div>
           );

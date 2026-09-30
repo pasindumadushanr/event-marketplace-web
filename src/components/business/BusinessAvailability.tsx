@@ -14,9 +14,11 @@ export function BusinessAvailability({ blockedDates = [] }: { blockedDates?: str
 
   // Extract day numbers from blockedDates matching current year & month
   const currentMonthStr = `${year}-${String(month + 1).padStart(2, '0')}`;
-  const blockedDaysInMonth = blockedDates
-    .filter((d) => d.startsWith(currentMonthStr))
-    .map((d) => parseInt(d.split('-')[2], 10));
+  const safeDates = Array.isArray(blockedDates) ? blockedDates : [];
+  const blockedDaysInMonth = safeDates
+    .filter((d) => typeof d === 'string' && d.startsWith(currentMonthStr))
+    .map((d) => parseInt(d.split('-')[2], 10))
+    .filter((n) => !isNaN(n));
 
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">

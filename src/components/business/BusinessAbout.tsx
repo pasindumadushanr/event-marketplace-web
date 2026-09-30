@@ -16,11 +16,11 @@ export function BusinessAbout({ business }: BusinessAboutProps) {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {business.highlights && business.highlights.length > 0 && (
+        {Array.isArray(business.highlights) && business.highlights.length > 0 && (
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-4">Highlights</h4>
             <ul className="space-y-3">
-              {business.highlights.map((highlight, index) => (
+              {business.highlights.map((highlight: string, index: number) => (
                 <li key={index} className="flex items-start gap-3">
                   <div className="mt-0.5 bg-primary/10 p-1 rounded-full text-primary">
                     <Check className="h-3 w-3" />
@@ -35,16 +35,22 @@ export function BusinessAbout({ business }: BusinessAboutProps) {
         <div>
           <div className="mb-6">
             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Experience</h4>
-            <p className="text-slate-700 font-medium">{business.yearsOfExperience} Years in Business</p>
+            <p className="text-slate-700 font-medium">{business.yearsOfExperience || 1} Years in Business</p>
           </div>
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-2">Languages Spoken</h4>
             <div className="flex flex-wrap gap-2">
-              {business.languages.map((lang, index) => (
-                <span key={index} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium">
-                  {lang}
+              {Array.isArray(business.languages) && business.languages.length > 0 ? (
+                business.languages.map((lang: string, index: number) => (
+                  <span key={index} className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium">
+                    {lang}
+                  </span>
+                ))
+              ) : (
+                <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-lg text-sm font-medium">
+                  English
                 </span>
-              ))}
+              )}
             </div>
           </div>
         </div>
