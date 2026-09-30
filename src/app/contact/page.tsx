@@ -15,10 +15,38 @@ import { MapPin, Phone, Mail, Send, ExternalLink } from 'lucide-react';
 import api from '@/lib/api';
 
 const socialLinks = [
-  { name: 'Facebook', href: 'https://web.facebook.com/profile.php?id=61595001868271' },
-  { name: 'Instagram', href: 'https://www.instagram.com/nakathata.lk/' },
-  { name: 'TikTok', href: 'https://www.tiktok.com/@nakathata.lk' },
-  { name: 'YouTube', href: 'https://www.youtube.com/channel/UCYSC4gU8KyQuhFn7p3RUjMw' },
+  {
+    name: 'Facebook',
+    href: 'https://web.facebook.com/profile.php?id=61595001868271',
+    caption: 'Join our community',
+    color: 'bg-[#1877F2]',
+    hover: 'hover:border-blue-200 hover:bg-blue-50/50',
+    icon: <path d="M14 21v-8h2.7l.4-3H14V8c0-.9.3-1.5 1.6-1.5H17V3.8c-.3 0-1.3-.1-2.4-.1-2.4 0-4 1.5-4 4.1V10H8v3h2.6v8H14Z" fill="currentColor" />,
+  },
+  {
+    name: 'Instagram',
+    href: 'https://www.instagram.com/nakathata.lk/',
+    caption: '@nakathata.lk',
+    color: 'bg-gradient-to-tr from-amber-400 via-rose-500 to-purple-600',
+    hover: 'hover:border-pink-200 hover:bg-pink-50/50',
+    icon: <><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="2" /><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" /></>,
+  },
+  {
+    name: 'TikTok',
+    href: 'https://www.tiktok.com/@nakathata.lk',
+    caption: '@nakathata.lk',
+    color: 'bg-slate-950',
+    hover: 'hover:border-slate-300 hover:bg-slate-50',
+    icon: <path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 1 1-2.23-2.56V9.69a5.72 5.72 0 1 0 5.32 5.71V9.11a7.35 7.35 0 0 0 4.3 1.38V7.4a4.3 4.3 0 0 1-3.24-1.58Z" fill="currentColor" />,
+  },
+  {
+    name: 'YouTube',
+    href: 'https://www.youtube.com/channel/UCYSC4gU8KyQuhFn7p3RUjMw',
+    caption: 'Watch our latest',
+    color: 'bg-[#FF0000]',
+    hover: 'hover:border-red-200 hover:bg-red-50/50',
+    icon: <><rect x="2" y="5" width="20" height="14" rx="4" fill="currentColor" /><path d="m10 9 5 3-5 3V9Z" fill="#FF0000" /></>,
+  },
 ];
 
 const contactSchema = z.object({
@@ -130,25 +158,30 @@ export default function ContactPage() {
               </div>
             </div>
 
-            <section aria-labelledby="social-media-heading">
-              <h2 id="social-media-heading" className="text-2xl font-bold text-slate-900 mb-3">
+            <section aria-labelledby="social-media-heading" className="border-t border-slate-200 pt-8">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">Let’s stay connected</p>
+              <h2 id="social-media-heading" className="text-2xl font-bold tracking-tight text-slate-900 mb-3">
                 Follow Nakathata.lk
               </h2>
-              <p className="text-slate-600 mb-5 leading-relaxed">
-                Connect with us for event inspiration, updates, and our latest videos.
+              <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+                A little inspiration for your next big celebration. Follow along for ideas, stories, and updates.
               </p>
-              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {socialLinks.map(({ name, href }) => (
+              <ul className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3">
+                {socialLinks.map(({ name, href, caption, color, hover, icon }) => (
                   <li key={name}>
                     <a
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={`Nakathata.lk on ${name} (opens in a new tab)`}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-900 shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                      className={`group relative flex h-full flex-col items-start rounded-2xl border border-slate-200/80 bg-white p-4 text-slate-900 shadow-sm transition-colors ${hover} focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary`}
                     >
-                      {name}
-                      <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
+                      <span className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-sm ${color}`}>
+                        <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" focusable="false">{icon}</svg>
+                      </span>
+                      <span className="text-sm font-semibold">{name}</span>
+                      <span className="mt-1 text-xs leading-relaxed text-slate-500">{caption}</span>
+                      <ExternalLink className="absolute right-4 top-4 h-3.5 w-3.5 text-slate-400 transition-colors group-hover:text-slate-700" aria-hidden="true" />
                     </a>
                   </li>
                 ))}
