@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   MapPin, 
   Search, 
@@ -10,18 +11,15 @@ import {
   Palmtree, 
   Mountain, 
   Compass, 
-  Sparkles, 
+  ArrowUpRight,
+  SearchX,
   ArrowRight, 
-  CheckCircle2, 
   Truck, 
-  ShieldCheck, 
-  Layers
 } from 'lucide-react';
 import { Navbar } from '@/components/home/Navbar';
 import { Footer } from '@/components/home/Footer';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import type { DistrictMapItem } from '@/components/locations/SriLankaMap';
 
 // Dynamically import Leaflet Map to avoid SSR window errors
@@ -149,7 +147,7 @@ const SRI_LANKA_DISTRICTS: DistrictInfo[] = [
     vendorCountEstimate: '210+ Vendors',
     lat: 6.0535,
     lng: 80.2210,
-    image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=800&auto=format&fit=crop',
+    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=800&auto=format&fit=crop',
   },
   {
     id: 'matara',
@@ -401,383 +399,146 @@ const SRI_LANKA_DISTRICTS: DistrictInfo[] = [
 
 export default function LocationsPage() {
   const [selectedProvince, setSelectedProvince] = useState<string>('All Provinces');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [activeDistrictId, setActiveDistrictId] = useState<string>('colombo');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeDistrictId, setActiveDistrictId] = useState('colombo');
 
-  // Filter districts based on search and province
   const filteredDistricts = useMemo(() => {
-    const hasSearch = searchQuery.trim().length > 0;
-    return SRI_LANKA_DISTRICTS.filter((d) => {
-      const matchesProvince = 
-        hasSearch || selectedProvince === 'All Provinces' || d.province === selectedProvince;
-      const matchesSearch =
-        !hasSearch ||
-        d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        d.keyTowns.some((t) => t.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        d.popularCategories.some((c) => c.toLowerCase().includes(searchQuery.toLowerCase()));
-      return matchesProvince && matchesSearch;
-    });
+    const query = searchQuery.trim().toLowerCase();
+    return SRI_LANKA_DISTRICTS.filter((district) =>
+      (selectedProvince === 'All Provinces' || district.province === selectedProvince) &&
+      (!query || [district.name, ...district.keyTowns, ...district.popularCategories]
+        .some((value) => value.toLowerCase().includes(query)))
+    );
   }, [selectedProvince, searchQuery]);
 
-  // Current active district details
-  const activeDistrict = useMemo(() => {
-    return (
-      SRI_LANKA_DISTRICTS.find((d) => d.id === activeDistrictId) ||
-      SRI_LANKA_DISTRICTS[0]
-    );
-  }, [activeDistrictId]);
+  const activeDistrict = SRI_LANKA_DISTRICTS.find((district) => district.id === activeDistrictId) || SRI_LANKA_DISTRICTS[0];
+  const featuredDistricts = ['colombo', 'kandy', 'galle'].map((id) => SRI_LANKA_DISTRICTS.find((district) => district.id === id)!);
+  const showOnMap = (id: string) => {
+    setActiveDistrictId(id);
+    document.getElementById('location-map')?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth',
+      block: 'start',
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col justify-between">
-      <div className="bg-slate-900">
-        <Navbar />
-      </div>
-      <div className="h-20 bg-slate-900" />
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        
-        {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
-          <Badge className="bg-primary/10 text-primary border-primary/20 px-3.5 py-1 text-xs font-bold uppercase tracking-widest mb-4">
-            <Compass className="h-3.5 w-3.5 mr-1.5 inline" /> Island-Wide Event Coverage
-          </Badge>
-          <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight mb-4">
-            Service Coverage Across All <span className="text-primary font-serif italic">25 Districts</span>
-          </h1>
-          <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            From the bustling 5-star ballrooms of Colombo to coastal beach villas in Galle and cultural poruwas in Kandy, LuxeEvents connects you with top-rated venues and mobile event vendors operating in every corner of Sri Lanka.
-          </p>
-
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8 pt-6 border-t border-slate-200/80">
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-              <p className="text-2xl sm:text-3xl font-black text-primary">25 / 25</p>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Districts Covered</p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">9</p>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Provinces</p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-              <p className="text-2xl sm:text-3xl font-black text-emerald-600">100%</p>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Mobile Travel Network</p>
-            </div>
-            <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
-              <p className="text-2xl sm:text-3xl font-black text-slate-900">1,200+</p>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1">Vetted Professionals</p>
-            </div>
+    <div className="min-h-screen bg-[#faf8f4] font-sans text-slate-900">
+      <div className="h-20 bg-slate-900"><Navbar /></div>
+      <header className="relative overflow-hidden bg-slate-900 pb-24 pt-14 sm:pb-32 sm:pt-20">
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,175,55,0.18),transparent_65%)]" />
+        <div aria-hidden="true" className="absolute -right-28 -top-28 h-[560px] w-[560px] rounded-full border border-white/10" />
+        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.25fr_1fr] lg:items-end lg:gap-20 lg:px-8">
+          <div>
+            <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#e5c76b]"><Compass className="h-4 w-4" aria-hidden="true" /> Explore Sri Lanka</p>
+            <h1 className="text-4xl font-semibold leading-[1.12] tracking-tight text-white sm:text-5xl lg:text-6xl">Your occasion.<br /><span className="font-serif font-normal italic text-[#e5c76b]">An extraordinary setting.</span></h1>
+            <p className="mt-6 max-w-lg text-base leading-relaxed text-slate-300">City lights, ocean breezes, or misty hills. Discover a place that feels like you, then find the people to bring your celebration to life.</p>
+          </div>
+          <div className="rounded-2xl border border-white/15 bg-white/5 p-6 sm:p-8">
+            <label htmlFor="hero-location-search" className="mb-3 block text-sm font-medium text-white">Where are you dreaming of celebrating?</label>
+            <form action="#district-directory" className="flex gap-2">
+              <div className="relative min-w-0 flex-1">
+                <Search className="absolute left-3.5 top-4 h-4 w-4 text-slate-500" aria-hidden="true" />
+                <Input id="hero-location-search" value={searchQuery} onChange={(event) => { setSearchQuery(event.target.value); setSelectedProvince('All Provinces'); }} placeholder="Try Colombo, Ella, or Galle" className="h-12 rounded-xl border-0 bg-white pl-10 text-slate-900" />
+              </div>
+              <button type="submit" aria-label="Find districts" className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e5c76b] text-slate-900 hover:bg-[#f0d98f] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"><ArrowRight className="h-5 w-5" /></button>
+            </form>
+            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-slate-300"><span>25 districts to explore</span><span>9 provinces</span><span>One memorable occasion</span></div>
           </div>
         </div>
+      </header>
 
-        {/* Interactive Map & District Spotlight Grid */}
-        <section className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm mb-16">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8 pb-6 border-b border-slate-100">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                <MapPin className="h-6 w-6 text-primary" /> Interactive Sri Lanka Coverage Map
-              </h2>
-              <p className="text-slate-500 text-sm mt-1">
-                Real geographic map of Sri Lanka. Hover or click on any district pin to zoom in and explore verified event vendors.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 text-xs font-medium text-slate-500">
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-amber-500 inline-block shadow-xs"></span> Registered District</span>
-              <span className="flex items-center gap-1.5"><span className="h-2.5 w-2.5 rounded-full bg-emerald-500 inline-block shadow-xs"></span> Selected Spotlight</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Real GIS Leaflet Map (Left/Center Col - 7 cols) */}
-            <div className="lg:col-span-7">
-              <SriLankaMap
-                districts={SRI_LANKA_DISTRICTS}
-                activeDistrictId={activeDistrictId}
-                onSelectDistrict={(id) => setActiveDistrictId(id)}
-              />
-            </div>
-
-            {/* District Detail Spotlight (Right Col - 5 cols) */}
-            <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
-              <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 sm:p-7 space-y-5">
-                
-                {/* Header with image banner */}
-                <div className="flex flex-col sm:flex-row gap-4 items-start">
-                  <div className="w-full sm:w-24 h-24 rounded-2xl overflow-hidden shrink-0 shadow-md">
-                    <img
-                      src={activeDistrict.image}
-                      alt={activeDistrict.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge className="bg-slate-900 text-white font-semibold text-xs">
-                        {activeDistrict.province} Province
-                      </Badge>
-                      <Badge variant="outline" className="text-emerald-700 bg-emerald-50 border-emerald-200 text-xs font-bold">
-                        <CheckCircle2 className="h-3 w-3 mr-1 inline" /> 100% Active Coverage
-                      </Badge>
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-900 pt-0.5">{activeDistrict.name}</h3>
-                    <p className="text-xs font-semibold text-primary uppercase tracking-wider">
-                      {activeDistrict.tagline}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-                  {activeDistrict.description}
-                </p>
-
-                {/* Major Towns Served */}
-                <div className="space-y-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Key Towns & Areas Covered:
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {activeDistrict.keyTowns.map((town, idx) => (
-                      <span
-                        key={idx}
-                        className="text-xs font-medium bg-white text-slate-800 border border-slate-200 px-2.5 py-1 rounded-lg"
-                      >
-                        {town}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Top Categories */}
-                <div className="space-y-2">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                    Popular Event Services in {activeDistrict.name}:
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {activeDistrict.popularCategories.map((cat, idx) => (
-                      <span
-                        key={idx}
-                        className="text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-lg"
-                      >
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* CTA Action */}
-                <div className="pt-2">
-                  <Link href={`/search?city=${encodeURIComponent(activeDistrict.name)}`} className="block">
-                    <Button className="w-full h-11 bg-primary hover:bg-primary/90 text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
-                      Browse All {activeDistrict.name} Vendors & Venues <ArrowRight className="h-4 w-4" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Verified Metrics Badge */}
-              <div className="bg-emerald-50/70 border border-emerald-200/80 rounded-2xl p-4 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-emerald-950">Verified District Providers</h4>
-                  <p className="text-[11px] text-emerald-800">
-                    All listed professionals in {activeDistrict.name} have passed business registration, identity, and portfolio verification.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* Directory Search & Filter Controls */}
-        <div className="space-y-6 mb-10">
-          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900">Directory of All 25 Districts</h2>
-              <p className="text-slate-500 text-sm mt-0.5">Filter by province or search for your event town</p>
-            </div>
-
-            {/* Search Input */}
-            <div className="w-full sm:w-80 relative">
-              <Search className="h-4 w-4 text-slate-400 absolute left-3.5 top-3.5" />
-              <Input
-                placeholder="Search district, town, or service..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11 bg-white border-slate-200 rounded-xl text-sm"
-              />
-            </div>
-          </div>
-
-          {/* Province Filter Pills */}
-          <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-200">
-            {PROVINCES.map((prov) => {
-              const isSelected = selectedProvince === prov;
+      <main className="relative mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
+        <section aria-labelledby="destination-inspiration" className="relative -mt-12 mb-16">
+          <h2 id="destination-inspiration" className="sr-only">Find your kind of celebration</h2>
+          <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
+            {featuredDistricts.map((district, index) => {
+              const Icon = [Building2, Mountain, Palmtree][index];
               return (
-                <button
-                  key={prov}
-                  onClick={() => setSelectedProvince(prov)}
-                  className={`text-xs font-semibold px-4 py-2 rounded-xl transition-all ${
-                    isSelected
-                      ? 'bg-slate-900 text-white shadow-sm'
-                      : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  {prov}
-                </button>
+                <Link key={district.id} href={`/search?city=${encodeURIComponent(district.name)}`} className="group relative isolate flex h-64 items-end overflow-hidden rounded-2xl bg-slate-800 p-6 shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary sm:h-72">
+                  <Image src={district.image} alt="" fill unoptimized sizes="(max-width: 640px) 100vw, 33vw" className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105" />
+                  <span className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-slate-950/10" />
+                  <span className="absolute left-5 top-5 flex items-center gap-2 rounded-full border border-white/20 bg-slate-900/50 px-3 py-1.5 text-xs text-white backdrop-blur-sm"><Icon className="h-3.5 w-3.5" aria-hidden="true" />{['City celebrations', 'Hill-country moments', 'Coastal occasions'][index]}</span>
+                  <span className="relative flex w-full items-end justify-between gap-3">
+                    <span><span className="block text-xs text-slate-200">{district.province} Province</span><span className="mt-1 block text-3xl font-semibold tracking-tight text-white">{district.name}</span></span>
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/30 text-white group-hover:bg-white group-hover:text-slate-900"><ArrowUpRight className="h-5 w-5" aria-hidden="true" /></span>
+                  </span>
+                </Link>
               );
             })}
           </div>
-        </div>
+        </section>
 
-        {/* 25 Districts Interactive Card Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
-          {filteredDistricts.map((district) => {
-            const isSelected = activeDistrictId === district.id;
-
-            return (
-              <div
-                key={district.id}
-                onClick={() => {
-                  setActiveDistrictId(district.id);
-                  // Scroll smoothly to map section on mobile
-                  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
-                    window.scrollTo({ top: 450, behavior: 'smooth' });
-                  }
-                }}
-                className={`bg-white rounded-2xl border transition-all duration-200 overflow-hidden flex flex-col justify-between cursor-pointer group hover:shadow-xl hover:-translate-y-1 ${
-                  isSelected
-                    ? 'border-primary ring-2 ring-primary/20 shadow-md'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                {/* Image Banner */}
-                <div className="relative h-44 w-full overflow-hidden bg-slate-100">
-                  <img
-                    src={district.image}
-                    alt={district.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-                  
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5">
-                    <Badge className="bg-slate-900/90 text-white backdrop-blur-md text-[10px] font-bold">
-                      {district.province} Province
-                    </Badge>
-                  </div>
-
-                  <div className="absolute top-3 right-3">
-                    <Badge className="bg-emerald-500 text-white text-[10px] font-bold">
-                      {district.vendorCountEstimate}
-                    </Badge>
-                  </div>
-
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <h3 className="text-xl font-bold tracking-tight">{district.name}</h3>
-                    <p className="text-xs text-slate-200 line-clamp-1 opacity-90">
-                      {district.tagline}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Content Details */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                    {district.description}
-                  </p>
-
-                  <div className="space-y-1.5">
-                    <p className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Key Towns:
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {district.keyTowns.slice(0, 3).map((town, idx) => (
-                        <span
-                          key={idx}
-                          className="text-[11px] font-medium bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md"
-                        >
-                          {town}
-                        </span>
-                      ))}
-                      {district.keyTowns.length > 3 && (
-                        <span className="text-[11px] font-semibold text-slate-400 self-center">
-                          +{district.keyTowns.length - 3} more
-                        </span>
-                      )}
+        <section id="district-directory" aria-labelledby="directory-heading" className="scroll-mt-28">
+          <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div><p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#8c6c19]">Find your place</p><h2 id="directory-heading" className="text-3xl font-semibold tracking-tight sm:text-4xl">Every district. A different story.</h2><p className="mt-3 text-sm text-slate-500">Explore the island by province, district, or the town you have in mind.</p></div>
+            <a href="#location-map" className="inline-flex shrink-0 items-center gap-2 self-start rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-medium hover:bg-slate-100"><MapPin className="h-4 w-4" aria-hidden="true" /> Explore the map <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></a>
+          </div>
+          <div className="mb-6 rounded-2xl border border-slate-200 bg-white p-4 sm:p-5">
+            <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="relative flex-1">
+                <label htmlFor="district-search" className="sr-only">Search districts, towns, or services</label>
+                <Search className="absolute left-4 top-4 h-4 w-4 text-slate-400" aria-hidden="true" />
+                <Input id="district-search" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Search district, town, or service…" className="h-12 rounded-xl border-slate-200 bg-slate-50 pl-11" />
+              </div>
+              <p role="status" className="shrink-0 text-sm text-slate-500">{filteredDistricts.length} of 25 districts</p>
+            </div>
+            <div className="flex flex-wrap gap-2" aria-label="Filter by province">
+              {PROVINCES.map((province) => (
+                <button key={province} type="button" aria-pressed={selectedProvince === province} onClick={() => setSelectedProvince(province)} className={`rounded-full border px-4 py-2.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${selectedProvince === province ? 'border-slate-900 bg-slate-900 text-white' : 'border-slate-200 text-slate-600 hover:border-[#b49a50] hover:bg-[#faf8f4]'}`}>{province}</button>
+              ))}
+            </div>
+          </div>
+          {filteredDistricts.length === 0 ? (
+            <div className="mb-16 rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+              <SearchX className="mx-auto mb-4 h-8 w-8 text-[#8c6c19]" aria-hidden="true" /><h3 className="text-xl font-semibold">Let’s try another place.</h3><p className="mt-2 text-sm text-slate-500">No districts match these filters. Try another town or choose a different province.</p><Button variant="outline" className="mt-5" onClick={() => { setSearchQuery(''); setSelectedProvince('All Provinces'); }}>Reset filters</Button>
+            </div>
+          ) : (
+            <div className="mb-16 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredDistricts.map((district) => (
+                <article key={district.id} className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200/80 bg-white transition-shadow hover:shadow-lg">
+                  <Link href={`/search?city=${encodeURIComponent(district.name)}`} aria-label={`Explore vendors in ${district.name}`} className="relative block h-52 overflow-hidden bg-slate-200 focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-primary">
+                    <Image src={district.image} alt="" fill unoptimized sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-105" />
+                    <span className="absolute inset-0 bg-gradient-to-t from-slate-950/85 to-transparent" />
+                    <span className="absolute left-5 top-5 rounded-full border border-white/20 bg-slate-900/60 px-3 py-1 text-xs text-white">{district.province} Province</span>
+                    <h3 className="absolute bottom-5 left-5 right-5 text-2xl font-semibold tracking-tight text-white">{district.name}</h3>
+                  </Link>
+                  <div className="flex flex-1 flex-col p-5">
+                    <p className="mb-4 line-clamp-2 min-h-10 text-sm leading-relaxed text-slate-600">{district.tagline}</p>
+                    <div className="mb-5 flex flex-wrap gap-1.5">{district.keyTowns.slice(0, 3).map((town) => <span key={town} className="rounded-md bg-[#f5f3ee] px-2 py-1 text-xs text-slate-600">{town}</span>)}</div>
+                    <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                      <button type="button" onClick={() => showOnMap(district.id)} className="inline-flex items-center gap-1.5 rounded-md py-1 text-xs font-medium text-slate-500 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-primary" aria-label={`Show ${district.name} on map`}><MapPin className="h-3.5 w-3.5" aria-hidden="true" /> View on map</button>
+                      <Link href={`/search?city=${encodeURIComponent(district.name)}`} className="inline-flex items-center gap-2 rounded-md py-1 text-sm font-semibold text-[#80621b] hover:text-slate-900">Explore vendors <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link>
                     </div>
                   </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
-                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-slate-500 group-hover:text-primary transition-colors flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5 text-primary" /> View on Map
-                    </span>
-
-                    <Link
-                      href={`/search?city=${encodeURIComponent(district.name)}`}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="text-xs font-bold text-primary hover:text-primary hover:bg-primary/10 h-8 px-2.5"
-                      >
-                        {`Explore ${district.name} Vendors →`}
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* How Island-Wide Service Works Explainer */}
-        <section className="bg-slate-900 text-white rounded-3xl p-8 sm:p-12 mb-16 relative overflow-hidden">
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
-          <div className="relative max-w-3xl">
-            <Badge className="bg-primary/20 text-primary border-primary/30 text-xs font-bold uppercase tracking-widest mb-3">
-              Platform Architecture
-            </Badge>
-            <h2 className="text-2xl sm:text-3xl font-black tracking-tight mb-3">
-              How Island-Wide Service Works
-            </h2>
-            <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-8">
-              Whether your event is in a city hotel in Colombo, a tea plantation bungalow in Nuwara Eliya, or a beachfront villa in Jaffna, our platform accommodates both stationary and mobile service delivery models:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-xl bg-amber-500/10 text-amber-400">
-                    <Building2 className="h-5 w-5" />
-                  </div>
-                  <h4 className="font-bold text-base text-white">Fixed Venues & Hotels</h4>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Banquet halls, private villas, and resorts are tied to their physical district location. Filter by district to discover the exact venue options available for your event date.
-                </p>
-              </div>
-
-              <div className="bg-slate-800/80 border border-slate-700 p-5 rounded-2xl">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-                    <Truck className="h-5 w-5" />
-                  </div>
-                  <h4 className="font-bold text-base text-white">Mobile Vendors With Travel</h4>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Photographers, bridal stylists, catering teams, and live bands frequently travel across all 25 districts. Even if based in Colombo or Kandy, they readily service events anywhere in the island.
-                </p>
+        <section id="location-map" aria-labelledby="map-heading" className="relative isolate mb-16 scroll-mt-28 rounded-3xl border border-slate-200 bg-white p-5 sm:p-8">
+          <div className="mb-8"><p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#8c6c19]">A new perspective</p><h2 id="map-heading" className="text-3xl font-semibold tracking-tight">Let the island inspire you.</h2><p className="mt-3 text-sm text-slate-500">Select a district on the map to discover its towns and celebration ideas.</p></div>
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+            <div className="min-w-0"><SriLankaMap districts={SRI_LANKA_DISTRICTS} activeDistrictId={activeDistrictId} onSelectDistrict={setActiveDistrictId} /></div>
+            <div className="overflow-hidden rounded-2xl bg-[#f5f3ee]">
+              <div className="relative h-48 bg-slate-200"><Image src={activeDistrict.image} alt="" fill unoptimized sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover" /><span className="absolute inset-0 bg-gradient-to-t from-slate-950/70 to-transparent" /><p className="absolute bottom-5 left-6 text-xs font-medium uppercase tracking-widest text-white">{activeDistrict.province} Province</p></div>
+              <div className="p-6 sm:p-8">
+                <h3 className="text-3xl font-semibold tracking-tight">{activeDistrict.name}</h3><p className="mt-3 text-sm leading-relaxed text-slate-600">{activeDistrict.description}</p>
+                <h4 className="mb-3 mt-6 text-xs font-semibold uppercase tracking-widest text-[#80621b]">Towns to explore</h4>
+                <div className="flex flex-wrap gap-2">{activeDistrict.keyTowns.map((town) => <span key={town} className="rounded-lg bg-white px-3 py-1.5 text-xs text-slate-600">{town}</span>)}</div>
+                <Link href={`/search?city=${encodeURIComponent(activeDistrict.name)}`} className="mt-7 flex items-center justify-between gap-3 rounded-xl bg-slate-900 px-5 py-4 text-sm font-medium text-white hover:bg-slate-800">Explore {activeDistrict.name} vendors <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" /></Link>
               </div>
             </div>
           </div>
         </section>
 
+        <section className="grid gap-10 rounded-3xl bg-slate-900 p-7 text-white sm:p-12 lg:grid-cols-[1fr_1.2fr]">
+          <div><p className="mb-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#e5c76b]">Make it your own</p><h2 className="text-3xl font-semibold leading-tight tracking-tight">The right place.<br /><span className="font-serif font-normal italic text-[#e5c76b]">The right people.</span></h2><p className="mt-4 text-sm leading-relaxed text-slate-300">Start with a setting you love, then speak with vendors about the details that make your day special.</p><Link href="/contact" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-[#e5c76b] hover:underline">Need a little guidance? <ArrowUpRight className="h-4 w-4" aria-hidden="true" /></Link></div>
+          <div className="grid gap-5 sm:grid-cols-2">
+            {[{ icon: Building2, title: 'Find your setting', text: 'Explore venues by location, then confirm capacity, dates, and facilities directly with the venue.' }, { icon: Truck, title: 'Bring your team', text: 'Many event professionals travel. Ask about service areas, travel fees, and availability before booking.' }].map(({ icon: Icon, title, text }) => <div key={title} className="rounded-2xl border border-white/10 bg-white/5 p-6"><Icon className="mb-5 h-6 w-6 text-[#e5c76b]" aria-hidden="true" /><h3 className="mb-3 text-base font-semibold">{title}</h3><p className="text-sm leading-relaxed text-slate-300">{text}</p></div>)}
+          </div>
+        </section>
       </main>
-
       <Footer />
     </div>
   );

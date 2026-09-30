@@ -57,6 +57,51 @@ const TILE_PROVIDERS = {
   }
 };
 
+// Helper to build custom HTML pin icons
+function createMarkerIcon(name: string, isSelected: boolean) {
+  if (isSelected) {
+    const html = `
+      <div class="relative flex flex-col items-center cursor-pointer">
+        <div class="relative flex items-center justify-center">
+          <span class="absolute w-8 h-8 rounded-full bg-emerald-500/30 animate-ping"></span>
+          <span class="relative flex items-center justify-center w-7 h-7 rounded-full bg-emerald-600 text-white shadow-xl ring-2 ring-white border-2 border-emerald-400">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </span>
+        </div>
+        <span class="mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-slate-950 text-emerald-400 shadow-xl border border-emerald-500/50 whitespace-nowrap tracking-wide">
+          ${name}
+        </span>
+      </div>
+    `;
+
+    return L.divIcon({
+      className: 'sri-lanka-marker-active',
+      html: html,
+      iconSize: [90, 52],
+      iconAnchor: [45, 14],
+      popupAnchor: [0, -14],
+    });
+  }
+
+  // Unselected: Clean, non-overlapping pin dot with hover badge
+  const html = `
+    <div class="relative flex flex-col items-center cursor-pointer group">
+      <div class="w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-md group-hover:scale-125 group-hover:bg-amber-400 transition-transform duration-200"></div>
+    </div>
+  `;
+
+  return L.divIcon({
+    className: 'sri-lanka-marker-dot',
+    html: html,
+    iconSize: [16, 16],
+    iconAnchor: [8, 8],
+    popupAnchor: [0, -10],
+  });
+}
+
 export default function SriLankaMap({
   districts,
   activeDistrictId,
@@ -127,7 +172,6 @@ export default function SriLankaMap({
             <strong style="font-size: 15px; color: #0f172a;">${d.name}</strong>
             <span style="font-size: 10px; font-weight: 700; background: #e0f2fe; color: #0284c7; padding: 2px 6px; border-radius: 9999px;">${d.province}</span>
           </div>
-          <div style="font-size: 11px; color: #059669; font-weight: 600; margin-bottom: 6px;">${d.vendorCountEstimate}</div>
           <div style="font-size: 11px; color: #64748b; line-height: 1.3; margin-bottom: 8px;">Key towns: ${d.keyTowns.slice(0, 3).join(', ')}</div>
           <a href="/search?city=${encodeURIComponent(d.name)}" style="display: block; text-align: center; background: #0f172a; color: #ffffff; font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 8px; text-decoration: none;">
             Explore ${d.name} Vendors &rarr;
@@ -187,50 +231,6 @@ export default function SriLankaMap({
     });
   }, [activeDistrictId, districts]);
 
-  // Helper to build custom HTML pin icons
-  function createMarkerIcon(name: string, isSelected: boolean) {
-    if (isSelected) {
-      const html = `
-        <div class="relative flex flex-col items-center cursor-pointer">
-          <div class="relative flex items-center justify-center">
-            <span class="absolute w-8 h-8 rounded-full bg-emerald-500/30 animate-ping"></span>
-            <span class="relative flex items-center justify-center w-7 h-7 rounded-full bg-emerald-600 text-white shadow-xl ring-2 ring-white border-2 border-emerald-400">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                <circle cx="12" cy="10" r="3"></circle>
-              </svg>
-            </span>
-          </div>
-          <span class="mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-black bg-slate-950 text-emerald-400 shadow-xl border border-emerald-500/50 whitespace-nowrap tracking-wide">
-            ${name}
-          </span>
-        </div>
-      `;
-
-      return L.divIcon({
-        className: 'sri-lanka-marker-active',
-        html: html,
-        iconSize: [90, 52],
-        iconAnchor: [45, 14],
-        popupAnchor: [0, -14],
-      });
-    }
-
-    // Unselected: Clean, non-overlapping pin dot with hover badge
-    const html = `
-      <div class="relative flex flex-col items-center cursor-pointer group">
-        <div class="w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow-md group-hover:scale-125 group-hover:bg-amber-400 transition-transform duration-200"></div>
-      </div>
-    `;
-
-    return L.divIcon({
-      className: 'sri-lanka-marker-dot',
-      html: html,
-      iconSize: [16, 16],
-      iconAnchor: [8, 8],
-      popupAnchor: [0, -10],
-    });
-  }
 
   const handleResetView = () => {
     if (mapInstanceRef.current) {
@@ -253,7 +253,7 @@ export default function SriLankaMap({
   };
 
   return (
-    <div className="relative w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl border border-slate-200/80 bg-slate-900">
+    <div className="relative w-full h-[460px] sm:h-[600px] rounded-2xl overflow-hidden border border-slate-200/80 bg-slate-900">
       {/* Map Target Canvas */}
       <div 
         ref={mapContainerRef} 
@@ -262,10 +262,10 @@ export default function SriLankaMap({
       />
 
       {/* Floating Top Controls Header */}
-      <div className="absolute top-4 left-4 z-[400] flex flex-wrap items-center gap-2 bg-slate-950/85 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700/60 text-white shadow-lg pointer-events-auto">
+      <div className="absolute top-4 left-4 right-4 z-[400] flex flex-wrap items-center gap-2 bg-slate-950/85 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700/60 text-white shadow-lg pointer-events-auto">
         <div className="flex items-center gap-2 text-xs font-semibold pr-2 border-r border-slate-700">
           <Compass className="h-4 w-4 text-emerald-400" />
-          <span>Sri Lanka Coverage</span>
+          <span>Explore Sri Lanka</span>
         </div>
 
         {/* Tile Provider Switcher */}
