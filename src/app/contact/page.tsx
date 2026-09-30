@@ -11,8 +11,15 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { MapPin, Phone, Mail, Send } from 'lucide-react';
+import { MapPin, Phone, Mail, Send, ExternalLink } from 'lucide-react';
 import api from '@/lib/api';
+
+const socialLinks = [
+  { name: 'Facebook', href: 'https://web.facebook.com/profile.php?id=61595001868271' },
+  { name: 'Instagram', href: 'https://www.instagram.com/nakathata.lk/' },
+  { name: 'TikTok', href: 'https://www.tiktok.com/@nakathata.lk' },
+  { name: 'YouTube', href: 'https://www.youtube.com/channel/UCYSC4gU8KyQuhFn7p3RUjMw' },
+];
 
 const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -122,6 +129,31 @@ export default function ContactPage() {
                 </div>
               </div>
             </div>
+
+            <section aria-labelledby="social-media-heading">
+              <h2 id="social-media-heading" className="text-2xl font-bold text-slate-900 mb-3">
+                Follow Nakathata.lk
+              </h2>
+              <p className="text-slate-600 mb-5 leading-relaxed">
+                Connect with us for event inspiration, updates, and our latest videos.
+              </p>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {socialLinks.map(({ name, href }) => (
+                  <li key={name}>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Nakathata.lk on ${name} (opens in a new tab)`}
+                      className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-900 shadow-sm transition-colors hover:border-primary hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                    >
+                      {name}
+                      <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
           </div>
 
           {/* Contact Form */}
