@@ -92,7 +92,7 @@ export default function SEOSettingsPage() {
           <label className="text-sm font-medium text-slate-700">Profile URL Slug</label>
           <div className="flex items-center">
             <span className="bg-slate-100 border border-slate-200 border-r-0 rounded-l-md px-3 h-12 flex items-center text-slate-500 font-mono text-sm shrink-0">
-              eventmarketplace.com/business/
+              nakathata.lk/business/
             </span>
             <Input name="slug" value={formData.slug} onChange={handleChange} className="h-12 rounded-l-none font-mono text-sm" />
           </div>

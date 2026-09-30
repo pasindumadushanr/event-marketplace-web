@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 export default function SeoSettingsPage() {
   const [settings, setSettings] = useState({
-    metaTitle: 'Event Marketplace',
+    metaTitle: 'Nakathata.lk',
     metaDescription: 'Find the best vendors for your events in Sri Lanka.',
     keywords: 'events, weddings, photography, catering, sri lanka'
   });

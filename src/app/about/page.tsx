@@ -3,8 +3,8 @@ import { Footer } from '@/components/home/Footer';
 import { AboutContent } from '@/components/about/AboutContent';
 
 export const metadata = {
-  title: 'About Us - LuxeEvents',
-  description: 'Learn about the mission, vision, and story behind LuxeEvents, the premium event marketplace.',
+  title: 'About Us - Nakathata.lk',
+  description: 'Learn about the mission, vision, and story behind Nakathata.lk, the premium event marketplace.',
 };
 
 export default function AboutPage() {

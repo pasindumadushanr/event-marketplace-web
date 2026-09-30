@@ -4,8 +4,8 @@ import { ShieldCheck, Lock, Eye, Server, RefreshCw, Mail } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Privacy Policy | LuxeEvents Marketplace',
-  description: 'Learn how LuxeEvents protects your personal data, handles booking information, and ensures safe, encrypted transactions.',
+  title: 'Privacy Policy | Nakathata.lk Marketplace',
+  description: 'Learn how Nakathata.lk protects your personal data, handles booking information, and ensures safe, encrypted transactions.',
 };
 
 export default function PrivacyPage() {
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
               <ShieldCheck className="h-5 w-5 text-primary" /> 1. Commitment to Privacy
             </h2>
             <p>
-              At LuxeEvents (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), we recognize the sensitivity of the personal, logistical, and financial details involved in planning weddings, galas, and celebrations. This policy explains how we collect, safeguard, and utilize your information across our website and services.
+              At Nakathata.lk (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), we recognize the sensitivity of the personal, logistical, and financial details involved in planning weddings, galas, and celebrations. This policy explains how we collect, safeguard, and utilize your information across our website and services.
             </p>
           </section>
 
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
               Your financial safety is paramount. All payment operations (such as booking advance deposits) are processed via <strong>256-bit TLS/SSL encrypted channels</strong> with certified payment gateways compliant with PCI-DSS standards.
             </p>
             <p>
-              LuxeEvents <strong>never stores full credit or debit card numbers, CVC codes, or banking PINs</strong> on our application servers.
+              Nakathata.lk <strong>never stores full credit or debit card numbers, CVC codes, or banking PINs</strong> on our application servers.
             </p>
           </section>
 
@@ -85,8 +85,8 @@ export default function PrivacyPage() {
             </h2>
             <p>
               You maintain full ownership of your personal profile. You may access, amend, or request complete deletion of your account and personal data at any time by navigating to your Account Settings or contacting our Data Compliance team at{' '}
-              <a href="mailto:privacy@luxeevents.fun" className="text-primary font-bold hover:underline">
-                privacy@luxeevents.fun
+              <a href="mailto:privacy@nakathata.lk" className="text-primary font-bold hover:underline">
+                privacy@nakathata.lk
               </a>.
             </p>
           </section>
@@ -101,7 +101,7 @@ export default function PrivacyPage() {
               <Link href="/contact" className="text-primary font-bold hover:underline">
                 Contact Page
               </Link>{' '}
-              or email us directly at <span className="font-semibold text-slate-900">support@luxeevents.fun</span>.
+              or email us directly at <span className="font-semibold text-slate-900">support@nakathata.lk</span>.
             </p>
           </section>
         </div>

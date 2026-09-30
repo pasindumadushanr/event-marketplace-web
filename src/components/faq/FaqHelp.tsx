@@ -31,7 +31,7 @@ export function FaqHelp() {
                 Contact Support
               </Button>
             </Link>
-            <a href="mailto:support@luxeevents.com">
+            <a href="mailto:support@nakathata.lk">
               <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white hover:bg-slate-50 text-slate-900 rounded-full px-8 py-6 text-lg border-slate-200">
                 <Mail className="mr-2 h-5 w-5 text-slate-500" />
                 Email Us

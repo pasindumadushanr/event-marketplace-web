@@ -196,7 +196,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 flex-col bg-zinc-950 text-white fixed h-full z-10">
         <div className="h-16 flex items-center px-6 border-b border-zinc-800">
-          <span className="font-bold text-lg tracking-tight">Event Admin</span>
+          <span className="font-bold text-lg tracking-tight">Nakathata.lk Admin</span>
         </div>
         <div className="flex-1 py-4 overflow-y-auto no-scrollbar">
           <NavLinks />
@@ -221,7 +221,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <SheetContent side="left" className="w-64 bg-zinc-950 text-white border-zinc-800 p-0 flex flex-col">
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                 <div className="h-16 flex items-center px-6 border-b border-zinc-800 shrink-0">
-                  <span className="font-bold text-lg tracking-tight">Event Admin</span>
+                  <span className="font-bold text-lg tracking-tight">Nakathata.lk Admin</span>
                 </div>
                 <div className="flex-1 py-4 overflow-y-auto no-scrollbar">
                   <NavLinks />
@@ -234,7 +234,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </div>
               </SheetContent>
             </Sheet>
-            <span className="ml-4 font-bold text-lg tracking-tight md:hidden">Event Admin</span>
+            <span className="ml-4 font-bold text-lg tracking-tight md:hidden">Nakathata.lk Admin</span>
           </div>
 
           <div className="flex items-center gap-4">

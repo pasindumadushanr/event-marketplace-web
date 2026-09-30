@@ -171,7 +171,7 @@ export default function CustomerBookingsPage() {
                         {step === 1 && "The vendor is reviewing your request. They will confirm availability soon."}
                         {step === 2 && booking.paymentStatus === 'PENDING' && "The vendor has approved your request! Please pay the advance to lock your date."}
                         {step === 2 && booking.paymentStatus === 'PAID' && "Your date is locked! You're all set for the big day."}
-                        {step === 3 && "This event has been successfully completed. Thank you for using LuxeEvents!"}
+                        {step === 3 && "This event has been successfully completed. Thank you for using Nakathata.lk!"}
                       </p>
                       
                       {step === 2 && booking.paymentStatus === 'PENDING' && (

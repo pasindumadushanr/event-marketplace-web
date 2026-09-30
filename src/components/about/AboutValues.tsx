@@ -12,7 +12,7 @@ export function AboutValues({ data }: { data: any[] }) {
             Our Core Values
           </h2>
           <p className="text-lg text-slate-500">
-            The principles that guide every decision we make at LuxeEvents.
+            The principles that guide every decision we make at Nakathata.lk.
           </p>
         </div>
 

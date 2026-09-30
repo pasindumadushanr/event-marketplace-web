@@ -25,7 +25,7 @@ export const aboutData = {
   
   story: {
     title: 'Our Story',
-    content: 'Founded on the belief that every milestone deserves to be celebrated flawlessly, LuxeEvents was created to eliminate the friction in event planning. We recognized a gap between elite event professionals and the clients searching for them. Our platform serves as a curated bridge—bringing together the industry\'s most talented creators with those who appreciate true craftsmanship.'
+    content: 'Founded on the belief that every milestone deserves to be celebrated flawlessly, Nakathata.lk was created to eliminate the friction in event planning. We recognized a gap between elite event professionals and the clients searching for them. Our platform serves as a curated bridge—bringing together the industry\'s most talented creators with those who appreciate true craftsmanship.'
   },
 
   missionVision: {
@@ -117,7 +117,7 @@ export const aboutData = {
 
   cta: {
     title: 'Ready to create something unforgettable?',
-    description: 'Join thousands of others who have transformed their event planning experience with LuxeEvents.',
+    description: 'Join thousands of others who have transformed their event planning experience with Nakathata.lk.',
     primaryCTA: 'Start Planning',
     primaryLink: '/search',
     secondaryCTA: 'Join as a Vendor',

@@ -71,7 +71,7 @@ export default function VendorNotificationsPage() {
       generated.push({
         id: 'sys-1',
         type: 'SYSTEM',
-        title: 'Welcome to EventMarketplace',
+        title: 'Welcome to Nakathata.lk',
         message: 'Your vendor dashboard is ready. Make sure to fully set up your business profile to start receiving bookings!',
         date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 1 week ago
         isUnread: false,

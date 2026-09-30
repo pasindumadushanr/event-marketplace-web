@@ -132,7 +132,7 @@ export function Navbar() {
               <Diamond className="h-6 w-6 text-white" />
             </div>
             <span className={`text-2xl font-bold tracking-tight ${isScrolled ? 'text-slate-900' : 'text-white'}`}>
-              Luxe<span className="font-light">Events</span>
+              Nakathata<span className="font-light">.lk</span>
             </span>
           </Link>
 

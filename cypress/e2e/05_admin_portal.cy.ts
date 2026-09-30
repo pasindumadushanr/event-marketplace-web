@@ -24,7 +24,7 @@ describe('05 - Admin Portal Security & Views', () => {
   it('allows authenticated admin to view the dashboard layout', () => {
     const mockAdmin = {
       id: 'admin-id-999',
-      email: 'admin@luxeevents.fun',
+      email: 'admin@nakathata.lk',
       firstName: 'Chief',
       lastName: 'Admin',
       roleName: 'SUPER_ADMIN',

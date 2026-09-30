@@ -66,7 +66,7 @@ export default function VendorRegisterPage() {
               <Diamond className="h-6 w-6 text-white" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-white flex items-center h-10">
-              Luxe<span className="font-light">Events</span>
+              Nakathata<span className="font-light">.lk</span>
             </span>
           </Link>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
@@ -96,7 +96,7 @@ export default function VendorRegisterPage() {
               <Diamond className="h-6 w-6 text-white" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900">
-              Luxe<span className="font-light">Events</span>
+              Nakathata<span className="font-light">.lk</span>
             </span>
           </div>
 

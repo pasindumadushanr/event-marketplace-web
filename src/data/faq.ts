@@ -1,7 +1,7 @@
 export const faqData = {
   hero: {
     title: 'How can we help you?',
-    subtitle: 'Search our knowledge base or browse categories below to find answers to common questions about LuxeEvents.',
+    subtitle: 'Search our knowledge base or browse categories below to find answers to common questions about Nakathata.lk.',
   },
   categories: [
     {
@@ -9,12 +9,12 @@ export const faqData = {
       name: 'General',
       faqs: [
         {
-          question: 'What is LuxeEvents?',
-          answer: 'LuxeEvents is a premium marketplace connecting clients with top-tier, vetted event professionals, venues, and creatives for luxury celebrations.'
+          question: 'What is Nakathata.lk?',
+          answer: 'Nakathata.lk is a premium marketplace connecting clients with top-tier, vetted event professionals, venues, and creatives for luxury celebrations.'
         },
         {
           question: 'How do I contact customer support?',
-          answer: 'You can reach our support team 24/7 through the Contact Us page, or by emailing support@luxeevents.com directly.'
+          answer: 'You can reach our support team 24/7 through the Contact Us page, or by emailing support@nakathata.lk directly.'
         }
       ]
     },
@@ -91,7 +91,7 @@ export const faqData = {
   ],
   cta: {
     title: 'Ready to create something unforgettable?',
-    description: 'Join thousands of others who have transformed their event planning experience with LuxeEvents.',
+    description: 'Join thousands of others who have transformed their event planning experience with Nakathata.lk.',
     primaryCTA: 'Explore Vendors',
     primaryLink: '/search',
     secondaryCTA: 'Become a Vendor',

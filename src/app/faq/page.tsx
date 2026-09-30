@@ -3,8 +3,8 @@ import { Footer } from '@/components/home/Footer';
 import { FaqContent } from '@/components/faq/FaqContent';
 
 export const metadata = {
-  title: 'FAQ - LuxeEvents',
-  description: 'Frequently Asked Questions about using LuxeEvents as a customer or a vendor.',
+  title: 'FAQ - Nakathata.lk',
+  description: 'Frequently Asked Questions about using Nakathata.lk as a customer or a vendor.',
 };
 
 export default function FaqPage() {

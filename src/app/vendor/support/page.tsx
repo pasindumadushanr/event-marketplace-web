@@ -125,7 +125,7 @@ export default function VendorSupportPage() {
             <div className="space-y-4 relative z-10">
               <div className="flex items-center gap-3">
                 <Mail className="h-5 w-5 text-blue-400" />
-                <span className="text-sm font-medium">vendors@eventmarketplace.com</span>
+                <span className="text-sm font-medium">vendors@nakathata.lk</span>
               </div>
               <div className="flex items-center gap-3">
                 <PhoneCall className="h-5 w-5 text-green-400" />

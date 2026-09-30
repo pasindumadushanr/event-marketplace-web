@@ -560,16 +560,16 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            {/* LuxeEvents Guarantee Card */}
+            {/* Nakathata.lk Guarantee Card */}
             <div className="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-6 shadow-xl space-y-3">
               <div className="flex items-center gap-2.5 text-primary">
                 <ShieldCheck className="h-6 w-6" />
                 <span className="font-black text-sm uppercase tracking-wider text-white">
-                  LuxeEvents Guarantee
+                  Nakathata.lk Guarantee
                 </span>
               </div>
               <p className="text-xs text-slate-300 leading-relaxed">
-                By paying your deposit through our platform, you are 100% protected. If the vendor fails to show or cancels, LuxeEvents refunds your deposit immediately.
+                By paying your deposit through our platform, you are 100% protected. If the vendor fails to show or cancels, Nakathata.lk refunds your deposit immediately.
               </p>
             </div>
           </div>

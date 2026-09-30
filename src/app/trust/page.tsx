@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Trust & Safety | LuxeEvents Marketplace',
-  description: 'Learn about our 4-pillar trust framework, vendor vetting process, verified reviews, and the LuxeEvents 100% Money-Back Guarantee.',
+  title: 'Trust & Safety | Nakathata.lk Marketplace',
+  description: 'Learn about our 4-pillar trust framework, vendor vetting process, verified reviews, and the Nakathata.lk 100% Money-Back Guarantee.',
 };
 
 export default function TrustPage() {
@@ -19,7 +19,7 @@ export default function TrustPage() {
     {
       icon: Lock,
       title: '100% Refund Guarantee',
-      description: 'When you secure your date with an advance deposit through LuxeEvents, your funds are fully protected. If a vendor cancels or fails to show, you receive an immediate 100% refund.',
+      description: 'When you secure your date with an advance deposit through Nakathata.lk, your funds are fully protected. If a vendor cancels or fails to show, you receive an immediate 100% refund.',
     },
     {
       icon: Star,
@@ -44,7 +44,7 @@ export default function TrustPage() {
             Buyer Protection & Security
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mt-4 mb-4">
-            Trust & Safety at LuxeEvents
+            Trust & Safety at Nakathata.lk
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
             Planning a luxury wedding, gala, or celebration should be exhilarating, not stressful. Discover how our multi-layered safety framework ensures complete peace of mind.
@@ -71,13 +71,13 @@ export default function TrustPage() {
         <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl mb-16">
           <div className="max-w-3xl space-y-4">
             <span className="text-primary font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4" /> The LuxeEvents Guarantee
+              <ShieldCheck className="h-4 w-4" /> The Nakathata.lk Guarantee
             </span>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
               Zero Risk. Your Date is Officially Protected.
             </h2>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              If an unforeseen circumstance occurs and your confirmed vendor cannot service your event, LuxeEvents steps in to either provide an immediate priority replacement from our verified network or issue an instant 100% refund of your advance deposit.
+              If an unforeseen circumstance occurs and your confirmed vendor cannot service your event, Nakathata.lk steps in to either provide an immediate priority replacement from our verified network or issue an instant 100% refund of your advance deposit.
             </p>
             <div className="pt-2">
               <Link href="/search">
@@ -96,7 +96,7 @@ export default function TrustPage() {
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 text-sm text-slate-600">
             <div className="space-y-2">
-              <h4 className="font-bold text-slate-900">1. Keep Messages on LuxeEvents</h4>
+              <h4 className="font-bold text-slate-900">1. Keep Messages on Nakathata.lk</h4>
               <p>Chatting through our secure inbox provides an official paper trail of all agreements, requirements, and quote modifications.</p>
             </div>
             <div className="space-y-2">

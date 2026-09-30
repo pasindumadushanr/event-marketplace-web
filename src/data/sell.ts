@@ -13,7 +13,7 @@ import {
 
 export const sellData = {
   hero: {
-    title: 'Grow Your Event Business with LuxeEvents',
+    title: 'Grow Your Event Business with Nakathata.lk',
     subtitle: 'Join the premier marketplace for luxury event professionals. Reach high-end clients, manage your bookings effortlessly, and scale your business.',
     primaryCTA: 'Start Selling Today',
     primaryLink: '/vendor/register',
@@ -86,7 +86,7 @@ export const sellData = {
 
   testimonials: [
     {
-      quote: "Since joining LuxeEvents, our photography business has doubled its bookings. The caliber of clients on this platform is unmatched.",
+      quote: "Since joining Nakathata.lk, our photography business has doubled its bookings. The caliber of clients on this platform is unmatched.",
       name: "Sarah Jenkins",
       role: "Founder, Luminary Studios",
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"
@@ -98,7 +98,7 @@ export const sellData = {
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"
     },
     {
-      quote: "LuxeEvents provided the exact exposure our high-end catering company needed. It's the only marketing channel we need now.",
+      quote: "Nakathata.lk provided the exact exposure our high-end catering company needed. It's the only marketing channel we need now.",
       name: "Elena Rodriguez",
       role: "Executive Chef",
       image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80"

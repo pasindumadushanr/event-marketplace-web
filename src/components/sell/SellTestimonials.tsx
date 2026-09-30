@@ -13,7 +13,7 @@ export function SellTestimonials({ data }: { data: any[] }) {
             Trusted by the Best
           </h2>
           <p className="text-lg text-slate-500">
-            See what other luxury event professionals are saying about their experience on LuxeEvents.
+            See what other luxury event professionals are saying about their experience on Nakathata.lk.
           </p>
         </div>
 

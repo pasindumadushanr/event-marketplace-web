@@ -22,8 +22,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!post) return { title: 'Post Not Found' };
   
   return {
-    title: `${post.metaTitle || post.title} | Event Marketplace`,
-    description: post.metaDescription || post.excerpt || 'Read this article on Event Marketplace',
+    title: `${post.metaTitle || post.title} | Nakathata.lk`,
+    description: post.metaDescription || post.excerpt || 'Read this article on Nakathata.lk',
   };
 }
 

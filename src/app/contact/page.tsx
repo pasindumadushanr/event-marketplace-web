@@ -164,7 +164,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Email</h4>
-                  <a href="mailto:support@luxeevents.com" className="inline-block break-all text-slate-600 mt-1 hover:underline">support@luxeevents.com</a>
+                  <a href="mailto:support@nakathata.lk" className="inline-block break-all text-slate-600 mt-1 hover:underline">support@nakathata.lk</a>
                 </div>
               </div>
             </div>

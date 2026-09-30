@@ -12,7 +12,7 @@ export function AboutHowItWorks({ data }: { data: any[] }) {
         
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-            How LuxeEvents Works
+            How Nakathata.lk Works
           </h2>
           <p className="text-lg text-slate-400">
             A frictionless journey from finding your perfect vendor to celebrating your big day.

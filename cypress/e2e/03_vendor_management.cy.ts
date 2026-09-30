@@ -5,7 +5,7 @@ describe('03 - Vendor Business Management Dashboard', () => {
     // Mock vendor authenticated state
     const mockVendorUser = {
       id: 'mock-vendor-id-123',
-      email: 'test-vendor@luxeevents.fun',
+      email: 'test-vendor@nakathata.lk',
       firstName: 'Luxury',
       lastName: 'Vendor',
       roleName: 'VENDOR',
@@ -18,7 +18,7 @@ describe('03 - Vendor Business Management Dashboard', () => {
       city: 'Colombo',
       address: '45 Galle Road',
       phone: '+94771234567',
-      email: 'vendor@luxeevents.fun',
+      email: 'vendor@nakathata.lk',
       website: 'https://grandroyal.lk',
       isVerified: true,
       categoryId: 'cat-1',

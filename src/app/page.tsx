@@ -12,7 +12,7 @@ import { VendorCTA } from '@/components/home/VendorCTA';
 import { Footer } from '@/components/home/Footer';
 
 export const metadata = {
-  title: 'LuxeEvents - The Premium Event Marketplace',
+  title: 'Nakathata.lk - The Premium Nakathata.lk',
   description: 'Discover and book the finest venues, photographers, and event professionals for weddings and corporate galas.',
 };
 

@@ -4,8 +4,8 @@ import { Briefcase, Heart, Sparkles, Globe, Laptop, Coffee, ArrowRight, Mail } f
 import { Button } from '@/components/ui/button';
 
 export const metadata = {
-  title: 'Careers | Join the LuxeEvents Team',
-  description: 'Help us redefine the future of luxury event planning and vendor discovery. Explore career opportunities, company values, and open roles at LuxeEvents.',
+  title: 'Careers | Join the Nakathata.lk Team',
+  description: 'Help us redefine the future of luxury event planning and vendor discovery. Explore career opportunities, company values, and open roles at Nakathata.lk.',
 };
 
 export default function CareersPage() {
@@ -77,7 +77,7 @@ export default function CareersPage() {
             Build the Future of Celebrations
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            At LuxeEvents, we are reimagining how weddings, corporate galas, and landmark celebrations are discovered, planned, and secured. Join an ambitious, design-led team building a world-class platform.
+            At Nakathata.lk, we are reimagining how weddings, corporate galas, and landmark celebrations are discovered, planned, and secured. Join an ambitious, design-led team building a world-class platform.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function CareersPage() {
                 </div>
 
                 <a
-                  href={`mailto:careers@luxeevents.fun?subject=${encodeURIComponent(`Application for ${job.title}`)}`}
+                  href={`mailto:careers@nakathata.lk?subject=${encodeURIComponent(`Application for ${job.title}`)}`}
                   className="shrink-0"
                 >
                   <Button className="w-full sm:w-auto h-11 bg-slate-900 hover:bg-primary text-white font-bold rounded-xl text-xs transition-colors flex items-center justify-center gap-1.5">
@@ -144,9 +144,9 @@ export default function CareersPage() {
             We are always eager to connect with extraordinary engineers, designers, and luxury event specialists. Send your portfolio or CV our way.
           </p>
           <div className="pt-2">
-            <a href="mailto:careers@luxeevents.fun?subject=Spontaneous%20Application%20-%20LuxeEvents">
+            <a href="mailto:careers@nakathata.lk?subject=Spontaneous%20Application%20-%20Nakathata.lk">
               <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 mx-auto">
-                <Mail className="h-4 w-4" /> Email Us at careers@luxeevents.fun
+                <Mail className="h-4 w-4" /> Email Us at careers@nakathata.lk
               </Button>
             </a>
           </div>

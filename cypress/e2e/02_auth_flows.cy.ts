@@ -21,7 +21,7 @@ describe('02 - Authentication & Route Guard Flows', () => {
     }).as('invalidLogin');
 
     cy.visit('/login');
-    cy.get('#email').should('be.visible').type('nonexistent-test-user@luxeevents.fun');
+    cy.get('#email').should('be.visible').type('nonexistent-test-user@nakathata.lk');
     cy.get('#password').type('WrongPassword123!');
     cy.contains('button', /Sign in/i).click();
     cy.wait('@invalidLogin');
@@ -52,7 +52,7 @@ describe('02 - Authentication & Route Guard Flows', () => {
     cy.get('#password').should('be.visible');
     
     // Submit invalid credentials
-    cy.get('#email').type('fake-vendor@luxeevents.fun');
+    cy.get('#email').type('fake-vendor@nakathata.lk');
     cy.get('#password').type('WrongPassword123!');
     cy.contains('button', /Sign In/i).click();
     cy.wait('@invalidVendorLogin');
@@ -74,7 +74,7 @@ describe('02 - Authentication & Route Guard Flows', () => {
     cy.wait(1000);
 
     // Step 1: Request OTP
-    cy.get('input#email').type('customer@luxeevents.fun');
+    cy.get('input#email').type('customer@nakathata.lk');
     cy.contains('button', /Send Recovery Code/i).click();
     cy.wait('@requestOtp');
 

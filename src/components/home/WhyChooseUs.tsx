@@ -48,7 +48,7 @@ export function WhyChooseUs() {
             transition={{ duration: 0.6 }}
           >
             <h2 className="text-sm font-bold tracking-widest text-primary uppercase mb-3">
-              Why Choose LuxeEvents
+              Why Choose Nakathata.lk
             </h2>
             <h3 className="text-4xl font-bold text-slate-900 mb-6">
               The Gold Standard in Event Planning

@@ -4,7 +4,7 @@ import { FileText, Shield, CheckCircle2, Clock, HelpCircle } from 'lucide-react'
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Terms of Service | LuxeEvents Marketplace',
+  title: 'Terms of Service | Nakathata.lk Marketplace',
   description: 'Review our terms of service governing bookings, vendor listings, payments, advance deposits, and platform policies.',
 };
 
@@ -23,7 +23,7 @@ export default function TermsPage() {
             Terms of Service
           </h1>
           <p className="text-sm text-slate-500 mt-2">
-            Last Updated: September 2026 • Effective for all clients and vendors on LuxeEvents
+            Last Updated: September 2026 • Effective for all clients and vendors on Nakathata.lk
           </p>
         </div>
 
@@ -35,10 +35,10 @@ export default function TermsPage() {
               <FileText className="h-5 w-5 text-primary" /> 1. Platform Purpose & Scope
             </h2>
             <p>
-              LuxeEvents operates as a curated luxury event marketplace connecting event planners, couples, and corporate organizers (&ldquo;Clients&rdquo;) with vetted event professionals and venues (&ldquo;Vendors&rdquo;).
+              Nakathata.lk operates as a curated luxury event marketplace connecting event planners, couples, and corporate organizers (&ldquo;Clients&rdquo;) with vetted event professionals and venues (&ldquo;Vendors&rdquo;).
             </p>
             <p>
-              By accessing or using our marketplace (luxeevents.fun), mobile interfaces, and messaging tools, you agree to comply with and be bound by these Terms of Service. If you do not agree, please do not use our services.
+              By accessing or using our marketplace (nakathata.lk), mobile interfaces, and messaging tools, you agree to comply with and be bound by these Terms of Service. If you do not agree, please do not use our services.
             </p>
           </section>
 
@@ -60,14 +60,14 @@ export default function TermsPage() {
               <Shield className="h-5 w-5 text-primary" /> 3. Bookings & The 15% Advance Deposit System
             </h2>
             <p>
-              To protect both Clients and Vendors from arbitrary cancellations, LuxeEvents operates a standardized booking model:
+              To protect both Clients and Vendors from arbitrary cancellations, Nakathata.lk operates a standardized booking model:
             </p>
             <div className="bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200 space-y-2 text-xs sm:text-sm">
               <p>
                 <strong>Stage 1 (Inquiry & Approval):</strong> Client submits a booking request through the vendor profile. No funds are charged until the vendor formally confirms availability.
               </p>
               <p>
-                <strong>Stage 2 (Advance Deposit):</strong> Upon vendor approval, the Client pays an agreed advance deposit (standardized at 15% of the total package value) online through the LuxeEvents platform to officially lock the event date.
+                <strong>Stage 2 (Advance Deposit):</strong> Upon vendor approval, the Client pays an agreed advance deposit (standardized at 15% of the total package value) online through the Nakathata.lk platform to officially lock the event date.
               </p>
               <p>
                 <strong>Stage 3 (Event Settlement):</strong> The remaining 85% balance is payable directly to the Vendor on the day of the event (or per the vendor&apos;s agreed milestone contract).
@@ -81,7 +81,7 @@ export default function TermsPage() {
               <Clock className="h-5 w-5 text-primary" /> 4. Cancellation & Refund Policy
             </h2>
             <p>
-              <strong>LuxeEvents Guarantee:</strong> If a Vendor fails to provide the agreed service, fails to appear on the event date, or initiates a cancellation, the Client receives an unconditional <strong>100% refund</strong> of their platform advance deposit.
+              <strong>Nakathata.lk Guarantee:</strong> If a Vendor fails to provide the agreed service, fails to appear on the event date, or initiates a cancellation, the Client receives an unconditional <strong>100% refund</strong> of their platform advance deposit.
             </p>
             <p>
               <strong>Client Cancellations:</strong> If a Client cancels a confirmed booking:
@@ -107,8 +107,8 @@ export default function TermsPage() {
             </h2>
             <p>
               For legal questions, dispute resolutions, or clarifications on our terms, reach out to our legal department at{' '}
-              <a href="mailto:support@luxeevents.fun" className="text-primary font-bold hover:underline">
-                support@luxeevents.fun
+              <a href="mailto:support@nakathata.lk" className="text-primary font-bold hover:underline">
+                support@nakathata.lk
               </a>{' '}
               or submit an inquiry via our <Link href="/contact" className="text-primary font-bold hover:underline">Contact Center</Link>.
             </p>

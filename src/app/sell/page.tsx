@@ -3,7 +3,7 @@ import { Footer } from '@/components/home/Footer';
 import { SellContent } from '@/components/sell/SellContent';
 
 export const metadata = {
-  title: 'Become a Vendor - LuxeEvents',
+  title: 'Become a Vendor - Nakathata.lk',
   description: 'Join the premier marketplace for luxury event professionals. Scale your business and reach high-end clients.',
 };
 

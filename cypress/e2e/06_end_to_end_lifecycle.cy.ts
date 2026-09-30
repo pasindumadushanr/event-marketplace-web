@@ -5,7 +5,7 @@ describe('06 - Complete Multi-Persona Lifecycle & User Scenarios', () => {
 
   const mockVendorUser = {
     id: 'vendor-user-lifecycle-1',
-    email: 'vendor.director@luxeevents.fun',
+    email: 'vendor.director@nakathata.lk',
     firstName: 'Marcus',
     lastName: 'Vance',
     roleName: 'VENDOR',
@@ -347,7 +347,7 @@ describe('06 - Complete Multi-Persona Lifecycle & User Scenarios', () => {
     // Admin user Navbar test
     const mockAdminUser = {
       id: 'admin-user-1',
-      email: 'admin@luxeevents.fun',
+      email: 'admin@nakathata.lk',
       firstName: 'Chief',
       lastName: 'Administrator',
       roleName: 'ADMIN'

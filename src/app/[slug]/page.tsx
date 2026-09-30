@@ -20,8 +20,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!page) return { title: 'Page Not Found' };
   
   return {
-    title: `${page.metaTitle || page.title} | Event Marketplace`,
-    description: page.metaDescription || 'Event Marketplace',
+    title: `${page.metaTitle || page.title} | Nakathata.lk`,
+    description: page.metaDescription || 'Nakathata.lk',
   };
 }
 

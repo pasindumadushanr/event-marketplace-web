@@ -10,8 +10,8 @@ import { Button } from '@/components/ui/button';
 
 export default function GeneralSettingsPage() {
   const [settings, setSettings] = useState({
-    siteName: 'Event Marketplace',
-    contactEmail: 'admin@eventmarketplace.com',
+    siteName: 'Nakathata.lk',
+    contactEmail: 'admin@nakathata.lk',
     currency: 'LKR',
     supportPhone: '+94701234567'
   });

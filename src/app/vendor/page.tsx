@@ -61,7 +61,7 @@ export default function VendorDashboardPage() {
         <div className="w-24 h-24 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-6">
           <FileText className="h-12 w-12" />
         </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-4">Welcome to Event Marketplace!</h2>
+        <h2 className="text-3xl font-bold text-slate-900 mb-4">Welcome to Nakathata.lk!</h2>
         <p className="text-slate-500 mb-8 max-w-lg">
           You are just a few steps away from joining our exclusive vendor network. Submit your application today to start connecting with premium clients.
         </p>

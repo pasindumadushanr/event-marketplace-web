@@ -31,8 +31,8 @@ export default function SettingsAdmin() {
   const fetchSettings = async () => {
     try {
       const res = await api.get('/admin/cms/public/settings/FOOTER_CONTENT');
-      if (res.data && res.data.value) {
-        const val = res.data.value;
+      if (res.data) {
+        const val = res.data.value ?? res.data;
         setFooterDesc(val.description || '');
         setCopyright(val.copyright || '');
         setSubtext(val.subtext || '');
@@ -127,7 +127,7 @@ export default function SettingsAdmin() {
               <div className="space-y-3">
                 <div>
                   <label className="text-xs font-medium text-zinc-500">Copyright Text</label>
-                  <Input value={copyright} onChange={e => setCopyright(e.target.value)} placeholder="© 2026 LuxeEvents..." />
+                  <Input value={copyright} onChange={e => setCopyright(e.target.value)} placeholder="© 2026 Nakathata.lk..." />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-zinc-500">Subtext</label>

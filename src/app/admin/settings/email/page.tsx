@@ -15,8 +15,8 @@ export default function EmailSettingsPage() {
     smtpPort: '587',
     smtpUser: '',
     smtpPassword: '',
-    fromEmail: 'noreply@eventmarketplace.com',
-    fromName: 'Event Marketplace'
+    fromEmail: 'noreply@nakathata.lk',
+    fromName: 'Nakathata.lk'
   });
   const [isSaving, setIsSaving] = useState(false);
 
@@ -109,7 +109,7 @@ export default function EmailSettingsPage() {
                 <Input 
                   value={settings.fromName} 
                   onChange={e => setSettings({...settings, fromName: e.target.value})} 
-                  placeholder="Event Marketplace"
+                  placeholder="Nakathata.lk"
                 />
               </div>
 
@@ -118,7 +118,7 @@ export default function EmailSettingsPage() {
                 <Input 
                   value={settings.fromEmail} 
                   onChange={e => setSettings({...settings, fromEmail: e.target.value})} 
-                  placeholder="noreply@eventmarketplace.com"
+                  placeholder="noreply@nakathata.lk"
                 />
               </div>
             </div>

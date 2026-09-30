@@ -14,7 +14,7 @@ export function Footer() {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/settings/FOOTER_CONTENT`);
         if (res.ok) {
           const data = await res.json();
-          setCms(data.value);
+          setCms(data.value ?? data);
         }
       } catch (error) {
         console.error('Failed to fetch footer settings:', error);
@@ -24,9 +24,9 @@ export function Footer() {
   }, []);
 
   const description = cms?.description || 'The premier destination for luxury events. Discover, compare, and book the finest vendors and venues with ease and security.';
-  const copyright = cms?.copyright || `© ${new Date().getFullYear()} LuxeEvents Marketplace. All rights reserved.`;
+  const copyright = cms?.copyright || `© ${new Date().getFullYear()} Nakathata.lk Marketplace. All rights reserved.`;
   const subtext = cms?.subtext || 'Designed for Premium Events';
-  const socials = cms?.socials || { website: '#', instagram: '#', facebook: '#', linkedin: '#' };
+  const socials = cms?.socials || { website: 'https://nakathata.lk', instagram: 'https://www.instagram.com/nakathata.lk/', facebook: 'https://web.facebook.com/profile.php?id=61595001868271', linkedin: '#' };
 
   return (
     <footer className="bg-slate-950 text-slate-300 pt-20 pb-10">
@@ -49,7 +49,7 @@ export function Footer() {
                 <Diamond className="h-5 w-5 text-white" />
               </div>
               <span className="text-2xl font-bold tracking-tight text-white">
-                Luxe<span className="font-light">Events</span>
+                Nakathata<span className="font-light">.lk</span>
               </span>
             </Link>
             <p className="text-slate-400 leading-relaxed mb-6 max-w-sm">

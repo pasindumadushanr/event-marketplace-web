@@ -22,7 +22,7 @@ export function AboutWhyChooseUs({ data }: { data: any[] }) {
         
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-4">
-            Why Choose LuxeEvents
+            Why Choose Nakathata.lk
           </h2>
           <p className="text-lg text-slate-500">
             We provide a secure, seamless, and premium environment designed specifically for high-end event planning.

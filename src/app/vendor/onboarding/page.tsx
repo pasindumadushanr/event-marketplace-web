@@ -223,7 +223,7 @@ export default function VendorOnboardingWizard() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
               <h3 className="text-xl font-bold border-b pb-4">Step 5: Review & Submit</h3>
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 text-blue-900">
-                <h4 className="font-bold text-lg mb-2">Ready to join Event Marketplace?</h4>
+                <h4 className="font-bold text-lg mb-2">Ready to join Nakathata.lk?</h4>
                 <p className="text-sm">By submitting this application, our administrative team will review your business details. Once approved, you will gain full access to the vendor dashboard to manage packages, bookings, and your public gallery.</p>
               </div>
             </div>

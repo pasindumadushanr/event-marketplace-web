@@ -10,10 +10,10 @@ import { Button } from '@/components/ui/button';
 
 export default function SocialSettingsPage() {
   const [settings, setSettings] = useState({
-    facebook: 'https://facebook.com/eventmarketplace',
-    instagram: 'https://instagram.com/eventmarketplace',
-    twitter: 'https://twitter.com/eventmarketplace',
-    youtube: ''
+    facebook: 'https://web.facebook.com/profile.php?id=61595001868271',
+    instagram: 'https://www.instagram.com/nakathata.lk/',
+    twitter: '',
+    youtube: 'https://www.youtube.com/channel/UCYSC4gU8KyQuhFn7p3RUjMw'
   });
   const [isSaving, setIsSaving] = useState(false);
 

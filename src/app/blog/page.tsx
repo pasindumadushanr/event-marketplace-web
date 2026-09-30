@@ -17,7 +17,7 @@ async function getBlogPosts() {
 }
 
 export const metadata = {
-  title: 'Blog | Event Marketplace',
+  title: 'Blog | Nakathata.lk',
   description: 'Read our latest articles, news, and event planning tips.',
 };
 
