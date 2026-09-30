@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { MapPin, Phone, Mail, Send, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Mail, Send, ExternalLink, ArrowUpRight, MessageCircle, Sparkles, CheckCircle2, LoaderCircle } from 'lucide-react';
 import api from '@/lib/api';
 
 const socialLinks = [
@@ -61,6 +62,7 @@ type ContactFormValues = z.infer<typeof contactSchema>;
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSent, setIsSent] = useState(false);
 
   const {
     register,
@@ -73,11 +75,13 @@ export default function ContactPage() {
 
   const onSubmit = async (data: ContactFormValues) => {
     setIsSubmitting(true);
+    setIsSent(false);
     try {
       await api.post('/contact', data);
       toast.success('Your message has been sent successfully!');
       reset();
-    } catch (error) {
+      setIsSent(true);
+    } catch {
       toast.error('Failed to send message. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -85,44 +89,51 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col bg-[#faf8f4] font-sans text-slate-900">
       <div className="bg-slate-900">
         <Navbar />
       </div>
       <div className="h-20 bg-slate-900" />
 
       {/* Contact Hero */}
-      <div className="relative border-b border-slate-200 py-20 lg:py-32 overflow-hidden">
+      <header className="relative overflow-hidden bg-slate-900 pb-24 pt-14 sm:pb-32 sm:pt-20">
         {/* Background Image & Overlays */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
-            alt="Event Planning Contact" 
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-slate-900/70 mix-blend-multiply"></div>
-          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/3"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,175,55,0.16),transparent_60%)]" />
+          <div className="absolute -right-24 -top-48 h-[600px] w-[600px] rounded-full border border-white/10" />
+          <div className="absolute -right-8 -top-32 h-[470px] w-[470px] rounded-full border border-white/10" />
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight drop-shadow-sm">
-            Get in Touch
-          </h1>
-          <p className="text-lg md:text-xl text-slate-200 max-w-2xl mx-auto font-light leading-relaxed">
-            Whether you have a question about our marketplace, need help finding a vendor, or want to partner with us, our team is here to assist.
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <p className="mb-6 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#e5c76b]">
+            <span className="h-px w-8 bg-[#e5c76b]" /> Contact us
           </p>
+          <div className="grid items-end gap-8 lg:grid-cols-[1.3fr_1fr] lg:gap-20">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-white tracking-tight leading-[1.12]">
+              Great celebrations.<br /><span className="font-serif italic font-normal text-[#e5c76b]">Start with a hello.</span>
+            </h1>
+            <div className="max-w-md">
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed">
+                Planning something special? Looking to grow your business? Whatever brings you here, we would love to hear from you.
+              </p>
+              <a href="#contact-form" className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-white underline decoration-white/30 underline-offset-8 hover:text-[#e5c76b] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#e5c76b]">
+                Let’s talk <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-16">
+      <main className="relative z-10 -mt-12 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.85fr_1.3fr] gap-0 overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-[0_20px_70px_-30px_rgba(15,23,42,0.25)]">
           
           {/* Contact Information */}
-          <div className="lg:col-span-1 space-y-10">
+          <div className="space-y-8 bg-[#f2efe8] p-6 sm:p-10 lg:p-12">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Contact Information</h2>
-              <p className="text-slate-600 mb-8 leading-relaxed">
-                Reach out to us through any of these channels or fill out the form, and we will get back to you within 24 hours.
+              <span className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#8c6c19] shadow-sm"><MessageCircle className="h-6 w-6" aria-hidden="true" /></span>
+              <h2 className="text-2xl font-semibold tracking-tight text-slate-900 mb-3">A conversation away.</h2>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                From finding the right vendor to getting your business listed, let us help with your next step.
               </p>
             </div>
             
@@ -143,7 +154,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Phone</h4>
-                  <p className="text-slate-500 mt-1">+94 (11) 234-5678</p>
+                  <a href="tel:+94112345678" className="inline-block text-slate-600 mt-1 hover:underline">+94 (11) 234-5678</a>
                 </div>
               </div>
               
@@ -153,72 +164,49 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-bold text-slate-900">Email</h4>
-                  <p className="text-slate-500 mt-1">support@luxeevents.com</p>
+                  <a href="mailto:support@luxeevents.com" className="inline-block break-all text-slate-600 mt-1 hover:underline">support@luxeevents.com</a>
                 </div>
               </div>
             </div>
 
-            <section aria-labelledby="social-media-heading" className="border-t border-slate-200 pt-8">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">Let’s stay connected</p>
-              <h2 id="social-media-heading" className="text-2xl font-bold tracking-tight text-slate-900 mb-3">
-                Follow Nakathata.lk
-              </h2>
-              <p className="text-sm text-slate-500 mb-6 leading-relaxed">
-                A little inspiration for your next big celebration. Follow along for ideas, stories, and updates.
-              </p>
-              <ul className="grid grid-cols-1 min-[360px]:grid-cols-2 gap-3">
-                {socialLinks.map(({ name, href, caption, color, hover, icon }) => (
-                  <li key={name}>
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label={`Nakathata.lk on ${name} (opens in a new tab)`}
-                      className={`group relative flex h-full flex-col items-start rounded-2xl border border-slate-200/80 bg-white p-4 text-slate-900 shadow-sm transition-colors ${hover} focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary`}
-                    >
-                      <span className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl text-white shadow-sm ${color}`}>
-                        <svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" focusable="false">{icon}</svg>
-                      </span>
-                      <span className="text-sm font-semibold">{name}</span>
-                      <span className="mt-1 text-xs leading-relaxed text-slate-500">{caption}</span>
-                      <ExternalLink className="absolute right-4 top-4 h-3.5 w-3.5 text-slate-400 transition-colors group-hover:text-slate-700" aria-hidden="true" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
+            <Link href="/faq" className="group flex items-center justify-between gap-4 rounded-2xl border border-slate-300/60 p-5 transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary">
+              <span><span className="block text-sm font-semibold">Looking for a quick answer?</span><span className="mt-1 block text-sm text-slate-500">Explore our frequently asked questions</span></span>
+              <ArrowUpRight className="h-5 w-5 shrink-0 text-[#8c6c19]" aria-hidden="true" />
+            </Link>
           </div>
 
           {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-3xl border border-slate-200 p-8 md:p-12 shadow-sm">
-              <h3 className="text-2xl font-bold text-slate-900 mb-8">Send us a Message</h3>
+          <div id="contact-form" className="scroll-mt-28">
+            <div className="p-6 sm:p-10 lg:p-12">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#8c6c19]">Your next step starts here</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-slate-900 mb-3">Tell us what’s on your mind.</h2>
+              <p className="mb-8 text-sm leading-relaxed text-slate-500">Share a few details and our team will get back to you by email. Fields marked * are required.</p>
               
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6 [&_input]:h-12 [&_input]:rounded-xl [&_input]:border-slate-200 [&_input]:bg-slate-50/70 [&_input]:px-4 [&_input]:shadow-none [&_label]:text-slate-700">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="name">Full Name <span className="text-red-500">*</span></Label>
-                    <Input id="name" placeholder="John Doe" {...register('name')} />
-                    {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+                    <Input id="name" autoComplete="name" placeholder="Your full name" aria-invalid={!!errors.name} aria-describedby={errors.name ? 'name-error' : undefined} {...register('name')} />
+                    {errors.name && <p id="name-error" className="text-sm text-red-600">{errors.name.message}</p>}
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address <span className="text-red-500">*</span></Label>
-                    <Input id="email" type="email" placeholder="john@example.com" {...register('email')} />
-                    {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+                    <Input id="email" type="email" autoComplete="email" placeholder="you@example.com" aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} {...register('email')} />
+                    {errors.email && <p id="email-error" className="text-sm text-red-600">{errors.email.message}</p>}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone Number (Optional)</Label>
-                    <Input id="phone" placeholder="+94 77 123 4567" {...register('phone')} />
+                    <Input id="phone" type="tel" autoComplete="tel" placeholder="+94 77 123 4567" {...register('phone')} />
                   </div>
                   
                   <div className="space-y-2">
                     <Label htmlFor="subject">Subject <span className="text-red-500">*</span></Label>
-                    <Input id="subject" placeholder="How can we help you?" {...register('subject')} />
-                    {errors.subject && <p className="text-sm text-red-500">{errors.subject.message}</p>}
+                    <Input id="subject" placeholder="What would you like help with?" aria-invalid={!!errors.subject} aria-describedby={errors.subject ? 'subject-error' : undefined} {...register('subject')} />
+                    {errors.subject && <p id="subject-error" className="text-sm text-red-600">{errors.subject.message}</p>}
                   </div>
                 </div>
 
@@ -226,26 +214,49 @@ export default function ContactPage() {
                   <Label htmlFor="message">Message <span className="text-red-500">*</span></Label>
                   <Textarea 
                     id="message" 
-                    placeholder="Tell us about your inquiry..." 
-                    className="min-h-[150px] resize-none"
+                    placeholder="Tell us about your plans, your business, or how we can help…"
+                    className="min-h-[140px] resize-y rounded-xl border-slate-200 bg-slate-50/70 p-4 shadow-none"
+                    aria-invalid={!!errors.message}
+                    aria-describedby={errors.message ? 'message-error' : undefined}
                     {...register('message')} 
                   />
-                  {errors.message && <p className="text-sm text-red-500">{errors.message.message}</p>}
+                  {errors.message && <p id="message-error" className="text-sm text-red-600">{errors.message.message}</p>}
                 </div>
 
                 <Button 
                   type="submit" 
                   disabled={isSubmitting} 
-                  className="w-full md:w-auto px-8 py-6 bg-slate-900 hover:bg-primary text-white text-lg rounded-xl flex items-center gap-2"
+                  className="h-13 w-full px-8 bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold rounded-xl flex items-center justify-center gap-3"
                 >
                   {isSubmitting ? 'Sending...' : 'Send Message'}
-                  <Send className="h-4 w-4" />
+                  {isSubmitting ? <LoaderCircle className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /> : <Send className="h-4 w-4" aria-hidden="true" />}
                 </Button>
+                {isSent && <p role="status" className="flex items-start gap-2 rounded-xl bg-emerald-50 p-4 text-sm text-emerald-800"><CheckCircle2 className="h-5 w-5 shrink-0" aria-hidden="true" />Thanks for reaching out! Your message is with our team.</p>}
               </form>
             </div>
           </div>
 
         </div>
+        <section aria-labelledby="social-media-heading" className="mt-16 sm:mt-20">
+          <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+            <div>
+              <p className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-[#8c6c19]"><Sparkles className="h-4 w-4" aria-hidden="true" /> A little inspiration, every day</p>
+              <h2 id="social-media-heading" className="text-3xl font-semibold tracking-tight">Stay close to the celebration.</h2>
+            </div>
+            <p className="max-w-xs text-sm leading-relaxed text-slate-500">Follow Nakathata.lk for fresh ideas, event stories, and a look behind the scenes.</p>
+          </div>
+          <ul className="grid grid-cols-1 min-[380px]:grid-cols-2 lg:grid-cols-4 gap-4">
+            {socialLinks.map(({ name, href, caption, color, hover, icon }) => (
+              <li key={name}>
+                <a href={href} target="_blank" rel="noopener noreferrer" aria-label={`Nakathata.lk on ${name} (opens in a new tab)`} className={`group relative flex h-full flex-col items-start gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 transition-colors ${hover} focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary`}>
+                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-white ${color}`}><svg viewBox="0 0 24 24" className="h-6 w-6" aria-hidden="true" focusable="false">{icon}</svg></span>
+                  <span className="min-w-0"><span className="block text-sm font-semibold">{name}</span><span className="mt-1 block text-xs text-slate-500">{caption}</span></span>
+                  <ExternalLink className="absolute right-5 top-5 h-3.5 w-3.5 text-slate-400 group-hover:text-slate-700" aria-hidden="true" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
 
       <Footer />
