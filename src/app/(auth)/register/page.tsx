@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 import { GoogleAuthButton } from '@/components/auth/google-auth-button';
 
 const registerSchema = z.object({
@@ -73,13 +74,7 @@ export default function RegisterPage() {
         />
         <div className="absolute inset-0 z-10 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-zinc-950/20" />
         
-        <div className="relative z-20 flex items-center text-lg font-bold">
-          <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          Nakathata.lk
-        </div>
+        <Link href="/" className="relative z-20 inline-flex self-start" aria-label="Nakathata.lk home"><BrandLogo priority className="w-48" /></Link>
         
         <div className="relative z-20 space-y-6 max-w-md">
           <h1 className="text-5xl font-extrabold tracking-tight leading-[1.1]">
@@ -94,6 +89,7 @@ export default function RegisterPage() {
       {/* Right Pane - Form */}
       <div className="flex items-center justify-center p-8 bg-white min-h-screen">
         <div className="w-full max-w-sm space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 py-12">
+          <Link href="/" className="mx-auto block w-fit lg:hidden" aria-label="Nakathata.lk home"><BrandLogo priority className="w-44" /></Link>
           <div className="space-y-2 text-center">
             <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Create an account</h1>
             <p className="text-zinc-500 text-sm">

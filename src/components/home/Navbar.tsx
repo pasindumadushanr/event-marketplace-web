@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Diamond, User as UserIcon, Heart, CalendarDays, LogOut, Settings, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Menu, X, User as UserIcon, Heart, CalendarDays, LogOut, Settings, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/auth-context';
 import {
@@ -119,8 +120,8 @@ export function Navbar() {
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100 py-3' 
-          : 'bg-transparent py-5'
+          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100 py-1'
+          : 'bg-transparent py-1'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -128,12 +129,7 @@ export function Navbar() {
           
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 z-50">
-            <div className="h-10 w-10 bg-primary rounded-lg flex items-center justify-center">
-              <Diamond className="h-6 w-6 text-white" />
-            </div>
-            <span className={`text-2xl font-bold tracking-tight ${isScrolled ? 'text-slate-900' : 'text-white'}`}>
-              Nakathata<span className="font-light">.lk</span>
-            </span>
+            <BrandLogo priority className="w-24 sm:w-28" />
           </Link>
 
           {/* Desktop Navigation Links */}

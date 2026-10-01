@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { Diamond } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/BrandLogo';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -60,12 +60,7 @@ export default function VendorLoginPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
         <div className="absolute bottom-12 left-12 right-12 z-10">
           <Link href="/" className="flex items-center gap-2 mb-8 inline-block">
-            <div className="h-10 w-10 bg-primary rounded-lg flex items-center justify-center">
-              <Diamond className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-white flex items-center h-10">
-              Nakathata<span className="font-light">.lk</span>
-            </span>
+            <BrandLogo className="w-48" />
           </Link>
           <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
             Manage your premium bookings.
@@ -90,12 +85,7 @@ export default function VendorLoginPage() {
         <div className="w-full max-w-md space-y-8 mt-12 lg:mt-0">
           
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <div className="h-10 w-10 bg-primary rounded-lg flex items-center justify-center">
-              <Diamond className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight text-slate-900">
-              Nakathata<span className="font-light">.lk</span>
-            </span>
+            <BrandLogo className="w-48" />
           </div>
 
           <div className="text-center lg:text-left">

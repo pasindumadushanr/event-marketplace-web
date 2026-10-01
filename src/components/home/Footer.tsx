@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Diamond, Mail, Globe, Camera, MessageCircle, Briefcase } from 'lucide-react';
+import { BrandLogo } from '@/components/brand/BrandLogo';
+import { Globe, Camera, MessageCircle, Briefcase } from 'lucide-react';
 import { NewsletterForm } from './NewsletterForm';
 
 export function Footer() {
@@ -45,12 +46,7 @@ export function Footer() {
           
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-6">
-              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center">
-                <Diamond className="h-5 w-5 text-white" />
-              </div>
-              <span className="text-2xl font-bold tracking-tight text-white">
-                Nakathata<span className="font-light">.lk</span>
-              </span>
+              <BrandLogo className="w-48" />
             </Link>
             <p className="text-slate-400 leading-relaxed mb-6 max-w-sm">
               {description}
