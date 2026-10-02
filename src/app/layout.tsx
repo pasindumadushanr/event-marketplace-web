@@ -18,12 +18,23 @@ export const metadata: Metadata = {
   title: 'Nakathata.lk | Plan Your Next Celebration',
   description: 'Discover event venues and service providers across Sri Lanka. Find your setting, connect with vendors, and plan your celebration with Nakathata.lk.',
   applicationName: 'Nakathata.lk',
+  icons: {
+    icon: [{ url: '/images/brand/nakathata-logo.jpg', type: 'image/jpeg', sizes: '2048x2048' }],
+    apple: [{ url: '/images/brand/nakathata-logo.jpg', sizes: '2048x2048' }],
+  },
   openGraph: {
     siteName: 'Nakathata.lk',
     title: 'Nakathata.lk | Plan Your Next Celebration',
     description: 'Discover event venues and service providers across Sri Lanka with Nakathata.lk.',
     locale: 'en_LK',
     type: 'website',
+    images: [{ url: '/images/brand/nakathata-logo.jpg', width: 2048, height: 2048, alt: 'Nakathata.lk — Weddings, Events, Everything Together' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Nakathata.lk | Plan Your Next Celebration',
+    description: 'Discover event venues and service providers across Sri Lanka with Nakathata.lk.',
+    images: ['/images/brand/nakathata-logo.jpg'],
   },
 };
 
