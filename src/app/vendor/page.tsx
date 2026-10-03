@@ -179,24 +179,47 @@ export default function VendorDashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-3xl font-serif font-bold tracking-tight text-secondary">
-          Welcome back, {business.name || "Vendor"}!
-        </h2>
-        <p className="text-slate-500 mt-1">
-          Manage your bookings, reply to customers and keep your business page
-          up to date.
-        </p>
+      <div className="vendor-hero flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
+        <div className="max-w-xl">
+          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#dfc18b]">
+            A little progress. A memorable celebration.
+          </p>
+          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+            Welcome back,
+            <br />
+            {business.name || "Vendor"}.
+          </h2>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70">
+            Your next great event starts here. Stay connected with customers and
+            keep your business moving forward.
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-start gap-4 sm:items-end">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80">
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${business.status === "ACTIVE" ? "bg-[#b7d7a8]" : "bg-amber-300"}`}
+            />
+            {business.status === "ACTIVE"
+              ? "Your business page is live"
+              : "Let’s get your page ready"}
+          </span>
+          <Link
+            href="/vendor/business"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#e7c991] px-5 py-3 text-sm font-semibold text-[#283c30] hover:bg-[#f0d8ac]"
+          >
+            Manage my business <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
       </div>
       {business.status === "ACTIVE" && <DailyOverview />}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Profile Completion Widget */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm">
+        <div className="vendor-panel vendor-setup lg:col-span-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div>
               <h3 className="text-xl font-serif font-bold text-secondary">
-                Profile Setup
+                Your business profile
               </h3>
               <p className="text-sm text-slate-500 mt-1">
                 Application approved.{" "}
@@ -282,7 +305,7 @@ export default function VendorDashboardPage() {
 
         {/* Quick Stats Placeholder */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-secondary rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+          <div className="vendor-status relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
             <h3 className="font-serif font-semibold text-primary mb-6">
               Profile Status

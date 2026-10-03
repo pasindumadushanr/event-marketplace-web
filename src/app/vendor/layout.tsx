@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { BusinessProfileProvider } from "@/contexts/BusinessProfileContext";
+import "./vendor.css";
 
 const navConfig = [
   { href: "/vendor", label: "Home", icon: LayoutDashboard },
@@ -147,7 +148,11 @@ export default function VendorLayout({
     });
 
     return (
-      <nav className="flex-1 space-y-1 px-4 py-4">
+      <nav
+        aria-label="Vendor navigation"
+        className="flex-1 space-y-2 px-4 py-4"
+      >
+        <p className="vendor-nav-caption">WORKSPACE</p>
         {filteredNavConfig.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -172,10 +177,10 @@ export default function VendorLayout({
               href={item.href}
               aria-current={isActive ? "page" : undefined}
               onClick={() => setIsMobileMenuOpen(false)}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
+              className={`vendor-nav-link flex items-center gap-3 rounded-xl px-4 py-3 transition-all ${
                 isActive
-                  ? "bg-primary text-primary-foreground font-medium"
-                  : "text-white/60 hover:bg-white/10 hover:text-white"
+                  ? "vendor-nav-active"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               <item.icon className="h-5 w-5" />
@@ -188,67 +193,82 @@ export default function VendorLayout({
   };
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="vendor-workspace flex h-dvh">
       {/* Mobile Menu Button */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           aria-label={isMobileMenuOpen ? "Close navigation" : "Open navigation"}
           aria-expanded={isMobileMenuOpen}
-          className="p-2 rounded-md bg-slate-900 text-white shadow-md"
+          className="p-2 rounded-xl bg-white text-slate-800 border border-slate-200 shadow-sm"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-secondary text-white/80 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
+        className={`vendor-sidebar fixed inset-y-0 left-0 z-40 w-64 shrink-0 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
           {/* Logo / Header */}
-          <div className="flex h-16 items-center px-6 bg-secondary border-b border-white/10 shrink-0">
-            <span className="text-xl font-serif font-bold text-primary tracking-tight">
+          <div className="flex h-24 items-center gap-3 px-6 shrink-0">
+            <span aria-hidden="true" className="vendor-brand-mark">
+              N<span>✦</span>
+            </span>
+            <span className="text-xl font-serif font-bold text-slate-900 tracking-tight">
               Nakathata.lk{" "}
-              <span className="block text-xs font-sans font-normal text-white/60">
-                Your business workspace
+              <span className="mt-1 block text-[10px] font-sans font-medium uppercase tracking-[0.16em] text-slate-500">
+                Vendor workspace
               </span>
             </span>
           </div>
 
           {vendorStatus === "APPROVED" && (
             <div className="p-4 shrink-0">
-              <Link href="/vendor/preview">
-                <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 rounded-lg py-2 transition-colors font-medium text-sm">
-                  <Eye className="h-4 w-4" />
-                  Preview My Business Page
-                </button>
+              <Link href="/vendor/preview" className="vendor-preview-link">
+                <Eye className="h-4 w-4" />
+                Preview My Business Page
               </Link>
             </div>
           )}
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-2 custom-scrollbar">
+          <div className="flex-1 overflow-y-auto py-2 custom-scrollbar">
             {renderNavLinks()}
-          </nav>
+          </div>
+          <div className="vendor-sidebar-help mx-5 mb-5 rounded-2xl bg-[#f4f6f3] p-4">
+            <p className="text-sm font-semibold text-[#183e38]">
+              A little help goes a long way.
+            </p>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">
+              Our team is here to help you make the most of your business page.
+            </p>
+            <Link
+              href="/vendor/support"
+              className="mt-3 inline-block text-xs font-semibold text-[#183e38] underline underline-offset-4"
+            >
+              Talk to our team ↗
+            </Link>
+          </div>
 
           {/* User Footer */}
-          <div className="border-t border-white/10 p-4">
+          <div className="border-t border-slate-100 p-4">
             <div className="flex items-center gap-3 mb-4 px-2">
-              <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
+              <div className="h-10 w-10 rounded-full bg-[#e9efe9] flex items-center justify-center text-[#183e38] font-bold">
                 {user?.firstName?.charAt(0) || "V"}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-semibold text-slate-800">
                   {user?.firstName} {user?.lastName}
                 </span>
-                <span className="text-xs text-white/50">Vendor Account</span>
+                <span className="text-xs text-slate-500">Vendor Account</span>
               </div>
             </div>
             <button
               onClick={logout}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-white/60 transition-all hover:bg-white/10 hover:text-white"
+              className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-xs text-slate-500 transition-all hover:bg-slate-50 hover:text-slate-900"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -260,20 +280,36 @@ export default function VendorLayout({
       {/* Main Content */}
       <main className="flex-1 min-w-0 overflow-y-auto">
         {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 shadow-sm">
+        <header className="vendor-topbar flex h-20 items-center justify-between gap-4 px-5 pl-20 lg:px-9">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
+              Your workspace
+            </p>
+            <p className="mt-1 text-sm font-semibold text-slate-800">
+              {navConfig.find((item) => pathname === item.href)?.label ||
+                "Business management"}
+            </p>
+          </div>
           <div className="flex items-center gap-4">
             <Link
               href="/vendor/notifications"
               aria-label="View notifications"
-              className="text-slate-500 hover:text-slate-900 p-2"
+              className="rounded-full border border-slate-200 bg-white text-slate-500 hover:text-slate-900 p-3"
             >
               <Bell className="h-5 w-5" />
+            </Link>
+            <Link
+              href="/vendor/settings"
+              aria-label="Account settings"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#183e38] text-sm font-semibold text-white"
+            >
+              {user?.firstName?.charAt(0) || "V"}
             </Link>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        <div className="vendor-page-content p-4 sm:p-6 lg:p-9 max-w-[1440px] mx-auto">
           <BusinessProfileProvider>{children}</BusinessProfileProvider>
         </div>
       </main>

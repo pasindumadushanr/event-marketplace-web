@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, CalendarDays, MessageCircle } from "lucide-react";
+import {
+  ArrowRight,
+  CalendarDays,
+  MessageCircle,
+  CalendarCheck2,
+  ImagePlus,
+  Package,
+  Settings2,
+} from "lucide-react";
 import api from "@/lib/api";
 
 type Booking = {
@@ -52,18 +60,23 @@ export function DailyOverview() {
   );
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const upcoming = bookings
+  const allUpcoming = bookings
     .filter(
       (booking) =>
         booking.status === "CONFIRMED" && new Date(booking.date) >= today,
     )
-    .sort((a, b) => Date.parse(a.date) - Date.parse(b.date))
-    .slice(0, 4);
+    .sort((a, b) => Date.parse(a.date) - Date.parse(b.date));
+  const upcoming = allUpcoming.slice(0, 4);
   return (
     <section className="space-y-4" aria-label="Daily overview">
-      <h2 className="text-xl font-semibold text-slate-900">
-        Needs your attention
-      </h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold text-slate-900">
+          Needs your attention
+        </h2>
+        <span className="text-xs text-slate-500">
+          Your business at a glance
+        </span>
+      </div>
       {error ? (
         <div
           role="alert"
@@ -82,7 +95,7 @@ export function DailyOverview() {
         </div>
       ) : (
         <>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             {[
               {
                 href: "/vendor/bookings",
@@ -90,6 +103,7 @@ export function DailyOverview() {
                 value: pending.length,
                 hint: "Review requests and confirm dates",
                 icon: CalendarDays,
+                tone: "bg-[#fcf2df] text-[#956724]",
               },
               {
                 href: "/vendor/messages",
@@ -97,28 +111,43 @@ export function DailyOverview() {
                 value: needsReply.length,
                 hint: "Customers who sent the latest message",
                 icon: MessageCircle,
+                tone: "bg-[#edf1fa] text-[#526c9f]",
+              },
+              {
+                href: "/vendor/calendar",
+                title: "Upcoming bookings",
+                value: allUpcoming.length,
+                hint: "Confirmed events on your calendar",
+                icon: CalendarCheck2,
+                tone: "bg-[#eaf2e9] text-[#4f7958]",
               },
             ].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="group rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:border-primary focus-visible:ring-2 focus-visible:ring-primary"
+                className="vendor-panel vendor-metric group p-5 sm:p-6 focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <div className="flex items-center justify-between">
-                  <item.icon className="h-6 w-6 text-primary" />
-                  <ArrowRight className="h-5 w-5 text-slate-400 group-hover:text-primary" />
+                  <span
+                    className={`flex h-11 w-11 items-center justify-center rounded-2xl ${item.tone}`}
+                  >
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-primary" />
                 </div>
-                <p className="mt-4 text-4xl font-bold text-slate-900">
+                <p className="mt-5 text-4xl font-semibold tracking-tight text-[#183e38]">
                   {loading ? "…" : item.value}
                 </p>
-                <h3 className="mt-1 font-semibold text-slate-800">
+                <h3 className="mt-2 text-sm font-semibold text-slate-800">
                   {item.title}
                 </h3>
-                <p className="mt-1 text-sm text-slate-500">{item.hint}</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-500">
+                  {item.hint}
+                </p>
               </Link>
             ))}
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+          <div className="vendor-panel p-5 sm:p-6">
             <div className="flex justify-between gap-3">
               <h2 className="font-semibold text-slate-900">
                 Upcoming bookings
@@ -164,26 +193,55 @@ export function DailyOverview() {
                 ))}
               </ul>
             ) : (
-              <p className="py-6 text-sm text-slate-500">
-                No upcoming confirmed bookings. New customer requests will
-                appear above.
-              </p>
+              <div className="mt-5 flex flex-col items-center rounded-2xl border border-dashed border-[#dde5dc] bg-[#fafbf8] px-5 py-8 text-center">
+                <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#eef2e9] text-[#64806a]">
+                  <CalendarDays className="h-5 w-5" />
+                </span>
+                <p className="text-sm font-semibold text-slate-700">
+                  Your next event belongs here
+                </p>
+                <p className="mt-1 max-w-sm text-xs leading-relaxed text-slate-500">
+                  No upcoming confirmed bookings. New customer requests will
+                  appear above.
+                </p>
+              </div>
             )}
           </div>
         </>
       )}
-      <div className="flex flex-wrap gap-3">
+      <div className="grid gap-3 sm:grid-cols-3">
         {[
-          ["/vendor/packages", "Manage services & prices"],
-          ["/vendor/gallery", "Add photos"],
-          ["/vendor/business/general", "Edit business details"],
-        ].map(([href, label]) => (
+          {
+            href: "/vendor/packages",
+            label: "Manage services & prices",
+            icon: Package,
+            hint: "Keep your offers up to date",
+          },
+          {
+            href: "/vendor/gallery",
+            label: "Add photos",
+            icon: ImagePlus,
+            hint: "Showcase your best work",
+          },
+          {
+            href: "/vendor/business/general",
+            label: "Edit business details",
+            icon: Settings2,
+            hint: "Make a great first impression",
+          },
+        ].map(({ href, label, icon: Icon, hint }) => (
           <Link
             key={href}
             href={href}
-            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:border-primary"
+            className="flex items-center gap-3 rounded-2xl border border-transparent bg-[#ecefe8] px-4 py-4 text-sm font-medium text-[#365346] hover:border-[#c6d3c2]"
           >
-            {label}
+            <Icon className="h-5 w-5 shrink-0" />
+            <span className="text-xs font-semibold">
+              {label}
+              <span className="mt-1 block text-[11px] font-normal text-slate-500">
+                {hint}
+              </span>
+            </span>
           </Link>
         ))}
       </div>

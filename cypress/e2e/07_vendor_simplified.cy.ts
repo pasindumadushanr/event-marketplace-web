@@ -69,6 +69,7 @@ describe("Simplified vendor workspace", () => {
   it("shows daily actions and only highlights the current navigation item", () => {
     visitVendor();
     cy.contains("Needs your attention").should("be.visible");
+    cy.screenshot("vendor-home-desktop");
     cy.contains("a", "New booking requests").should("contain", "1");
     cy.contains("a", "Conversations to reply to").should("contain", "1");
     cy.get('aside a[aria-current="page"]')
