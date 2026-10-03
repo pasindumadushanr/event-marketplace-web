@@ -1,48 +1,34 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import api from '@/lib/api';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import api from "@/lib/api";
 import {
   LayoutDashboard,
   Building2,
-  Image as ImageIcon,
-  Package,
   CalendarDays,
   CalendarRange,
-  Star,
   LineChart,
   Bell,
-  FileText,
   Settings,
-  HelpCircle,
   LogOut,
   Menu,
   X,
-  ChevronDown,
   Eye,
-  CreditCard,
   MessageCircle,
-} from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
-import { BusinessProfileProvider } from '@/contexts/BusinessProfileContext';
+} from "lucide-react";
+import { useAuth } from "@/lib/auth-context";
+import { BusinessProfileProvider } from "@/contexts/BusinessProfileContext";
 
 const navConfig = [
-  { href: '/vendor', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/vendor/business', label: 'My Business', icon: Building2 },
-  { href: '/vendor/gallery', label: 'Gallery', icon: ImageIcon },
-  { href: '/vendor/packages', label: 'Packages', icon: Package },
-  { href: '/vendor/bookings', label: 'Bookings', icon: CalendarDays },
-  { href: '/vendor/calendar', label: 'Calendar', icon: CalendarRange },
-  { href: '/vendor/reviews', label: 'Reviews', icon: Star },
-  { href: '/vendor/revenue', label: 'Revenue & Analytics', icon: LineChart },
-  { href: '/vendor/messages', label: 'Messages', icon: MessageCircle },
-  { href: '/vendor/notifications', label: 'Notifications', icon: Bell },
-  { href: '/vendor/documents', label: 'Documents', icon: FileText },
-  { href: '/vendor/subscription', label: 'Membership Plan', icon: CreditCard },
-  { href: '/vendor/settings', label: 'Settings', icon: Settings },
-  { href: '/vendor/support', label: 'Support', icon: HelpCircle },
+  { href: "/vendor", label: "Home", icon: LayoutDashboard },
+  { href: "/vendor/bookings", label: "Bookings", icon: CalendarDays },
+  { href: "/vendor/messages", label: "Messages", icon: MessageCircle },
+  { href: "/vendor/business", label: "My Business Page", icon: Building2 },
+  { href: "/vendor/calendar", label: "Availability", icon: CalendarRange },
+  { href: "/vendor/revenue", label: "Earnings", icon: LineChart },
+  { href: "/vendor/account", label: "Account & Help", icon: Settings },
 ];
 
 export default function VendorLayout({
@@ -59,72 +45,78 @@ export default function VendorLayout({
 
   // Routes that should NOT show the dashboard sidebar (just auth stuff now)
   const hideSidebar = [
-    '/vendor/register', 
-    '/vendor/login',
-    '/vendor/verify-email'
+    "/vendor/register",
+    "/vendor/login",
+    "/vendor/verify-email",
   ].includes(pathname);
 
   const [vendorStatus, setVendorStatus] = useState<string | null>(null);
 
   const allowedRoutes = [
-    '/vendor',
-    '/vendor/onboarding',
-    '/vendor/settings',
-    '/vendor/notifications',
-    '/vendor/support'
+    "/vendor",
+    "/vendor/onboarding",
+    "/vendor/settings",
+    "/vendor/notifications",
+    "/vendor/support",
+    "/vendor/account",
   ];
 
   useEffect(() => {
     // We still want to skip verification on the register and login page
-    if (pathname === '/vendor/register' || pathname === '/vendor/login') {
+    if (pathname === "/vendor/register" || pathname === "/vendor/login") {
       setIsAuthorized(true);
       setIsLoading(false);
       return;
     }
 
     if (!authLoading && !isAuthenticated) {
-      router.push('/vendor/login');
+      router.push("/vendor/login");
       return;
     }
+    if (authLoading || !isAuthenticated) return;
 
     const verifyVendorApproval = async () => {
       try {
-        const { data } = await api.get('/vendor/business/onboarding/status');
-        
+        const { data } = await api.get("/vendor/business/onboarding/status");
+
         // Handle Email Verification Logic
         if (!data.emailVerified) {
-          if (pathname !== '/vendor/verify-email') {
-            router.push('/vendor/verify-email');
+          if (pathname !== "/vendor/verify-email") {
+            router.push("/vendor/verify-email");
           } else {
             setIsAuthorized(true); // Allow them to stay on verify-email
           }
           return;
-        } else if (pathname === '/vendor/verify-email') {
+        } else if (pathname === "/vendor/verify-email") {
           // If already verified but on the verify page, push to dashboard
-          router.push('/vendor');
+          router.push("/vendor");
           return;
         }
 
         setVendorStatus(data.vendorStatus);
         setIsAuthorized(true);
-        
-        if (data.vendorStatus !== 'APPROVED') {
+
+        if (data.vendorStatus !== "APPROVED") {
           // Check if pathname starts with any of the allowed routes, or exactly matches
-          const isAllowed = allowedRoutes.some(route => 
-            pathname === route || pathname.startsWith(route + '/')
+          const isAllowed = allowedRoutes.some(
+            (route) =>
+              pathname === route ||
+              (route !== "/vendor" && pathname.startsWith(route + "/")),
           );
-          
+
           if (!isAllowed) {
-            router.push('/vendor');
+            router.push("/vendor");
           }
         }
       } catch (error) {
         setIsAuthorized(true);
-        const isAllowed = allowedRoutes.some(route => 
-          pathname === route || pathname.startsWith(route + '/')
+        const isAllowed = allowedRoutes.some(
+          (route) =>
+            pathname === route ||
+            (route !== "/vendor" && pathname.startsWith(route + "/")),
         );
         if (!isAllowed) {
-          router.push('/vendor');
+          router.push("/vendor");
         }
       } finally {
         setIsLoading(false);
@@ -135,7 +127,11 @@ export default function VendorLayout({
 
   if (isLoading || !isAuthorized) {
     if (hideSidebar) return <>{children}</>;
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
   }
 
   // If we are on a page that hides the sidebar, just render children
@@ -143,26 +139,43 @@ export default function VendorLayout({
     return <>{children}</>;
   }
 
-  const NavLinks = () => {
+  const renderNavLinks = () => {
     // If not approved, filter out links that require approval
-    const filteredNavConfig = navConfig.filter(item => {
-      if (vendorStatus === 'APPROVED') return true;
+    const filteredNavConfig = navConfig.filter((item) => {
+      if (vendorStatus === "APPROVED") return true;
       return allowedRoutes.includes(item.href);
     });
 
     return (
       <nav className="flex-1 space-y-1 px-4 py-4">
         {filteredNavConfig.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/vendor" && pathname.startsWith(item.href + "/")) ||
+            (item.href === "/vendor/business" &&
+              [
+                "/vendor/gallery",
+                "/vendor/packages",
+                "/vendor/reviews",
+                "/vendor/preview",
+              ].includes(pathname)) ||
+            (item.href === "/vendor/account" &&
+              [
+                "/vendor/settings",
+                "/vendor/support",
+                "/vendor/documents",
+                "/vendor/subscription",
+              ].includes(pathname));
           return (
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               onClick={() => setIsMobileMenuOpen(false)}
               className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
                 isActive
-                  ? 'bg-primary text-primary-foreground font-medium'
-                  : 'text-white/60 hover:bg-white/10 hover:text-white'
+                  ? "bg-primary text-primary-foreground font-medium"
+                  : "text-white/60 hover:bg-white/10 hover:text-white"
               }`}
             >
               <item.icon className="h-5 w-5" />
@@ -180,6 +193,8 @@ export default function VendorLayout({
       <div className="lg:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label={isMobileMenuOpen ? "Close navigation" : "Open navigation"}
+          aria-expanded={isMobileMenuOpen}
           className="p-2 rounded-md bg-slate-900 text-white shadow-md"
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -188,37 +203,46 @@ export default function VendorLayout({
 
       <aside
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-secondary text-white/80 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${
-          isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex h-full flex-col">
           {/* Logo / Header */}
           <div className="flex h-16 items-center px-6 bg-secondary border-b border-white/10 shrink-0">
-            <span className="text-2xl font-serif font-bold text-primary tracking-tight">Vendor Portal</span>
+            <span className="text-xl font-serif font-bold text-primary tracking-tight">
+              Nakathata.lk{" "}
+              <span className="block text-xs font-sans font-normal text-white/60">
+                Your business workspace
+              </span>
+            </span>
           </div>
 
-          <div className="p-4 shrink-0">
-            <Link href="/vendor/preview">
-              <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 rounded-lg py-2 transition-colors font-medium text-sm">
-                <Eye className="h-4 w-4" />
-                Preview Store
-              </button>
-            </Link>
-          </div>
+          {vendorStatus === "APPROVED" && (
+            <div className="p-4 shrink-0">
+              <Link href="/vendor/preview">
+                <button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 rounded-lg py-2 transition-colors font-medium text-sm">
+                  <Eye className="h-4 w-4" />
+                  Preview My Business Page
+                </button>
+              </Link>
+            </div>
+          )}
 
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto py-2 custom-scrollbar">
-            <NavLinks />
+            {renderNavLinks()}
           </nav>
 
           {/* User Footer */}
           <div className="border-t border-white/10 p-4">
             <div className="flex items-center gap-3 mb-4 px-2">
               <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
-                {user?.firstName?.charAt(0) || 'V'}
+                {user?.firstName?.charAt(0) || "V"}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-medium text-white">{user?.firstName} {user?.lastName}</span>
+                <span className="text-sm font-medium text-white">
+                  {user?.firstName} {user?.lastName}
+                </span>
                 <span className="text-xs text-white/50">Vendor Account</span>
               </div>
             </div>
@@ -234,21 +258,23 @@ export default function VendorLayout({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 min-w-0 overflow-y-auto">
         {/* Top Header */}
         <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-end px-8 shadow-sm">
           <div className="flex items-center gap-4">
-            <button className="text-slate-400 hover:text-slate-600">
+            <Link
+              href="/vendor/notifications"
+              aria-label="View notifications"
+              className="text-slate-500 hover:text-slate-900 p-2"
+            >
               <Bell className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-8 max-w-7xl mx-auto">
-          <BusinessProfileProvider>
-            {children}
-          </BusinessProfileProvider>
+        <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+          <BusinessProfileProvider>{children}</BusinessProfileProvider>
         </div>
       </main>
 

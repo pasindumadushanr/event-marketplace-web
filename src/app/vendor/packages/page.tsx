@@ -1,16 +1,18 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import api from '@/lib/api';
-import { toast } from 'sonner';
-import { 
-  Plus, 
-  Trash2, 
-  Edit2, 
-  Package as PackageIcon, 
+import { useState, useEffect, useRef } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import api from "@/lib/api";
+import { toast } from "sonner";
+import Link from "next/link";
+import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
+import {
+  Plus,
+  Trash2,
+  Edit2,
+  Package as PackageIcon,
   CheckCircle2,
   Clock,
   Banknote,
@@ -26,85 +28,159 @@ import {
   ArrowLeft,
   Info,
   CalendarCheck,
-  ShieldCheck
-} from 'lucide-react';
+  ShieldCheck,
+} from "lucide-react";
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
 
 const SAMPLE_PRESETS = [
-  { label: '🚗 White Mercedes-Benz', url: 'https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&auto=format&fit=crop&q=80' },
-  { label: '🚘 Vintage Rolls-Royce', url: 'https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&auto=format&fit=crop&q=80' },
-  { label: '🚐 Luxury Wedding Van', url: 'https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop&q=80' },
-  { label: '🏰 Banquet Hall Room', url: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop&q=80' },
-  { label: '🌸 Floral Mandap Setup', url: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80' },
+  {
+    label: "🚗 White Mercedes-Benz",
+    url: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&auto=format&fit=crop&q=80",
+  },
+  {
+    label: "🚘 Vintage Rolls-Royce",
+    url: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&auto=format&fit=crop&q=80",
+  },
+  {
+    label: "🚐 Luxury Wedding Van",
+    url: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop&q=80",
+  },
+  {
+    label: "🏰 Banquet Hall Room",
+    url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop&q=80",
+  },
+  {
+    label: "🌸 Floral Mandap Setup",
+    url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80",
+  },
 ];
 
 const QUICK_SPECS = [
-  'Uniformed Chauffeur Included',
-  'Full Air Conditioned',
-  'Silk Ribbon & Flower Bonnet Deco',
-  '100km / 8 Hours Included',
-  'Fuel & Driver Allowance Covered',
-  'Luxury Leather Interior',
-  'Backup Vehicle on Standby',
+  "Uniformed Chauffeur Included",
+  "Full Air Conditioned",
+  "Silk Ribbon & Flower Bonnet Deco",
+  "100km / 8 Hours Included",
+  "Fuel & Driver Allowance Covered",
+  "Luxury Leather Interior",
+  "Backup Vehicle on Standby",
 ];
 
 const DURATION_PRESETS = [
-  '8 Hours / 100km',
-  'Full Day Rental',
-  'Per Day',
-  'Per Event'
+  "8 Hours / 100km",
+  "Full Day Rental",
+  "Per Day",
+  "Per Event",
 ];
 
 const packageSchema = z.object({
-  name: z.string().min(2, 'Name is required'),
+  name: z.string().min(2, "Name is required"),
   description: z.string().optional(),
   image: z.string().optional(),
-  price: z.coerce.number().min(0, 'Price must be a positive number'),
+  price: z.coerce.number().min(0, "Price must be a positive number"),
   duration: z.string().optional(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'ARCHIVED']).default('ACTIVE'),
-  features: z.array(z.object({ value: z.string() })).optional().default([])
+  status: z.enum(["ACTIVE", "INACTIVE", "ARCHIVED"]).default("ACTIVE"),
+  features: z
+    .array(z.object({ value: z.string() }))
+    .optional()
+    .default([]),
 });
 
 type PackageFormValues = z.infer<typeof packageSchema>;
 
 export default function VendorPackagesPage() {
+  const { business } = useBusinessProfile();
+  const category = (business?.category?.name || "").toLowerCase();
+  const isTransport = /car|transport|vehicle/.test(category);
+  const isPhotography = /photo|video/.test(category);
+  const isCatering = /cater|food/.test(category);
+  const isVenue = /venue|hotel|hall/.test(category);
+  const nameExample = isTransport
+    ? "Wedding car with driver"
+    : isPhotography
+      ? "Full-day wedding photography"
+      : isCatering
+        ? "Wedding buffet for 100 guests"
+        : isVenue
+          ? "Wedding hall for 200 guests"
+          : "Standard wedding package";
+  const quickSpecs = isTransport
+    ? QUICK_SPECS
+    : isPhotography
+      ? [
+          "Full-day coverage",
+          "Edited digital photos",
+          "Online gallery",
+          "Wedding album",
+        ]
+      : isCatering
+        ? [
+            "Buffet service",
+            "Serving staff",
+            "Vegetarian options",
+            "Tableware included",
+          ]
+        : isVenue
+          ? [
+              "Guest parking",
+              "Air conditioning",
+              "Tables and chairs",
+              "Bridal dressing room",
+            ]
+          : ["Setup included", "Event-day support", "Customisation available"];
+  const durations = isTransport
+    ? DURATION_PRESETS
+    : ["Per Event", "Full Day", "Half Day", "Per Hour"];
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'list' | 'editor'>('list');
+  const [viewMode, setViewMode] = useState<"list" | "editor">("list");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, control, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<PackageFormValues>({
+  const {
+    register,
+    control,
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<PackageFormValues>({
     resolver: zodResolver(packageSchema) as any,
     defaultValues: {
-      name: '',
-      description: '',
-      image: '',
-      price: '' as any,
-      duration: '',
-      status: 'ACTIVE',
-      features: [{ value: '' }]
-    }
+      name: "",
+      description: "",
+      image: "",
+      price: "" as any,
+      duration: "",
+      status: "ACTIVE",
+      features: [{ value: "" }],
+    },
   });
 
-  const currentName = watch('name');
-  const currentPrice = watch('price');
-  const currentDescription = watch('description');
-  const currentImage = watch('image');
-  const currentDuration = watch('duration');
-  const currentStatus = watch('status');
-  const currentFeatures = watch('features');
+  const currentName = watch("name");
+  const currentPrice = watch("price");
+  const currentDescription = watch("description");
+  const currentImage = watch("image");
+  const currentDuration = watch("duration");
+  const currentStatus = watch("status");
+  const currentFeatures = watch("features");
 
   const { fields, append, remove } = useFieldArray({
     name: "features",
-    control
+    control,
   });
 
   useEffect(() => {
@@ -113,10 +189,10 @@ export default function VendorPackagesPage() {
 
   const fetchPackages = async () => {
     try {
-      const res = await api.get('/vendor/packages');
+      const res = await api.get("/vendor/packages");
       setPackages(res.data);
     } catch (error) {
-      toast.error('Failed to load packages');
+      toast.error("Failed to load packages");
     } finally {
       setIsLoading(false);
     }
@@ -125,78 +201,94 @@ export default function VendorPackagesPage() {
   const handleCreateNew = () => {
     setEditingId(null);
     reset({
-      name: '',
-      description: '',
-      image: '',
-      price: '' as any,
-      duration: '',
-      status: 'ACTIVE',
-      features: [{ value: '' }]
+      name: "",
+      description: "",
+      image: "",
+      price: "" as any,
+      duration: "",
+      status: "ACTIVE",
+      features: [{ value: "" }],
     });
-    setViewMode('editor');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setViewMode("editor");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleEdit = (pkg: any) => {
     setEditingId(pkg.id);
     reset({
       name: pkg.name,
-      description: pkg.description || '',
-      image: pkg.image || '',
+      description: pkg.description || "",
+      image: pkg.image || "",
       price: Number(pkg.price),
-      duration: pkg.duration || '',
+      duration: pkg.duration || "",
       status: pkg.status,
-      features: pkg.features?.length > 0 ? pkg.features.map((f: string) => ({ value: f })) : [{ value: '' }]
+      features:
+        pkg.features?.length > 0
+          ? pkg.features.map((f: string) => ({ value: f }))
+          : [{ value: "" }],
     });
-    setViewMode('editor');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setViewMode("editor");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Only image files (JPG, PNG, WEBP) are allowed');
+    if (!file.type.startsWith("image/")) {
+      toast.error("Only image files (JPG, PNG, WEBP) are allowed");
       return;
     }
 
     setIsUploadingImage(true);
     try {
       const formData = new FormData();
-      formData.append('file', file);
-      
-      let uploadUrl = '';
+      formData.append("file", file);
+
+      let uploadUrl = "";
       try {
-        const res = await api.post('/vendor/packages/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
+        const res = await api.post("/vendor/packages/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
         });
         uploadUrl = res.data.url;
       } catch (err: any) {
         // Fallback to /vendor/business/upload which is active on production Render backend
-        const fallbackRes = await api.post('/vendor/business/upload', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
+        const fallbackRes = await api.post(
+          "/vendor/business/upload",
+          formData,
+          {
+            headers: { "Content-Type": "multipart/form-data" },
+          },
+        );
         uploadUrl = fallbackRes.data.url;
       }
 
       if (uploadUrl) {
-        setValue('image', uploadUrl, { shouldValidate: true, shouldDirty: true });
-        toast.success('Photo uploaded successfully');
+        setValue("image", uploadUrl, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+        toast.success("Photo uploaded successfully");
       } else {
-        throw new Error('Failed to retrieve photo URL');
+        throw new Error("Failed to retrieve photo URL");
       }
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to upload photo. You can also paste an image URL directly.');
+      toast.error(
+        err.response?.data?.message ||
+          "Failed to upload photo. You can also paste an image URL directly.",
+      );
     } finally {
       setIsUploadingImage(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
   const handleAddQuickSpec = (spec: string) => {
-    if (fields.length === 1 && !watch('features.0.value')) {
-      setValue('features.0.value', spec, { shouldValidate: true, shouldDirty: true });
+    if (fields.length === 1 && !watch("features.0.value")) {
+      setValue("features.0.value", spec, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     } else {
       append({ value: spec });
     }
@@ -208,80 +300,82 @@ export default function VendorPackagesPage() {
       const payload = {
         ...data,
         price: Number(data.price) || 0,
-        features: (data.features || []).map(f => f.value.trim()).filter(Boolean)
+        features: (data.features || [])
+          .map((f) => f.value.trim())
+          .filter(Boolean),
       };
 
       if (editingId) {
         await api.patch(`/vendor/packages/${editingId}`, payload);
-        toast.success('Package updated successfully');
+        toast.success("Package updated successfully");
       } else {
-        await api.post('/vendor/packages', payload);
-        toast.success('Package created successfully');
+        await api.post("/vendor/packages", payload);
+        toast.success("Package created successfully");
       }
-      setViewMode('list');
+      setViewMode("list");
       fetchPackages();
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to save package');
+      toast.error(error.response?.data?.message || "Failed to save package");
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this package?')) return;
+    if (!confirm("Are you sure you want to delete this package?")) return;
     try {
       await api.delete(`/vendor/packages/${id}`);
-      toast.success('Package deleted successfully');
+      toast.success("Package deleted successfully");
       fetchPackages();
     } catch (error) {
-      toast.error('Failed to delete package');
+      toast.error("Failed to delete package");
     }
   };
 
   const toggleStatus = async (pkg: any) => {
     try {
-      const newStatus = pkg.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+      const newStatus = pkg.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
       await api.patch(`/vendor/packages/${pkg.id}`, { status: newStatus });
       toast.success(`Package is now ${newStatus.toLowerCase()}`);
       fetchPackages();
     } catch (error) {
-      toast.error('Failed to update status');
+      toast.error("Failed to update status");
     }
   };
 
   // FULL-PAGE DEDICATED EDITOR VIEW
-  if (viewMode === 'editor') {
+  if (viewMode === "editor") {
     return (
       <div className="max-w-6xl mx-auto space-y-8 pb-20 animate-in fade-in duration-300">
         {/* Navigation Bar */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => setViewMode('list')}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setViewMode("list")}
               className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold"
             >
               <ArrowLeft className="h-4 w-4 mr-2" /> Back to Packages & Fleet
             </Button>
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
-                {editingId ? 'Edit Mode' : 'New Listing'}
+                {editingId ? "Edit Mode" : "New Listing"}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <Button 
-              type="button" 
-              variant="ghost" 
-              onClick={() => setViewMode('list')}
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setViewMode("list")}
               className="rounded-xl font-semibold text-slate-600"
             >
               Cancel
             </Button>
-            <Button 
-              type="button" 
+            <Button
+              type="button"
               disabled={isSaving || isUploadingImage}
               onClick={handleSubmit(onSubmit)}
               className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-6 shadow-md"
@@ -290,8 +384,10 @@ export default function VendorPackagesPage() {
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...
                 </>
+              ) : editingId ? (
+                "Save Changes"
               ) : (
-                editingId ? 'Update Card' : 'Save & Publish Card'
+                "Save Service"
               )}
             </Button>
           </div>
@@ -300,20 +396,19 @@ export default function VendorPackagesPage() {
         {/* Title Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-            {editingId ? 'Edit Item / Package Card' : 'Create Item / Package Card'}
+            {editingId ? "Edit Service" : "Add a Service"}
           </h1>
           <p className="text-slate-500 text-sm">
-            Showcase your cars, banquet halls, decor packages, or equipment with photos, pricing, and key specifications.
+            Showcase your cars, banquet halls, decor packages, or equipment with
+            photos, pricing, and key specifications.
           </p>
         </div>
 
         {/* Main 2-Column Responsive Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
           {/* LEFT COLUMN: Main Form Builder (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              
               {/* SECTION 1: PHOTO UPLOAD */}
               <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-xs space-y-4">
                 <div className="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -322,14 +417,19 @@ export default function VendorPackagesPage() {
                       1
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Vehicle / Item Photo</h3>
-                      <p className="text-xs text-slate-500">Upload a crisp photo from your device or paste a web link.</p>
+                      <h3 className="text-base font-bold text-slate-900">
+                        Service Photo
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Upload a crisp photo from your device or paste a web
+                        link.
+                      </p>
                     </div>
                   </div>
                   {currentImage && (
-                    <button 
-                      type="button" 
-                      onClick={() => setValue('image', '')} 
+                    <button
+                      type="button"
+                      onClick={() => setValue("image", "")}
                       className="text-xs text-red-600 hover:text-red-700 hover:underline flex items-center gap-1 font-semibold"
                     >
                       <X className="h-3.5 w-3.5" /> Remove
@@ -340,25 +440,29 @@ export default function VendorPackagesPage() {
                 {/* Preview Box or Dropzone */}
                 {currentImage ? (
                   <div className="relative h-64 sm:h-72 w-full rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 shadow-inner group">
-                    <img src={currentImage} alt="Item Preview" className="w-full h-full object-cover" />
+                    <img
+                      src={currentImage}
+                      alt="Item Preview"
+                      className="w-full h-full object-cover"
+                    />
                     <div className="absolute top-4 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow flex items-center gap-1.5">
                       <Check className="h-3.5 w-3.5" /> Photo Loaded & Ready
                     </div>
                     <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                      <Button 
-                        type="button" 
-                        size="sm" 
+                      <Button
+                        type="button"
+                        size="sm"
                         variant="secondary"
                         onClick={() => fileInputRef.current?.click()}
                         className="text-xs font-bold shadow rounded-xl"
                       >
                         <Upload className="h-3.5 w-3.5 mr-1.5" /> Replace Photo
                       </Button>
-                      <Button 
-                        type="button" 
-                        size="sm" 
+                      <Button
+                        type="button"
+                        size="sm"
                         variant="destructive"
-                        onClick={() => setValue('image', '')}
+                        onClick={() => setValue("image", "")}
                         className="text-xs font-bold shadow rounded-xl"
                       >
                         <X className="h-3.5 w-3.5 mr-1.5" /> Remove Photo
@@ -374,21 +478,24 @@ export default function VendorPackagesPage() {
                       Upload photo from your computer or phone
                     </p>
                     <p className="text-xs text-slate-400 mb-4 max-w-sm mx-auto">
-                      Supports JPG, PNG, WEBP files up to 10MB. High quality landscape photos look best.
+                      Supports JPG, PNG, WEBP files up to 10MB. High quality
+                      landscape photos look best.
                     </p>
-                    <Button 
-                      type="button" 
+                    <Button
+                      type="button"
                       disabled={isUploadingImage}
                       onClick={() => fileInputRef.current?.click()}
                       className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow rounded-xl px-5"
                     >
                       {isUploadingImage ? (
                         <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Uploading to Cloud...
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />{" "}
+                          Uploading to Cloud...
                         </>
                       ) : (
                         <>
-                          <Upload className="h-4 w-4 mr-2" /> Select File from Device
+                          <Upload className="h-4 w-4 mr-2" /> Select File from
+                          Device
                         </>
                       )}
                     </Button>
@@ -396,12 +503,12 @@ export default function VendorPackagesPage() {
                 )}
 
                 {/* Hidden input */}
-                <input 
-                  type="file" 
-                  ref={fileInputRef} 
-                  accept="image/*" 
-                  onChange={handleFileUpload} 
-                  className="hidden" 
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
                 />
 
                 {/* URL Input */}
@@ -409,31 +516,40 @@ export default function VendorPackagesPage() {
                   <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                     Or paste an image web link (URL):
                   </label>
-                  <Input 
-                    placeholder="https://images.unsplash.com/..." 
+                  <Input
+                    placeholder="https://images.unsplash.com/..."
                     className="text-xs bg-slate-50/50 h-10 rounded-xl border-slate-200"
-                    {...register('image')} 
+                    {...register("image")}
                   />
                 </div>
 
                 {/* Quick Presets for 1-Click Testing */}
-                <div className="pt-1">
-                  <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                    Or choose a sample photo for quick testing:
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {SAMPLE_PRESETS.map((preset, idx) => (
-                      <button
-                        key={idx}
-                        type="button"
-                        onClick={() => setValue('image', preset.url, { shouldValidate: true, shouldDirty: true })}
-                        className="text-xs px-3 py-1.5 rounded-xl bg-slate-100/80 hover:bg-amber-100 hover:border-amber-300 border border-slate-200 text-slate-800 font-semibold transition-all shadow-2xs"
-                      >
-                        {preset.label}
-                      </button>
-                    ))}
+                {isTransport && (
+                  <div className="pt-1">
+                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
+                      Or choose a sample photo for quick testing:
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {(isTransport ? SAMPLE_PRESETS.slice(0, 3) : []).map(
+                        (preset, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() =>
+                              setValue("image", preset.url, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              })
+                            }
+                            className="text-xs px-3 py-1.5 rounded-xl bg-slate-100/80 hover:bg-amber-100 hover:border-amber-300 border border-slate-200 text-slate-800 font-semibold transition-all shadow-2xs"
+                          >
+                            {preset.label}
+                          </button>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* SECTION 2: TITLE & PRICING */}
@@ -443,40 +559,54 @@ export default function VendorPackagesPage() {
                     2
                   </div>
                   <div>
-                    <h3 className="text-base font-bold text-slate-900">Title & Pricing</h3>
-                    <p className="text-xs text-slate-500">Provide the item title and your rental rate in LKR.</p>
+                    <h3 className="text-base font-bold text-slate-900">
+                      Title & Pricing
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      Give your service a clear name and set the price in LKR.
+                    </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-800">
-                      Item / Package Title <span className="text-red-500">*</span>
+                      Item / Package Title{" "}
+                      <span className="text-red-500">*</span>
                     </label>
-                    <Input 
-                      placeholder="e.g. White Mercedes-Benz E-Class Wedding Car" 
-                      className="rounded-xl border-slate-200 h-11" 
-                      {...register('name')} 
+                    <Input
+                      placeholder={`e.g. ${nameExample}`}
+                      className="rounded-xl border-slate-200 h-11"
+                      {...register("name")}
                     />
-                    {errors.name && <p className="text-xs text-red-500">{errors.name.message}</p>}
+                    {errors.name && (
+                      <p className="text-xs text-red-500">
+                        {errors.name.message}
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-800">
-                      Price in Sri Lankan Rupees (LKR) <span className="text-red-500">*</span>
+                      Price in Sri Lankan Rupees (LKR){" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-xs font-black text-slate-400">
                         LKR
                       </div>
-                      <Input 
-                        type="number" 
-                        placeholder="45000" 
-                        className="pl-14 rounded-xl border-slate-200 h-11 font-bold text-base" 
-                        {...register('price')} 
+                      <Input
+                        type="number"
+                        placeholder="45000"
+                        className="pl-14 rounded-xl border-slate-200 h-11 font-bold text-base"
+                        {...register("price")}
                       />
                     </div>
-                    {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
+                    {errors.price && (
+                      <p className="text-xs text-red-500">
+                        {errors.price.message}
+                      </p>
+                    )}
                   </div>
                 </div>
 
@@ -485,18 +615,23 @@ export default function VendorPackagesPage() {
                     <label className="text-sm font-bold text-slate-800">
                       Rental Duration / Terms (Optional)
                     </label>
-                    <Input 
-                      placeholder="e.g. 8 Hours / 100km, Full Day, Per Event" 
-                      className="rounded-xl border-slate-200 h-11" 
-                      {...register('duration')} 
+                    <Input
+                      placeholder="e.g. 8 Hours / 100km, Full Day, Per Event"
+                      className="rounded-xl border-slate-200 h-11"
+                      {...register("duration")}
                     />
                     <div className="flex flex-wrap gap-1.5 pt-1">
-                      {DURATION_PRESETS.map((dur, i) => (
+                      {durations.map((dur, i) => (
                         <button
                           key={i}
                           type="button"
-                          onClick={() => setValue('duration', dur, { shouldValidate: true, shouldDirty: true })}
-                          className={`text-xs px-2.5 py-1 rounded-lg border font-semibold transition-colors ${currentDuration === dur ? 'bg-slate-900 text-white border-slate-900' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'}`}
+                          onClick={() =>
+                            setValue("duration", dur, {
+                              shouldValidate: true,
+                              shouldDirty: true,
+                            })
+                          }
+                          className={`text-xs px-2.5 py-1 rounded-lg border font-semibold transition-colors ${currentDuration === dur ? "bg-slate-900 text-white border-slate-900" : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"}`}
                         >
                           {dur}
                         </button>
@@ -508,12 +643,16 @@ export default function VendorPackagesPage() {
                     <label className="text-sm font-bold text-slate-800">
                       Storefront Visibility Status
                     </label>
-                    <select 
+                    <select
                       className="w-full flex h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold"
-                      {...register('status')}
+                      {...register("status")}
                     >
-                      <option value="ACTIVE">🟢 Active (Visible to Customers)</option>
-                      <option value="INACTIVE">⚪ Draft (Hidden from Storefront)</option>
+                      <option value="ACTIVE">
+                        🟢 Active (Visible to Customers)
+                      </option>
+                      <option value="INACTIVE">
+                        ⚪ Draft (Hidden from Storefront)
+                      </option>
                     </select>
                     <p className="text-[11px] text-slate-400">
                       You can change this visibility anytime.
@@ -525,10 +664,10 @@ export default function VendorPackagesPage() {
                   <label className="text-sm font-bold text-slate-800">
                     Description & Inclusions (Optional)
                   </label>
-                  <Textarea 
-                    placeholder="Describe vehicle condition, chauffeur attire, interior details, air conditioning, terms..." 
-                    className="resize-none h-24 rounded-xl border-slate-200 text-sm leading-relaxed" 
-                    {...register('description')} 
+                  <Textarea
+                    placeholder="Explain what customers receive, who this service is for, and any important limits or extra charges."
+                    className="resize-none h-24 rounded-xl border-slate-200 text-sm leading-relaxed"
+                    {...register("description")}
                   />
                 </div>
               </div>
@@ -541,15 +680,20 @@ export default function VendorPackagesPage() {
                       3
                     </div>
                     <div>
-                      <h3 className="text-base font-bold text-slate-900">Inclusions & Specifications</h3>
-                      <p className="text-xs text-slate-500">Key bullet points so customers know exactly what is included.</p>
+                      <h3 className="text-base font-bold text-slate-900">
+                        Inclusions & Specifications
+                      </h3>
+                      <p className="text-xs text-slate-500">
+                        Key bullet points so customers know exactly what is
+                        included.
+                      </p>
                     </div>
                   </div>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => append({ value: '' })} 
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => append({ value: "" })}
                     className="text-xs font-bold rounded-xl bg-slate-50"
                   >
                     <Plus className="h-3.5 w-3.5 mr-1" /> Add Custom
@@ -562,7 +706,7 @@ export default function VendorPackagesPage() {
                     1-Click Suggestion Chips:
                   </label>
                   <div className="flex flex-wrap gap-1.5">
-                    {QUICK_SPECS.map((spec, idx) => (
+                    {quickSpecs.map((spec, idx) => (
                       <button
                         key={idx}
                         type="button"
@@ -580,15 +724,15 @@ export default function VendorPackagesPage() {
                   {fields.map((field, index) => (
                     <div key={field.id} className="flex items-center gap-2.5">
                       <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                      <Input 
-                        placeholder="e.g. Uniformed Chauffeur, Full AC, White Ribbon..." 
+                      <Input
+                        placeholder={`e.g. ${quickSpecs[0]}`}
                         className="bg-white text-sm h-10 rounded-xl border-slate-200 font-medium"
-                        {...register(`features.${index}.value` as const)} 
+                        {...register(`features.${index}.value` as const)}
                       />
-                      <Button 
-                        type="button" 
-                        variant="ghost" 
-                        size="icon" 
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
                         className="text-slate-400 hover:text-red-500 shrink-0 h-9 w-9 rounded-xl"
                         onClick={() => remove(index)}
                         disabled={fields.length === 1}
@@ -602,20 +746,24 @@ export default function VendorPackagesPage() {
 
               {/* Bottom Actions */}
               <div className="flex items-center justify-between pt-4">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  onClick={() => setViewMode('list')}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setViewMode("list")}
                   className="rounded-xl font-semibold"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" /> Back
                 </Button>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   disabled={isSaving || isUploadingImage}
                   className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl px-8 h-12 shadow-lg text-base"
                 >
-                  {isSaving ? 'Saving...' : (editingId ? 'Update Card' : 'Save & Publish Card')}
+                  {isSaving
+                    ? "Saving..."
+                    : editingId
+                      ? "Save Changes"
+                      : "Save Service"}
                 </Button>
               </div>
             </form>
@@ -627,14 +775,20 @@ export default function VendorPackagesPage() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Sparkles className="h-4 w-4 text-amber-400" />
-                  <span className="text-xs font-black uppercase tracking-wider text-amber-400">Live Customer Preview</span>
+                  <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                    Live Customer Preview
+                  </span>
                 </div>
-                <Badge variant="outline" className="text-white/80 border-white/20 text-[10px]">
+                <Badge
+                  variant="outline"
+                  className="text-white/80 border-white/20 text-[10px]"
+                >
                   Real-Time
                 </Badge>
               </div>
               <p className="text-xs text-slate-400">
-                This is how your item card looks on your public storefront right now as you type.
+                This is how your item card looks on your public storefront right
+                now as you type.
               </p>
             </div>
 
@@ -643,26 +797,35 @@ export default function VendorPackagesPage() {
               {/* Photo Banner */}
               <div className="relative h-60 w-full overflow-hidden bg-slate-100">
                 {currentImage ? (
-                  <img 
-                    src={currentImage} 
-                    alt={currentName || 'Item Photo'} 
+                  <img
+                    src={currentImage}
+                    alt={currentName || "Item Photo"}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                 ) : (
                   <div className="w-full h-full bg-slate-100 flex flex-col items-center justify-center text-slate-400 gap-2">
                     <ImageIcon className="h-10 w-10 text-slate-300" />
-                    <span className="text-xs font-semibold">Photo will appear here</span>
+                    <span className="text-xs font-semibold">
+                      Photo will appear here
+                    </span>
                   </div>
                 )}
-                
+
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
-                
+
                 <div className="absolute top-3 left-3">
-                  <Badge variant="outline" className={currentStatus === 'ACTIVE' ? 'text-emerald-700 border-emerald-300 bg-white/95 backdrop-blur-md font-bold text-xs shadow-xs' : 'text-slate-500 bg-white/90 text-xs shadow-xs'}>
-                    {currentStatus === 'ACTIVE' ? '🟢 Active' : '⚪ Draft'}
+                  <Badge
+                    variant="outline"
+                    className={
+                      currentStatus === "ACTIVE"
+                        ? "text-emerald-700 border-emerald-300 bg-white/95 backdrop-blur-md font-bold text-xs shadow-xs"
+                        : "text-slate-500 bg-white/90 text-xs shadow-xs"
+                    }
+                  >
+                    {currentStatus === "ACTIVE" ? "🟢 Active" : "⚪ Draft"}
                   </Badge>
                 </div>
-                
+
                 <div className="absolute bottom-3 left-4 text-white font-black text-2xl drop-shadow">
                   LKR {Number(currentPrice || 0).toLocaleString()}
                 </div>
@@ -672,7 +835,7 @@ export default function VendorPackagesPage() {
               <div className="p-5 flex-1 space-y-4">
                 <div>
                   <h3 className="text-xl font-bold text-slate-900 leading-snug">
-                    {currentName || 'Mercedes-Benz Luxury Wedding Car'}
+                    {currentName || nameExample}
                   </h3>
                   {currentDuration && (
                     <p className="text-xs text-slate-500 font-semibold flex items-center gap-1.5 mt-1.5">
@@ -690,14 +853,23 @@ export default function VendorPackagesPage() {
 
                 {/* Features Checklist */}
                 <div className="space-y-2 pt-3 border-t border-slate-100">
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Included Features / Specs</h4>
-                  {currentFeatures && currentFeatures.length > 0 && currentFeatures.some(f => f.value.trim()) ? (
-                    currentFeatures.map((f, i) => f.value.trim() ? (
-                      <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
-                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                        <span className="line-clamp-1">{f.value}</span>
-                      </div>
-                    ) : null)
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Included Features / Specs
+                  </h4>
+                  {currentFeatures &&
+                  currentFeatures.length > 0 &&
+                  currentFeatures.some((f) => f.value.trim()) ? (
+                    currentFeatures.map((f, i) =>
+                      f.value.trim() ? (
+                        <div
+                          key={i}
+                          className="flex items-start gap-2 text-xs text-slate-700"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
+                          <span className="line-clamp-1">{f.value}</span>
+                        </div>
+                      ) : null,
+                    )
                   ) : (
                     <div className="text-xs text-slate-400 italic">
                       Specifications you add will show here for customers.
@@ -708,8 +880,12 @@ export default function VendorPackagesPage() {
 
               {/* Customer Booking Button Preview */}
               <div className="p-4 pt-0">
-                <Button disabled className="w-full bg-slate-900 text-white font-bold rounded-xl shadow-xs py-5">
-                  <CalendarCheck className="h-4 w-4 mr-2" /> Request this Package
+                <Button
+                  disabled
+                  className="w-full bg-slate-900 text-white font-bold rounded-xl shadow-xs py-5"
+                >
+                  <CalendarCheck className="h-4 w-4 mr-2" /> Request this
+                  Package
                 </Button>
               </div>
             </div>
@@ -718,7 +894,8 @@ export default function VendorPackagesPage() {
             <div className="bg-amber-50/80 border border-amber-200/80 rounded-2xl p-4 flex items-start gap-3 text-xs text-amber-900">
               <Info className="h-4 w-4 text-amber-600 shrink-0 mt-0.5" />
               <span>
-                <strong>Pro Tip:</strong> Cards with high-definition photos and clear duration details receive up to 3x more customer inquiries.
+                <strong>Tip:</strong> Use your own photos and explain exactly
+                what is included in the price.
               </span>
             </div>
           </div>
@@ -732,50 +909,78 @@ export default function VendorPackagesPage() {
     <div className="space-y-8 max-w-6xl pb-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">Packages, Fleet & Services</h2>
+          <Link
+            href="/vendor/business"
+            className="mb-3 inline-block text-sm text-slate-500 underline"
+          >
+            Back to My Business Page
+          </Link>
+          <h2 className="text-3xl font-black tracking-tight text-slate-900">
+            Services & Prices
+          </h2>
           <p className="text-muted-foreground mt-1 text-slate-500 text-sm">
-            Showcase your cars, packages, rooms, or service tiers with photos and pricing. Customers can view item cards and book directly.
+            Add what you offer, what is included, and how much it costs.
           </p>
         </div>
-        <Button onClick={handleCreateNew} className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm font-semibold rounded-xl">
+        <Button
+          onClick={handleCreateNew}
+          className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm font-semibold rounded-xl"
+        >
           <Plus className="h-4 w-4 mr-2" />
-          Add Item / Package Card
+          Add Service
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="text-center text-slate-500 py-12">Loading packages...</div>
+        <div className="text-center text-slate-500 py-12">
+          Loading packages...
+        </div>
       ) : packages.length === 0 ? (
         <div className="text-center text-slate-500 py-16 border-2 border-dashed rounded-3xl bg-white shadow-xs p-8">
           <div className="w-16 h-16 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4 border border-amber-200">
-            <Car className="h-8 w-8" />
+            <PackageIcon className="h-8 w-8" />
           </div>
-          <h3 className="text-xl font-bold text-slate-900 mb-2">No cars or service items added yet</h3>
+          <h3 className="text-xl font-bold text-slate-900 mb-2">
+            Add your first service
+          </h3>
           <p className="mb-6 text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
-            Add vehicle cards, rental items, or service packages with photos so customers can view and book them directly from your storefront.
+            Start with one service or package. Include a clear photo, price and
+            description to help customers choose.
           </p>
-          <Button onClick={handleCreateNew} className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md px-6">
+          <Button
+            onClick={handleCreateNew}
+            className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md px-6"
+          >
             <Plus className="h-4 w-4 mr-2" />
-            Create Your First Item Card
+            Add My First Service
           </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {packages.map((pkg) => (
-            <Card key={pkg.id} className={`flex flex-col relative overflow-hidden transition-all hover:shadow-xl border-slate-200 rounded-3xl ${pkg.status === 'INACTIVE' ? 'opacity-70 bg-slate-50 grayscale-[20%]' : ''}`}>
-              
+            <Card
+              key={pkg.id}
+              className={`flex flex-col relative overflow-hidden transition-all hover:shadow-xl border-slate-200 rounded-3xl ${pkg.status === "INACTIVE" ? "opacity-70 bg-slate-50 grayscale-[20%]" : ""}`}
+            >
               {/* Image Banner */}
               {pkg.image ? (
                 <div className="relative h-52 w-full overflow-hidden bg-slate-100">
-                  <img 
-                    src={pkg.image} 
-                    alt={pkg.name} 
+                  <img
+                    src={pkg.image}
+                    alt={pkg.name}
                     className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent pointer-events-none" />
                   <div className="absolute top-3 left-3">
-                    <Badge variant="outline" className={pkg.status === 'ACTIVE' ? 'text-emerald-700 border-emerald-300 bg-white/95 backdrop-blur-md font-bold text-xs' : 'text-slate-500 bg-white/90 text-xs'}>
-                      {pkg.status === 'ACTIVE' ? '🟢 Active' : '⚪ Draft'}
+                    <Badge
+                      variant="outline"
+                      className={
+                        pkg.status === "ACTIVE"
+                          ? "text-emerald-700 border-emerald-300 bg-white/95 backdrop-blur-md font-bold text-xs"
+                          : "text-slate-500 bg-white/90 text-xs"
+                      }
+                    >
+                      {pkg.status === "ACTIVE" ? "🟢 Active" : "⚪ Draft"}
                     </Badge>
                   </div>
                   <div className="absolute bottom-3 left-3 text-white font-black text-xl drop-shadow">
@@ -786,21 +991,40 @@ export default function VendorPackagesPage() {
                 <div className="relative h-32 w-full bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-400">
                   <ImageIcon className="h-10 w-10 text-slate-300" />
                   <div className="absolute top-3 left-3">
-                    <Badge variant="outline" className={pkg.status === 'ACTIVE' ? 'text-emerald-700 border-emerald-300 bg-white/95 font-bold text-xs' : 'text-slate-500 bg-white/90 text-xs'}>
+                    <Badge
+                      variant="outline"
+                      className={
+                        pkg.status === "ACTIVE"
+                          ? "text-emerald-700 border-emerald-300 bg-white/95 font-bold text-xs"
+                          : "text-slate-500 bg-white/90 text-xs"
+                      }
+                    >
                       {pkg.status}
                     </Badge>
                   </div>
                 </div>
               )}
-              
+
               <CardHeader className="pb-3 pt-4">
                 <div className="flex justify-between items-start mb-1">
-                  <CardTitle className="text-lg font-bold text-slate-900 leading-snug">{pkg.name}</CardTitle>
+                  <CardTitle className="text-lg font-bold text-slate-900 leading-snug">
+                    {pkg.name}
+                  </CardTitle>
                   <div className="flex gap-1 shrink-0 ml-2">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-blue-600 rounded-lg" onClick={() => handleEdit(pkg)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-slate-400 hover:text-blue-600 rounded-lg"
+                      onClick={() => handleEdit(pkg)}
+                    >
                       <Edit2 className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-red-600 rounded-lg" onClick={() => handleDelete(pkg.id)}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-slate-400 hover:text-red-600 rounded-lg"
+                      onClick={() => handleDelete(pkg.id)}
+                    >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -822,35 +1046,50 @@ export default function VendorPackagesPage() {
                   </p>
                 )}
               </CardHeader>
-              
+
               <CardContent className="flex-1 pb-4">
                 {pkg.description && (
-                  <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed">{pkg.description}</p>
+                  <p className="text-xs text-slate-600 line-clamp-3 mb-4 leading-relaxed">
+                    {pkg.description}
+                  </p>
                 )}
-                
+
                 <div className="space-y-2 pt-2 border-t border-slate-100">
-                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Included Features / Specs</h4>
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                    Included Features / Specs
+                  </h4>
                   {pkg.features?.map((feature: string, i: number) => (
-                    <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 text-xs text-slate-700"
+                    >
                       <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 shrink-0 mt-0.5" />
                       <span className="line-clamp-1">{feature}</span>
                     </div>
                   ))}
                   {(!pkg.features || pkg.features.length === 0) && (
-                    <p className="text-xs text-slate-400 italic">No features listed.</p>
+                    <p className="text-xs text-slate-400 italic">
+                      No features listed.
+                    </p>
                   )}
                 </div>
               </CardContent>
-              
+
               <CardFooter className="pt-3 pb-4 border-t bg-slate-50/70">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className={`w-full text-xs font-semibold rounded-xl ${pkg.status === 'ACTIVE' ? 'border-amber-200 text-amber-700 hover:bg-amber-50' : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'}`}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={`w-full text-xs font-semibold rounded-xl ${pkg.status === "ACTIVE" ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`}
                   onClick={() => toggleStatus(pkg)}
                 >
-                  {pkg.status === 'ACTIVE' ? <EyeOff className="h-3.5 w-3.5 mr-1.5" /> : <Eye className="h-3.5 w-3.5 mr-1.5" />}
-                  {pkg.status === 'ACTIVE' ? 'Deactivate (Hide from Store)' : 'Activate (Show on Store)'}
+                  {pkg.status === "ACTIVE" ? (
+                    <EyeOff className="h-3.5 w-3.5 mr-1.5" />
+                  ) : (
+                    <Eye className="h-3.5 w-3.5 mr-1.5" />
+                  )}
+                  {pkg.status === "ACTIVE"
+                    ? "Deactivate (Hide from Store)"
+                    : "Activate (Show on Store)"}
                 </Button>
               </CardFooter>
             </Card>
