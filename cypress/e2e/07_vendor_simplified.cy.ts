@@ -48,6 +48,7 @@ function visitVendor(path = "/vendor", status = "APPROVED", active = true) {
     },
   ]);
   stub("**/vendor/packages", []);
+  stub("**/vendor/gallery", []);
   stub("**/vendor/business/content", []);
   cy.visit(path, {
     onBeforeLoad(win) {
@@ -66,6 +67,142 @@ function visitVendor(path = "/vendor", status = "APPROVED", active = true) {
 }
 
 describe("Simplified vendor workspace", () => {
+  it("renders saved visual edits after reload and on the customer-facing profile", () => {
+    visitVendor("/vendor/preview");
+    const updated = { ...business, name: "Published Photography Studio" };
+    cy.intercept("PATCH", "**/vendor/business", { body: updated }).as(
+      "savedName",
+    );
+    cy.get('button[aria-label="Edit Name, logo & cover"]').click();
+    cy.contains("label", "Business name")
+      .find("input")
+      .clear()
+      .type(updated.name);
+    cy.contains("button", "Save changes").click();
+    cy.wait("@savedName");
+    cy.intercept("GET", "**/vendor/business", (req) => {
+      if (req.headers.authorization) req.reply({ body: updated });
+      else req.continue();
+    });
+    cy.reload();
+    cy.get('[data-profile-section="hero"]').should("contain", updated.name);
+    cy.intercept("GET", "**/discovery/vendors/vendor-test", {
+      body: { ...updated, packages: [] },
+    });
+    cy.visit("/business/vendor-test");
+    cy.contains("h1", updated.name).should("be.visible");
+    cy.contains("Edit My Business Page").should("not.exist");
+  });
+  it("edits the preview live, cancels safely, and saves section-scoped changes", () => {
+    visitVendor("/vendor/preview");
+    const writes: unknown[] = [];
+    cy.intercept("PATCH", "**/vendor/business", (req) => {
+      writes.push(req.body);
+      req.reply({ statusCode: 200, body: {} });
+    }).as("visualSave");
+    cy.get('button[aria-label="Edit Name, logo & cover"]').click();
+    cy.contains("label", "Business name")
+      .find("input")
+      .clear()
+      .type("New Studio Name");
+    cy.get('[data-profile-section="hero"]').should(
+      "contain",
+      "New Studio Name",
+    );
+    cy.then(() => expect(writes).to.have.length(0));
+    cy.on("window:confirm", () => true);
+    cy.contains("button", "Cancel").click();
+    cy.get('[data-profile-section="hero"]')
+      .should("contain", "Sunrise Photography")
+      .and("not.contain", "New Studio Name");
+    cy.get('button[aria-label="Edit Name, logo & cover"]').click();
+    cy.contains("label", "Business name")
+      .find("input")
+      .clear()
+      .type("Saved Studio Name");
+    cy.contains("button", "Save changes").click();
+    cy.wait("@visualSave")
+      .its("request.body")
+      .should("deep.equal", {
+        name: "Saved Studio Name",
+        logo: business.logo,
+        coverImage: business.coverImage,
+      });
+    cy.contains("Changes saved.").should("be.visible");
+    cy.contains("button", "View as customer").click();
+    cy.get('button[aria-label^="Edit "]').should("not.exist");
+    cy.contains("button", "Request a Custom Quote").should("be.disabled");
+    cy.contains("button", "Back to editing").click();
+    cy.get('button[aria-label="Edit About your business"]').click();
+    cy.get('aside[aria-label="Editing About your business"]').should("be.visible");
+  });
+
+  it("retains visual edits on a failed save and saves new services without changing profile visibility", () => {
+    visitVendor("/vendor/preview");
+    cy.intercept("PATCH", "**/vendor/business", { statusCode: 500, body: {} });
+    cy.get('button[aria-label="Edit About your business"]').click();
+    cy.contains("label", "Tell customers")
+      .find("textarea")
+      .clear()
+      .type("A locally edited introduction.");
+    cy.contains("button", "Save changes").click();
+    cy.contains("Could not save these changes").should("be.visible");
+    cy.contains("label", "Tell customers")
+      .find("textarea")
+      .should("have.value", "A locally edited introduction.");
+    cy.on("window:confirm", () => true);
+    cy.contains("button", "Cancel").click();
+    cy.get('button[aria-label="Edit Services & prices"]').click();
+    cy.contains("button", "Add a service").click();
+    cy.contains("label", "Service name")
+      .find("textarea")
+      .type("Wedding coverage");
+    cy.contains("label", "Price (LKR)")
+      .find("input")
+      .type("45000")
+      .should("have.value", "45000");
+    cy.intercept("POST", "**/vendor/packages", (req) => {
+      expect(req.body.name).to.eq("Wedding coverage");
+      expect(req.body.price).to.eq(45000);
+      req.reply({ body: { ...req.body, id: "new-package" } });
+    }).as("createService");
+    cy.contains("button", "Save changes").click();
+    cy.wait("@createService");
+    cy.get('[data-profile-section="packages"]').should(
+      "contain",
+      "Wedding coverage",
+    );
+    cy.contains("button", "Hide My Page").should("be.enabled");
+  });
+
+  it("stages gallery uploads until Save and supports the phone editor", () => {
+    cy.viewport(390, 844);
+    visitVendor("/vendor/preview");
+    let uploads = 0;
+    cy.intercept("POST", "**/vendor/gallery/upload", (req) => {
+      uploads++;
+      req.reply({
+        body: { id: "new-photo", url: business.logo, type: "IMAGE" },
+      });
+    }).as("galleryUpload");
+    cy.get('button[aria-label="Edit Photos & videos"]').click();
+    cy.get('input[type="file"]').selectFile(
+      "public/images/brand/nakathata-logo.jpg",
+    );
+    cy.contains("Unsaved upload").should("be.visible");
+    cy.then(() => expect(uploads).to.eq(0));
+    cy.document().then((doc) =>
+      expect(doc.documentElement.scrollWidth).to.be.at.most(390),
+    );
+    cy.screenshot("visual-profile-editor-mobile");
+    cy.contains("button", "Save changes").click();
+    cy.wait("@galleryUpload");
+    cy.get('[data-profile-section="gallery"] img').should(
+      "have.attr",
+      "src",
+      business.logo,
+    );
+  });
   it("shows a guided business overview and every section remains reachable", () => {
     visitVendor("/vendor/business");
     cy.contains("4 of 4 essentials added").should("be.visible");

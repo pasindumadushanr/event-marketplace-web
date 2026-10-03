@@ -229,7 +229,7 @@ export default function VendorLayout({
             <div className="p-4 shrink-0">
               <Link href="/vendor/preview" className="vendor-preview-link">
                 <Eye className="h-4 w-4" />
-                Preview My Business Page
+                Edit My Business Page
               </Link>
             </div>
           )}

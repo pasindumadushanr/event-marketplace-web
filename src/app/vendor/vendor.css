@@ -5,6 +5,121 @@
   background: #f6f7f4;
   color: #233b36;
 }
+.visual-editor {
+  position: relative;
+}
+.visual-editor-open {
+  padding-right: 350px;
+}
+.visual-editor-open .visual-profile-columns {
+  grid-template-columns: minmax(0, 1fr);
+}
+.visual-editor-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #dce5db;
+  border-radius: 16px;
+  background: #fff;
+}
+.visual-canvas {
+  min-width: 0;
+}
+.visual-section {
+  min-width: 0;
+  margin-bottom: 20px;
+}
+.visual-section-editable {
+  border: 1px dashed #b6c8ac;
+  border-radius: 22px;
+  padding: 8px;
+}
+.visual-section-selected {
+  border: 2px solid #5c7e50;
+  background: #f4f7ef;
+}
+.visual-section-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px 12px;
+  color: #577449;
+  font-size: 11px;
+  font-weight: 600;
+}
+.visual-section-bar button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 8px;
+  background: #183e38;
+  color: white;
+  padding: 9px 12px;
+}
+.visual-edit-panel {
+  position: fixed;
+  top: 80px;
+  right: 16px;
+  bottom: 16px;
+  width: 340px;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: white;
+  border: 1px solid #dce5db;
+  border-radius: 18px;
+  box-shadow: 0 10px 50px #183e3820;
+}
+.visual-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #36564c;
+  font-size: 12px;
+  font-weight: 600;
+}
+.visual-field :is(input, textarea, select) {
+  min-width: 0;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dce5db;
+  border-radius: 8px;
+  background: #fafbf8;
+  color: #33473b;
+  font-size: 13px;
+  font-weight: 400;
+}
+.visual-field input[type="file"] {
+  font-size: 11px;
+}
+.visual-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px;
+  color: #a84235;
+  font-size: 11px;
+}
+@media (max-width: 1199px) {
+  .visual-editor-open {
+    padding-right: 0;
+    padding-bottom: 58dvh;
+  }
+  .visual-edit-panel {
+    top: auto;
+    right: 8px;
+    left: 8px;
+    bottom: 8px;
+    width: auto;
+    height: 55dvh;
+    z-index: 55;
+  }
+}
 .vendor-sidebar {
   background: #fff;
   border-right: 1px solid #e4e9e3;

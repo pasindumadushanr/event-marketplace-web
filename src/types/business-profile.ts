@@ -1,4 +1,4 @@
-export type BookingMethod = 'DIRECT_BOOKING' | 'REQUEST_QUOTE' | 'CONTACT_ONLY';
+export type BookingMethod = "DIRECT_BOOKING" | "REQUEST_QUOTE" | "CONTACT_ONLY";
 
 export interface VerificationStatus {
   isBusinessVerified: boolean;
@@ -38,6 +38,7 @@ export interface FAQ {
 export interface BusinessGalleryImage {
   id: string;
   url: string;
+  type?: string;
   caption?: string;
 }
 
@@ -69,7 +70,7 @@ export interface FullBusinessProfile {
   coverImage: string;
   categoryId: string;
   categoryName: string;
-  
+
   // Hero Stats
   isVerified: boolean;
   rating: number;
@@ -78,18 +79,18 @@ export interface FullBusinessProfile {
   yearsOfExperience: number;
   responseTime: string;
   memberSince: string; // YYYY
-  
+
   // About
   description: string;
   highlights: string[];
   languages: string[];
-  
+
   // Dynamic Data
   verification: VerificationStatus;
   featureGroups: BusinessFeatureGroup[];
   gallery: BusinessGalleryImage[];
   packages: Package[];
-  
+
   // Sidebar & Logistics
   bookingMethod: BookingMethod;
   businessHours: BusinessHours;
@@ -106,8 +107,10 @@ export interface FullBusinessProfile {
     website?: string;
     facebook?: string;
     instagram?: string;
+    youtube?: string;
+    tiktok?: string;
   };
-  
+
   // Trust & Info
   faq: FAQ[];
   policies: BusinessPolicy;

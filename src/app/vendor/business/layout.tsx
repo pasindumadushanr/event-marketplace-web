@@ -32,7 +32,7 @@ export default function BusinessManagementLayout({
           className="inline-flex items-center gap-2 rounded-xl border border-[#dce5db] bg-white px-4 py-2.5 text-xs font-semibold text-[#36564c]"
         >
           <Eye className="h-4 w-4" />
-          Preview My Business Page
+          Edit profile visually
         </Link>
       </div>
       {section && (

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { Phone, Mail, Globe, Camera, MessageCircle } from 'lucide-react';
+import { Phone, Mail, Globe, Camera, MessageCircle } from "lucide-react";
 
 interface BusinessContactProps {
   contact: {
@@ -10,31 +10,46 @@ interface BusinessContactProps {
     website?: string;
     facebook?: string;
     instagram?: string;
+    youtube?: string;
+    tiktok?: string;
   };
 }
 
 export function BusinessContact({ contact }: BusinessContactProps) {
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-      <h3 className="text-lg font-bold text-slate-900 mb-4">Contact Information</h3>
-      
+      <h3 className="text-lg font-bold text-slate-900 mb-4">
+        Contact Information
+      </h3>
+
       <div className="space-y-4 mb-6">
-        <a href={`tel:${contact.phone}`} className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium">
+        <a
+          href={`tel:${contact.phone}`}
+          className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium"
+        >
           <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
             <Phone className="h-4 w-4" />
           </div>
           {contact.phone}
         </a>
-        
-        <a href={`mailto:${contact.email}`} className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium">
+
+        <a
+          href={`mailto:${contact.email}`}
+          className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium"
+        >
           <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
             <Mail className="h-4 w-4" />
           </div>
           {contact.email}
         </a>
-        
+
         {contact.website && (
-          <a href={contact.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium">
+          <a
+            href={contact.website}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium"
+          >
             <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
               <Globe className="h-4 w-4" />
             </div>
@@ -43,19 +58,54 @@ export function BusinessContact({ contact }: BusinessContactProps) {
         )}
       </div>
 
-      <div className="flex gap-3 pt-4 border-t border-slate-100">
+      <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
+        {contact.youtube && (
+          <a
+            href={contact.youtube}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
+          >
+            YouTube
+          </a>
+        )}
+        {contact.tiktok && (
+          <a
+            href={contact.tiktok}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700"
+          >
+            TikTok
+          </a>
+        )}
         {contact.whatsapp && (
-          <a href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition-colors">
+          <a
+            href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="h-10 w-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition-colors"
+          >
             <MessageCircle className="h-5 w-5" />
           </a>
         )}
         {contact.facebook && (
-          <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors">
+          <a
+            href={contact.facebook}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="h-10 w-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors"
+          >
             <Globe className="h-5 w-5" />
           </a>
         )}
         {contact.instagram && (
-          <a href={contact.instagram} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-100 transition-colors">
+          <a
+            href={contact.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="h-10 w-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-100 transition-colors"
+          >
             <Camera className="h-5 w-5" />
           </a>
         )}
