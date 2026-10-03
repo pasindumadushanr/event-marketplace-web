@@ -111,7 +111,7 @@ export function BusinessCTA({ businessId, bookingMethod, startingPrice }: Busine
 
   return (
     <>
-      <div className="bg-white rounded-3xl p-6 shadow-xl border border-primary/20 sticky top-28">
+      <div className="bg-white rounded-3xl p-6 shadow-xl border border-primary/20">
         {startingPrice > 0 ? (
           <div className="text-center mb-6 pb-6 border-b border-slate-100">
             <p className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">Starting Price</p>

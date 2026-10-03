@@ -67,6 +67,26 @@ function visitVendor(path = "/vendor", status = "APPROVED", active = true) {
 }
 
 describe("Simplified vendor workspace", () => {
+  it("keeps the starting price card above the calendar while scrolling", () => {
+    cy.viewport(1440, 900);
+    cy.intercept("GET", "**/discovery/vendors/vendor-test", {
+      body: { ...business, startingPrice: 5222, packages: [] },
+    });
+    cy.visit("/business/vendor-test");
+    cy.contains("p", "Starting Price").parent().parent().as("priceCard");
+    cy.get("@priceCard").should("have.css", "position", "static");
+    for (const offset of [500, 1000, 1500]) {
+      cy.scrollTo(0, offset);
+      cy.get("@priceCard").should(($card) => {
+        const card = $card[0];
+        const calendar = card.nextElementSibling;
+        expect(calendar, "calendar follows the price card").not.to.be.null;
+        expect(card.getBoundingClientRect().bottom).to.be.at.most(
+          calendar!.getBoundingClientRect().top,
+        );
+      });
+    }
+  });
   it("renders saved visual edits after reload and on the customer-facing profile", () => {
     visitVendor("/vendor/preview");
     const updated = { ...business, name: "Published Photography Studio" };
