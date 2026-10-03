@@ -1,54 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import {
-  Building2,
-  Phone,
-  MapPin,
-  ListChecks,
-  Clock,
-  Settings,
-  FileText,
-  Search,
-  LayoutTemplate,
-  Globe,
-} from "lucide-react";
-
-const tabs = [
-  {
-    href: "/vendor/business/general",
-    label: "Business Details",
-    icon: Building2,
-  },
-  { href: "/vendor/gallery", label: "Photos & Videos", icon: LayoutTemplate },
-  { href: "/vendor/packages", label: "Services & Prices", icon: ListChecks },
-  { href: "/vendor/reviews", label: "Customer Reviews", icon: Globe },
-  { href: "/vendor/business/contact", label: "Contact", icon: Phone },
-  { href: "/vendor/business/location", label: "Location", icon: MapPin },
-  { href: "/vendor/business/features", label: "Features", icon: ListChecks },
-  { href: "/vendor/business/hours", label: "Business Hours", icon: Clock },
-  {
-    href: "/vendor/business/booking",
-    label: "Booking Settings",
-    icon: Settings,
-  },
-  {
-    href: "/vendor/business/content",
-    label: "Extra Page Sections",
-    icon: LayoutTemplate,
-  },
-  {
-    href: "/vendor/business/policies",
-    label: "Policies & FAQ",
-    icon: FileText,
-  },
-  {
-    href: "/vendor/business/seo",
-    label: "Google Search Appearance",
-    icon: Search,
-  },
-];
+import { usePathname, useRouter } from "next/navigation";
+import { ArrowLeft, Eye, LayoutGrid } from "lucide-react";
+import { businessSections } from "@/components/vendor/business-sections";
 
 export default function BusinessManagementLayout({
   children,
@@ -56,56 +11,83 @@ export default function BusinessManagementLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const optionalPaths = ["features", "hours", "booking", "content", "seo"];
-  const isOptional = (href: string) =>
-    optionalPaths.some((path) => href.endsWith("/" + path));
-  const renderTab = (tab: (typeof tabs)[number]) => (
-    <Link
-      key={tab.href}
-      href={tab.href}
-      aria-current={pathname === tab.href ? "page" : undefined}
-      className={`flex shrink-0 items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${pathname === tab.href ? "bg-primary/10 text-primary" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}
-    >
-      <tab.icon className="h-4 w-4 shrink-0" />
-      {tab.label}
-    </Link>
-  );
-
+  const router = useRouter();
+  const section = businessSections.find((item) => item.href === pathname);
   return (
-    <div className="flex flex-col lg:flex-row gap-8">
-      {/* Internal Navigation Sidebar */}
-      <div className="w-full lg:w-64 shrink-0">
-        <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden sticky top-8">
-          <div className="p-4 bg-slate-50 border-b border-slate-200">
-            <h2 className="font-bold text-slate-900">My Business Page</h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Manage your public profile
-            </p>
+    <div className="business-editor space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <Link
+          href="/vendor/business"
+          className="inline-flex items-center gap-2 text-sm font-medium text-[#36564c]"
+        >
+          {section ? (
+            <ArrowLeft className="h-4 w-4" />
+          ) : (
+            <LayoutGrid className="h-4 w-4" />
+          )}
+          {section ? "All business sections" : "My Business Page"}
+        </Link>
+        <Link
+          href="/vendor/preview"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#dce5db] bg-white px-4 py-2.5 text-xs font-semibold text-[#36564c]"
+        >
+          <Eye className="h-4 w-4" />
+          Preview My Business Page
+        </Link>
+      </div>
+      {section && (
+        <div className="business-editor-toolbar">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#e8eee5] text-[#446b50]">
+              <section.icon className="h-5 w-5" />
+            </span>
+            <div>
+              <p className="text-[10px] uppercase tracking-[.15em] text-slate-500">
+                {section.group}
+              </p>
+              <p className="mt-1 text-sm font-semibold text-[#183e38]">
+                {section.title}
+              </p>
+            </div>
           </div>
-          <nav className="flex overflow-x-auto lg:flex-col p-2">
-            {tabs.filter((tab) => !isOptional(tab.href)).map(renderTab)}
-          </nav>
-          <details
-            key={pathname}
-            open={isOptional(pathname)}
-            className="border-t border-slate-100 p-2"
-          >
-            <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-slate-500">
-              More options · optional
-            </summary>
-            <nav className="flex overflow-x-auto lg:flex-col">
-              {tabs.filter((tab) => isOptional(tab.href)).map(renderTab)}
-            </nav>
-          </details>
+          <div className="w-full sm:w-64">
+            <label
+              htmlFor="business-section"
+              className="mb-1 block text-[11px] font-medium text-slate-500"
+            >
+              Jump to another section
+            </label>
+            <select
+              id="business-section"
+              value={pathname}
+              onChange={(event) => {
+                if (
+                  window.dispatchEvent(
+                    new Event("vendor:before-navigate", { cancelable: true }),
+                  )
+                )
+                  router.push(event.target.value);
+              }}
+              className="w-full rounded-lg border border-[#dce5db] bg-white px-3 py-2 text-sm text-slate-700"
+            >
+              {["Essentials", "Showcase your business", "More options"].map(
+                (group) => (
+                  <optgroup key={group} label={group}>
+                    {businessSections
+                      .filter((item) => item.group === group)
+                      .map((item) => (
+                        <option key={item.key} value={item.href}>
+                          {item.title}
+                        </option>
+                      ))}
+                  </optgroup>
+                ),
+              )}
+            </select>
+          </div>
         </div>
-      </div>
-
-      {/* Main Form Content */}
-      <div className="flex-1 min-w-0">
-        <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-4 sm:p-8">
-          {children}
-        </div>
-      </div>
+      )}
+      <div className={section ? "business-editor-surface" : ""}>{children}</div>
     </div>
   );
 }
