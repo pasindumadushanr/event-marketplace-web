@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { orderedCategories, categoryPath } from '@/lib/categories';
 
 interface Category {
   id: string;
@@ -28,6 +29,7 @@ interface Category {
   slug: string;
   status: string;
   sortOrder: number;
+  parentId?: string | null;
   _count: {
     businesses: number;
   };
@@ -41,11 +43,12 @@ export default function BusinessCategoriesPage() {
   // New Category State
   const [newName, setNewName] = useState('');
   const [newSlug, setNewSlug] = useState('');
+  const [parentId, setParentId] = useState('');
 
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
-      const response = await api.get('/business-categories');
+      const response = await api.get('/business-categories/admin');
       setCategories(response.data);
     } catch (error) {
       toast.error('Failed to load categories');
@@ -89,12 +92,14 @@ export default function BusinessCategoriesPage() {
       await api.post('/business-categories', {
         name: newName,
         slug: newSlug,
-        sortOrder: categories.length + 1
+        sortOrder: categories.length + 1,
+        parentId: parentId || null,
       });
       toast.success('Category created successfully');
       setIsAdding(false);
       setNewName('');
       setNewSlug('');
+      setParentId('');
       fetchCategories();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to create category');
@@ -115,7 +120,13 @@ export default function BusinessCategoriesPage() {
       </div>
 
       {isAdding && (
-        <div className="bg-white p-4 rounded-md border shadow-sm flex items-end gap-4 mb-4">
+        <div className="bg-white p-4 rounded-md border shadow-sm flex flex-wrap items-end gap-4 mb-4">
+          <label className="flex-1 min-w-48 space-y-2 text-sm font-medium">Parent category
+            <select value={parentId} onChange={(event) => setParentId(event.target.value)} className="w-full rounded-md border p-2">
+              <option value="">None — main category</option>
+              {orderedCategories(categories).filter(({ depth }) => depth < 2).map(({ category, depth }) => <option key={category.id} value={category.id}>{'— '.repeat(depth)}{category.name}</option>)}
+            </select>
+          </label>
           <div className="flex-1 space-y-2">
             <label className="text-sm font-medium">Category Name</label>
             <Input 
@@ -164,9 +175,9 @@ export default function BusinessCategoriesPage() {
                 </TableCell>
               </TableRow>
             ) : (
-              categories.map((category) => (
+              orderedCategories(categories).map(({ category, depth }) => (
                 <TableRow key={category.id}>
-                  <TableCell className="font-medium">{category.name}</TableCell>
+                  <TableCell className="font-medium"><div style={{ paddingLeft: depth * 20 }}>{depth > 0 ? '↳ ' : ''}{category.name}<p className="mt-1 text-xs font-normal text-slate-500">{categoryPath(categories, category.id).slice(0, -1).map((item) => item.name).join(' / ') || 'Main category'}</p></div></TableCell>
                   <TableCell className="text-zinc-500 font-mono text-sm">{category.slug}</TableCell>
                   <TableCell>
                     <Badge 
@@ -177,7 +188,7 @@ export default function BusinessCategoriesPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right font-medium">
-                    {category._count.businesses}
+                    {category._count?.businesses ?? 0}
                   </TableCell>
                   <TableCell>
                     <DropdownMenu>

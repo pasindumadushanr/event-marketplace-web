@@ -16,11 +16,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from '@/components/ui/input';
+import { CategorySelector } from '@/components/categories/CategorySelector';
 
 function SearchContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get('q') || '';
   const initialCity = searchParams.get('city') || '';
+  const [categoryId, setCategoryId] = useState(searchParams.get('categoryId') || '');
   
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,16 +38,19 @@ function SearchContent() {
     const c = searchParams.get('city') || '';
     setQuery(q);
     setCity(c);
-    fetchResults(q, c, sortBy);
-  }, [searchParams, sortBy]);
+    const category = searchParams.get('categoryId') || '';
+    setCategoryId(category);
+    fetchResults(q, c, sortBy, category);
+  }, [searchParams]);
 
-  const fetchResults = async (searchQ = query, searchCity = city, sort = sortBy) => {
+  const fetchResults = async (searchQ = query, searchCity = city, sort = sortBy, selectedCategory = categoryId) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
       if (searchQ) params.append('q', searchQ);
       if (searchCity) params.append('city', searchCity);
       if (sort) params.append('sortBy', sort);
+      if (selectedCategory) params.append('categoryId', selectedCategory);
       
       const res = await api.get(`/discovery/search?${params.toString()}`);
       setBusinesses(res.data.data);
@@ -79,6 +84,7 @@ function SearchContent() {
             </div>
 
             <form onSubmit={handleSearchSubmit} className="space-y-6">
+              <CategorySelector value={categoryId} onChange={setCategoryId} />
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Keyword</label>
                 <Input 
@@ -120,7 +126,7 @@ function SearchContent() {
             </div>
             <div className="flex items-center gap-2">
               <span className="text-sm text-slate-500 font-medium whitespace-nowrap">Sort by:</span>
-              <Select value={sortBy} onValueChange={(val) => val && setSortBy(val)}>
+              <Select value={sortBy} onValueChange={(val) => { if (val) { setSortBy(val); fetchResults(query, city, val, categoryId); } }}>
                 <SelectTrigger className="w-[180px] bg-white">
                   <SelectValue placeholder="Sort order" />
                 </SelectTrigger>

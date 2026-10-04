@@ -108,7 +108,7 @@ export default function BusinessProfilePage({ params }: { params: Promise<{ slug
             Vendors
           </Link>
           <ChevronRight className="h-4 w-4 text-slate-300" />
-          <Link href={`/category/${business.categoryId}`} className="hover:text-primary transition-colors">
+          <Link href={`/search?categoryId=${business.categoryId}`} className="hover:text-primary transition-colors">
             {business.categoryName}
           </Link>
           <ChevronRight className="h-4 w-4 text-slate-300" />

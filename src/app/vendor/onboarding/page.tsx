@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/api';
+import { CategorySelector } from '@/components/categories/CategorySelector';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,6 @@ export default function VendorOnboardingWizard() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
 
   const [formData, setFormData] = useState({
     name: '', description: '', email: '', phone: '', website: '',
@@ -22,9 +22,6 @@ export default function VendorOnboardingWizard() {
     logo: '', coverImage: ''
   });
 
-  useEffect(() => {
-    api.get('/business-categories').then(res => setCategories(res.data)).catch(console.error);
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -143,13 +140,7 @@ export default function VendorOnboardingWizard() {
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
               <h3 className="text-xl font-bold border-b pb-4">Step 2: Business Category</h3>
               <div className="space-y-4">
-                <label className="text-sm font-medium">Select your primary service category *</label>
-                <select name="categoryId" value={formData.categoryId} onChange={handleChange} className="flex h-12 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm">
-                  <option value="" disabled>Select category...</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </select>
+                <CategorySelector required value={formData.categoryId} onChange={(categoryId) => setFormData((previous) => ({ ...previous, categoryId }))} />
               </div>
             </div>
           )}
