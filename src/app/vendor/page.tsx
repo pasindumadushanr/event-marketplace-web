@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -24,6 +24,7 @@ export default function VendorDashboardPage() {
     business,
     isLoading: businessLoading,
     updateBusinessLocally,
+    refreshBusiness,
   } = useBusinessProfile();
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
@@ -31,20 +32,23 @@ export default function VendorDashboardPage() {
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
-  useEffect(() => {
-    const fetchStatus = async () => {
-      try {
-        const { data } = await api.get("/vendor/business/onboarding/status");
-        setStatus(data.vendorStatus);
-        setRejectionReason(data.rejectionReason);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsLoadingStatus(false);
-      }
-    };
-    fetchStatus();
+  const fetchStatus = useCallback(async () => {
+    setIsLoadingStatus(true);
+    setStatus(null);
+    try {
+      const { data } = await api.get("/vendor/business/onboarding/status");
+      setStatus(data.vendorStatus);
+      setRejectionReason(data.rejectionReason);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoadingStatus(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchStatus();
+  }, [fetchStatus]);
 
   if (businessLoading || isLoadingStatus) {
     return (
@@ -132,12 +136,28 @@ export default function VendorDashboardPage() {
   // --- APPROVED STATE (FULL DASHBOARD) ---
   if (!business || status !== "APPROVED")
     return (
-      <div role="alert" className="rounded-2xl border bg-white p-6">
-        We couldn’t load your business status. Please refresh the page or{" "}
-        <Link className="underline" href="/vendor/support">
-          contact support
-        </Link>
-        .
+      <div role="alert" className="rounded-2xl border bg-white p-6 space-y-4">
+        <h2 className="text-lg font-semibold text-slate-900">
+          {status === "APPROVED"
+            ? "We couldn’t load your business profile"
+            : "We couldn’t check your business status"}
+        </h2>
+        <p className="text-sm text-slate-600">
+          Your saved details haven’t been changed. Try loading them again. If
+          the problem continues, contact our team for help.
+        </p>
+        <div className="flex flex-wrap items-center gap-4">
+          <Button
+            onClick={() => {
+              void Promise.all([fetchStatus(), refreshBusiness()]);
+            }}
+          >
+            Try again
+          </Button>
+          <Link className="text-sm underline" href="/vendor/support">
+            Contact support
+          </Link>
+        </div>
       </div>
     );
 
