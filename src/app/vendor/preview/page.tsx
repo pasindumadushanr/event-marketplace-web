@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
+import { previewSignature } from "@/components/vendor/setup-progress";
 import { Pencil, Eye, X, Save, ArrowLeft } from "lucide-react";
 import api from "@/lib/api";
 import { mapBusinessData } from "@/lib/map-business-profile";
@@ -412,6 +413,30 @@ export default function VendorPreviewPage() {
       setSaving(false);
     }
   }
+  async function confirmReview() {
+    if (!saved || dirty || saving) return;
+    setSaving(true);
+    setError("");
+    try {
+      const setupReview = {
+        signature: previewSignature(saved, saved.packages, saved.galleries),
+        reviewedAt: new Date().toISOString(),
+      };
+      await api.patch("/vendor/business", { profileSettings: { setupReview } });
+      const next = {
+        ...saved,
+        profileSettings: { ...saved.profileSettings, setupReview },
+      };
+      setSaved(next);
+      setDraft(next);
+      updateBusinessLocally({ profileSettings: { setupReview } });
+      setNotice("Preview checked. Return to your setup checklist to publish.");
+    } catch {
+      setError("Could not save your review. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
   async function togglePublish() {
     if (!saved || dirty || saving) return;
     if (
@@ -492,16 +517,35 @@ export default function VendorPreviewPage() {
             <Eye size={14} />
             {customerView ? "Back to editing" : "View as customer"}
           </button>
-          <button
-            type="button"
-            disabled={dirty || saving}
-            onClick={togglePublish}
-            className="business-subtle-button disabled:opacity-40"
-          >
-            {saved.status === "ACTIVE"
-              ? "Hide My Page"
-              : "Make My Page Visible"}
-          </button>
+          {customerView && (
+            <button
+              type="button"
+              disabled={dirty || saving}
+              onClick={confirmReview}
+              className="business-subtle-button disabled:opacity-40"
+            >
+              {saving ? "Saving…" : "I’ve checked my page"}
+            </button>
+          )}
+          {saved.status !== "ACTIVE" ? (
+            <Link
+              href="/vendor/business#business-setup"
+              className="business-subtle-button"
+            >
+              Continue to publish
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled={dirty || saving}
+              onClick={togglePublish}
+              className="business-subtle-button disabled:opacity-40"
+            >
+              {saved.status === "ACTIVE"
+                ? "Hide My Page"
+                : "Make My Page Visible"}
+            </button>
+          )}
         </div>
       </div>
       <div className="mb-5 mt-4">
@@ -524,6 +568,14 @@ export default function VendorPreviewPage() {
           <p role="status" className="mt-2 text-sm text-emerald-700">
             {notice}
           </p>
+        )}
+        {customerView && (
+          <Link
+            href="/vendor/business#business-setup"
+            className="mt-3 inline-block text-sm font-semibold text-[#36564c] underline"
+          >
+            Back to setup checklist
+          </Link>
         )}
         {error && !active && (
           <p role="alert" className="mt-2 text-sm text-red-700">

@@ -1,3 +1,5 @@
+import { previewSignature } from "../../src/components/vendor/setup-progress";
+
 const business = {
   id: "vendor-test",
   name: "Sunrise Photography",
@@ -17,7 +19,12 @@ const business = {
   },
 };
 
-function visitVendor(path = "/vendor", status = "APPROVED", active = true) {
+function visitVendor(
+  path = "/vendor",
+  status = "APPROVED",
+  active = true,
+  reviewed = false,
+) {
   const stub = (url: string, body: unknown) =>
     cy.intercept("GET", url, (req) => {
       if (req.headers.authorization) req.reply({ body });
@@ -30,6 +37,12 @@ function visitVendor(path = "/vendor", status = "APPROVED", active = true) {
   stub("**/vendor/business", {
     ...business,
     status: active ? "ACTIVE" : "INACTIVE",
+    profileSettings: {
+      ...business.profileSettings,
+      ...(reviewed
+        ? { setupReview: { signature: previewSignature(business, []) } }
+        : {}),
+    },
   });
   stub("**/bookings/vendor", [
     {
@@ -141,20 +154,20 @@ describe("Simplified vendor workspace", () => {
       .clear()
       .type("Saved Studio Name");
     cy.contains("button", "Save changes").click();
-    cy.wait("@visualSave")
-      .its("request.body")
-      .should("deep.equal", {
-        name: "Saved Studio Name",
-        logo: business.logo,
-        coverImage: business.coverImage,
-      });
+    cy.wait("@visualSave").its("request.body").should("deep.equal", {
+      name: "Saved Studio Name",
+      logo: business.logo,
+      coverImage: business.coverImage,
+    });
     cy.contains("Changes saved.").should("be.visible");
     cy.contains("button", "View as customer").click();
     cy.get('button[aria-label^="Edit "]').should("not.exist");
     cy.contains("button", "Request a Custom Quote").should("be.disabled");
     cy.contains("button", "Back to editing").click();
     cy.get('button[aria-label="Edit About your business"]').click();
-    cy.get('aside[aria-label="Editing About your business"]').should("be.visible");
+    cy.get('aside[aria-label="Editing About your business"]').should(
+      "be.visible",
+    );
   });
 
   it("retains visual edits on a failed save and saves new services without changing profile visibility", () => {
@@ -225,7 +238,7 @@ describe("Simplified vendor workspace", () => {
   });
   it("shows a guided business overview and every section remains reachable", () => {
     visitVendor("/vendor/business");
-    cy.contains("4 of 4 essentials added").should("be.visible");
+    cy.contains("Your page setup checklist").should("be.visible");
     cy.contains("a", "Policies & questions").click();
     cy.get("#business-section").find("option").should("have.length", 12);
     cy.contains("h1", "Policies & common questions").should("be.visible");
@@ -270,7 +283,7 @@ describe("Simplified vendor workspace", () => {
     cy.contains("Add both a question and an answer").should("be.visible");
     cy.get("#answer-0").type("Please contact us with your event location.");
     cy.on("window:confirm", () => false);
-    cy.contains("a", "All business sections").click();
+    cy.contains("a", "Back to setup checklist").click();
     cy.location("pathname").should("eq", "/vendor/business/policies");
   });
 
@@ -306,8 +319,8 @@ describe("Simplified vendor workspace", () => {
   });
 
   it("does not require SEO or seven days of hours to enable publishing", () => {
-    visitVendor("/vendor", "APPROVED", false);
-    cy.contains("button", "Make My Page Visible").should("be.enabled");
+    visitVendor("/vendor", "APPROVED", false, true);
+    cy.contains("button", "Publish my page").should("be.enabled");
     cy.contains("SEO Optimization").should("not.exist");
   });
 

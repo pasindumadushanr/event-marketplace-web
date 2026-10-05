@@ -3,19 +3,12 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  CheckCircle2,
-  CircleDashed,
-  ArrowRight,
-  Eye,
-  Clock,
-  XCircle,
-  FileText,
-} from "lucide-react";
+import { ArrowRight, Eye, Clock, XCircle, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import api from "@/lib/api";
 import { toast } from "sonner";
+import { GuidedSetup } from "@/components/vendor/GuidedSetup";
 import { DailyOverview } from "@/components/vendor/DailyOverview";
 
 export default function VendorDashboardPage() {
@@ -161,42 +154,6 @@ export default function VendorDashboardPage() {
       </div>
     );
 
-  // Dynamic completion logic based on business object
-  const hasPolicies = business.profileSettings?.policies?.bookingPolicy;
-
-  const completionTasks = [
-    {
-      name: "Business name, description & photos",
-      isComplete: !!(
-        business.name &&
-        business.description &&
-        business.logo &&
-        business.coverImage
-      ),
-      href: "/vendor/business/general",
-    },
-    {
-      name: "Contact Details",
-      isComplete: !!(business.phone && business.email),
-      href: "/vendor/business/contact",
-    },
-    {
-      name: "Location Details",
-      isComplete: !!(business.address && business.city),
-      href: "/vendor/business/location",
-    },
-    {
-      name: "Policies & FAQ",
-      isComplete: !!hasPolicies,
-      href: "/vendor/business/policies",
-    },
-  ];
-
-  const completedCount = completionTasks.filter((t) => t.isComplete).length;
-  const progressPercentage = Math.round(
-    (completedCount / completionTasks.length) * 100,
-  );
-
   return (
     <div className="space-y-8">
       <div className="vendor-hero flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
@@ -233,97 +190,9 @@ export default function VendorDashboardPage() {
       </div>
       {business.status === "ACTIVE" && <DailyOverview />}
 
+      <GuidedSetup />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Profile Completion Widget */}
-        <div className="vendor-panel vendor-setup lg:col-span-8">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-            <div>
-              <h3 className="text-xl font-serif font-bold text-secondary">
-                Your business profile
-              </h3>
-              <p className="text-sm text-slate-500 mt-1">
-                Application approved.{" "}
-                {business.status === "ACTIVE"
-                  ? "Your page is visible to customers."
-                  : "Finish these essentials before making your page visible."}{" "}
-                Advanced page settings are optional.
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-2xl font-extrabold text-primary">
-                  {progressPercentage}%
-                </p>
-                <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                  Completed
-                </p>
-              </div>
-              <div className="h-12 w-12 rounded-full border-4 border-slate-100 flex items-center justify-center relative">
-                <svg
-                  className="absolute inset-0 h-full w-full -rotate-90"
-                  viewBox="0 0 36 36"
-                >
-                  <path
-                    className="text-primary"
-                    strokeDasharray={`${progressPercentage}, 100`}
-                    d="M18 2.0845
-                      a 15.9155 15.9155 0 0 1 0 31.831
-                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                </svg>
-              </div>
-            </div>
-          </div>
-
-          {progressPercentage < 100 && (
-            <Link
-              href={completionTasks.find((task) => !task.isComplete)!.href}
-              className="mb-5 inline-flex items-center gap-2 rounded-xl bg-slate-900 px-5 py-3 font-medium text-white"
-            >
-              Continue setup <ArrowRight className="h-4 w-4" />
-            </Link>
-          )}
-          <details open={business.status !== "ACTIVE"}>
-            <summary className="mb-4 cursor-pointer text-sm font-medium text-slate-600">
-              {completedCount} of {completionTasks.length} essentials completed
-              · View checklist
-            </summary>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {completionTasks.map((task, idx) => (
-                <Link key={idx} href={task.href}>
-                  <div
-                    className={`p-4 rounded-xl border transition-all flex items-center justify-between group h-full ${
-                      task.isComplete
-                        ? "border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50"
-                        : "border-slate-200 bg-white hover:border-primary/50 hover:shadow-sm"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      {task.isComplete ? (
-                        <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0" />
-                      ) : (
-                        <CircleDashed className="h-5 w-5 text-slate-300 shrink-0 group-hover:text-primary transition-colors" />
-                      )}
-                      <span
-                        className={`font-medium ${task.isComplete ? "text-emerald-900" : "text-slate-700"}`}
-                      >
-                        {task.name}
-                      </span>
-                    </div>
-                    {!task.isComplete && (
-                      <ArrowRight className="h-4 w-4 text-slate-300 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all" />
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </details>
-        </div>
-
-        {/* Quick Stats Placeholder */}
+        {/* Page visibility */}
         <div className="lg:col-span-4 space-y-6">
           <div className="vendor-status relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
@@ -368,52 +237,20 @@ export default function VendorDashboardPage() {
                   {isTogglingStatus ? "Updating..." : "Hide My Business Page"}
                 </Button>
               </>
-            ) : progressPercentage === 100 ? (
-              <>
-                <p className="text-2xl font-bold text-emerald-400 mb-2">
-                  Ready to Publish
-                </p>
-                <p className="text-sm text-slate-400 font-medium mb-6">
-                  Your profile is 100% complete.
-                </p>
-                <Button
-                  disabled={isTogglingStatus}
-                  onClick={async () => {
-                    setIsTogglingStatus(true);
-                    try {
-                      await api.patch("/vendor/business/publish");
-                      updateBusinessLocally({ status: "ACTIVE" });
-                      toast.success(
-                        "Your business is now live on the marketplace!",
-                      );
-                    } catch (e: any) {
-                      toast.error(
-                        e?.response?.data?.message ||
-                          "Failed to publish business",
-                      );
-                    } finally {
-                      setIsTogglingStatus(false);
-                    }
-                  }}
-                  className="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold border-0 cursor-pointer"
-                >
-                  {isTogglingStatus ? "Publishing..." : "Make My Page Visible"}
-                </Button>
-              </>
             ) : (
               <>
                 <p className="text-2xl font-bold text-slate-400 mb-2">
-                  Incomplete
+                  Not yet published
                 </p>
                 <p className="text-sm text-amber-400 font-medium mb-6">
                   Your profile is currently hidden from customers.
                 </p>
-                <Button
-                  disabled
-                  className="w-full bg-slate-800 text-slate-500 font-bold border-0"
+                <Link
+                  href="/vendor/business#business-setup"
+                  className="text-sm text-white underline"
                 >
-                  Complete Setup to Publish
-                </Button>
+                  View setup checklist
+                </Link>
               </>
             )}
           </div>

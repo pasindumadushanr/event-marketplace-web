@@ -17,7 +17,9 @@ export default function BusinessManagementLayout({
     <div className="business-editor space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <Link
-          href="/vendor/business"
+          href={
+            section ? "/vendor/business#business-setup" : "/vendor/business"
+          }
           className="inline-flex items-center gap-2 text-sm font-medium text-[#36564c]"
         >
           {section ? (
@@ -25,7 +27,7 @@ export default function BusinessManagementLayout({
           ) : (
             <LayoutGrid className="h-4 w-4" />
           )}
-          {section ? "All business sections" : "My Business Page"}
+          {section ? "Back to setup checklist" : "My Business Page"}
         </Link>
         <Link
           href="/vendor/preview"

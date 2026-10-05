@@ -37,7 +37,7 @@ describe("Vendor dashboard loading recovery", () => {
     cy.wait("@profileRetry");
     cy.contains("Welcome back,").should("be.visible");
     cy.contains("Sunrise Photography").should("be.visible");
-    cy.contains("Application approved.").should("be.visible");
+    cy.contains("Manage my business").should("be.visible");
   });
 
   it("keeps a failed approval request blocked and retries it independently", () => {

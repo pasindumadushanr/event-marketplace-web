@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, Circle, Sparkles } from "lucide-react";
+import { GuidedSetup } from "@/components/vendor/GuidedSetup";
+import { ArrowRight, Check, Circle } from "lucide-react";
 import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import {
   businessSections,
@@ -22,12 +23,6 @@ export default function BusinessRootPage() {
       </div>
     );
   const essentials = businessEssentials(business);
-  const count = Object.values(essentials).filter(Boolean).length;
-  const nextSection = businessSections.find(
-    (item) =>
-      item.key in essentials &&
-      !essentials[item.key as keyof typeof essentials],
-  );
   const renderCards = (group: string) => (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {businessSections
@@ -104,34 +99,8 @@ export default function BusinessRootPage() {
             · {business.name}
           </p>
         </div>
-        <div className="business-progress-card">
-          <Sparkles className="mb-3 h-5 w-5 text-[#a77c35]" />
-          <p className="text-sm font-semibold text-[#183e38]">A strong start</p>
-          <p className="mt-1 text-xs text-slate-500">
-            {count} of 4 essentials added
-          </p>
-          <div
-            role="progressbar"
-            aria-label="Business essentials"
-            aria-valuenow={count}
-            aria-valuemin={0}
-            aria-valuemax={4}
-            className="my-4 h-1.5 overflow-hidden rounded-full bg-[#e5e9de]"
-          >
-            <div
-              className="h-full rounded-full bg-[#6b8764]"
-              style={{ width: `${count * 25}%` }}
-            />
-          </div>
-          <Link
-            href={nextSection?.href || "/vendor/preview"}
-            className="flex items-center justify-between gap-3 rounded-xl bg-[#183e38] px-4 py-3 text-xs font-semibold text-white"
-          >
-            {nextSection ? "Continue setup" : "Preview your page"}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
       </section>
+      <GuidedSetup />
       <section>
         <div className="mb-4">
           <h2 className="text-lg font-semibold text-slate-900">
