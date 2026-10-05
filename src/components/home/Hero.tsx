@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, Grid } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { homeCategories } from '@/lib/home-categories';
 
 export const SRI_LANKA_PROVINCES_DISTRICTS = [
   {
@@ -58,7 +59,7 @@ export function Hero() {
     const params = new URLSearchParams();
     if (query.trim()) params.append('q', query.trim());
     if (city) params.append('city', city);
-    if (category) params.append('category', category);
+    if (category) params.append('categorySlug', category);
     
     const queryString = params.toString();
     router.push(queryString ? `/search?${queryString}` : '/search');
@@ -119,17 +120,13 @@ export function Hero() {
             <div className="w-full md:w-56 flex items-center px-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-colors">
               <Grid className="h-5 w-5 text-slate-400 shrink-0" />
               <select 
+                aria-label="Category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full bg-transparent border-0 focus:ring-0 text-slate-700 h-14 px-3 outline-none cursor-pointer text-sm font-medium"
               >
                 <option value="">All Categories</option>
-                <option value="venues">Hotels & Venues</option>
-                <option value="photo">Photographers & Video</option>
-                <option value="bridal">Bridal & Beauty</option>
-                <option value="catering">Catering & Cakes</option>
-                <option value="decor">Floral & Decor</option>
-                <option value="music">Live Bands & DJs</option>
+                {homeCategories.map((item) => <option key={item.slug} value={item.slug}>{item.label}</option>)}
               </select>
             </div>
 
@@ -137,6 +134,7 @@ export function Hero() {
             <div className="w-full md:w-64 flex items-center px-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-colors">
               <MapPin className="h-5 w-5 text-slate-400 shrink-0" />
               <select 
+                aria-label="Location"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
                 className="w-full bg-transparent border-0 focus:ring-0 text-slate-700 h-14 px-3 outline-none cursor-pointer text-sm font-medium"

@@ -5,10 +5,12 @@ import { BusinessCategory, categoryPath } from "@/lib/categories";
 
 export function CategorySelector({
   value,
+  slug,
   onChange,
   required = false,
 }: {
   value: string;
+  slug?: string;
   onChange: (id: string) => void;
   required?: boolean;
 }) {
@@ -22,7 +24,8 @@ export function CategorySelector({
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
-  const path = categoryPath(categories, value);
+  const selectedId = value || categories.find((item) => item.slug === slug)?.id || '';
+  const path = categoryPath(categories, selectedId);
   return (
     <fieldset className="space-y-3 min-w-0">
       <legend className="mb-2 text-sm font-semibold">

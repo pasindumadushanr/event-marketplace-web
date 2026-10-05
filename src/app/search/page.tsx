@@ -23,6 +23,7 @@ function SearchContent() {
   const initialQuery = searchParams.get('q') || '';
   const initialCity = searchParams.get('city') || '';
   const [categoryId, setCategoryId] = useState(searchParams.get('categoryId') || '');
+  const [categorySlug, setCategorySlug] = useState(searchParams.get('categorySlug') || '');
   
   const [businesses, setBusinesses] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,10 +41,12 @@ function SearchContent() {
     setCity(c);
     const category = searchParams.get('categoryId') || '';
     setCategoryId(category);
-    fetchResults(q, c, sortBy, category);
+    const slug = searchParams.get('categorySlug') || '';
+    setCategorySlug(slug);
+    fetchResults(q, c, sortBy, category, slug);
   }, [searchParams]);
 
-  const fetchResults = async (searchQ = query, searchCity = city, sort = sortBy, selectedCategory = categoryId) => {
+  const fetchResults = async (searchQ = query, searchCity = city, sort = sortBy, selectedCategory = categoryId, selectedSlug = categorySlug) => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams();
@@ -51,6 +54,7 @@ function SearchContent() {
       if (searchCity) params.append('city', searchCity);
       if (sort) params.append('sortBy', sort);
       if (selectedCategory) params.append('categoryId', selectedCategory);
+      else if (selectedSlug) params.append('categorySlug', selectedSlug);
       
       const res = await api.get(`/discovery/search?${params.toString()}`);
       setBusinesses(res.data.data);
@@ -84,7 +88,7 @@ function SearchContent() {
             </div>
 
             <form onSubmit={handleSearchSubmit} className="space-y-6">
-              <CategorySelector value={categoryId} onChange={setCategoryId} />
+              <CategorySelector value={categoryId} slug={categorySlug} onChange={(id) => { setCategoryId(id); setCategorySlug(''); }} />
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700">Keyword</label>
                 <Input 
