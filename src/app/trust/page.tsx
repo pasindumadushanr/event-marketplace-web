@@ -6,48 +6,48 @@ import { Button } from '@/components/ui/button';
 
 export const metadata = {
   title: 'Trust & Safety | Nakathata.lk Marketplace',
-  description: 'Learn about our 4-pillar trust framework, vendor vetting process, verified reviews, and the Nakathata.lk 100% Money-Back Guarantee.',
+  description: 'Understand account email checks, completed-booking review labels, and the limits of verification on Nakathata.lk.',
 };
 
 export default function TrustPage() {
   const pillars = [
     {
       icon: ShieldCheck,
-      title: 'Rigorous Vendor Vetting',
-      description: 'Every vendor listing undergoes administrative review. We verify business registrations, national IDs, track records, and inspect past event portfolios before awarding verified status.',
+      title: 'What “Verified” means',
+      description: 'A verification label must name the check it represents. We currently confirm vendor account emails. Listing approval is permission to publish, not proof of identity, registration, phone ownership, or service quality. We do not award a general Verified business badge without recorded checks.',
     },
     {
       icon: Lock,
-      title: '100% Refund Guarantee',
-      description: 'When you secure your date with an advance deposit through Nakathata.lk, your funds are fully protected. If a vendor cancels or fails to show, you receive an immediate 100% refund.',
+      title: 'Know the limits',
+      description: 'An email check confirms access to the vendor account email. A phone number or uploaded document alone is not verification. We do not currently verify identity documents or business registration, and a badge is not a guarantee of service or refunds.',
     },
     {
       icon: Star,
-      title: 'Verified Client Reviews',
-      description: 'We do not permit paid, fake, or anonymous reviews. Every testimonial and star rating on our platform originates from real clients who completed bookings with that vendor.',
+      title: 'Verified-customer reviews',
+      description: '“Verified customer · completed booking” means the reviewer’s account has a completed booking recorded with that vendor, created before the review. Other reviews are labelled “booking not verified.” This does not mean we independently inspected the event or endorse the review.',
     },
     {
       icon: CheckCircle2,
       title: 'Direct Messaging & Price Clarity',
-      description: 'Communicate directly with vendors through encrypted chat, request bespoke quotes, and lock in exact transparent pricing without surprise hidden fees on your wedding day.',
+      description: 'Use messages to share your date, location, guest count, and requirements. Confirm the full price, inclusions, and cancellation terms with the vendor in writing. WhatsApp conversations take place outside Nakathata.lk.',
     },
   ];
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col justify-between">
-      <Navbar />
+      <div className="bg-slate-900"><Navbar /></div><div className="h-20 bg-slate-900" />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-20">
         {/* Hero Section */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">
-            Buyer Protection & Security
+            Clear checks. Honest labels.
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight mt-4 mb-4">
             Trust & Safety at Nakathata.lk
           </h1>
           <p className="text-slate-600 text-base sm:text-lg leading-relaxed">
-            Planning a luxury wedding, gala, or celebration should be exhilarating, not stressful. Discover how our multi-layered safety framework ensures complete peace of mind.
+            Understand what we can confirm, what we cannot, and how to make an informed choice for your celebration.
           </p>
         </div>
 
@@ -71,18 +71,18 @@ export default function TrustPage() {
         <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl mb-16">
           <div className="max-w-3xl space-y-4">
             <span className="text-primary font-bold text-xs uppercase tracking-widest flex items-center gap-1.5">
-              <ShieldCheck className="h-4 w-4" /> The Nakathata.lk Guarantee
+              <ShieldCheck className="h-4 w-4" /> Before you choose a vendor
             </span>
             <h2 className="text-2xl sm:text-3xl font-black tracking-tight">
-              Zero Risk. Your Date is Officially Protected.
+              Ask questions. Confirm the details.
             </h2>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              If an unforeseen circumstance occurs and your confirmed vendor cannot service your event, Nakathata.lk steps in to either provide an immediate priority replacement from our verified network or issue an instant 100% refund of your advance deposit.
+              Review recent work, read the different review labels, and ask for a written agreement. Confirm who will provide the service, the event date, the total cost, and cancellation conditions. Nakathata.lk does not promise automatic replacements or instant refunds.
             </p>
             <div className="pt-2">
               <Link href="/search">
                 <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-12 px-6 rounded-xl shadow-lg shadow-primary/20">
-                  Explore Verified Vendors <ArrowRight className="ml-2 h-4 w-4" />
+                  Explore Vendors <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
             </div>
@@ -100,8 +100,8 @@ export default function TrustPage() {
               <p>Chatting through our secure inbox provides an official paper trail of all agreements, requirements, and quote modifications.</p>
             </div>
             <div className="space-y-2">
-              <h4 className="font-bold text-slate-900">2. Pay Deposits on Platform</h4>
-              <p>Never transfer offline advance deposits without an official booking request. Platform deposits are the only ones covered by our guarantee.</p>
+              <h4 className="font-bold text-slate-900">2. Confirm Terms in Writing</h4>
+              <p>Agree on deposit, cancellation, and refund terms with your vendor. Do not assume that a verification label provides financial protection.</p>
             </div>
             <div className="space-y-2">
               <h4 className="font-bold text-slate-900">3. Review Package Details</h4>

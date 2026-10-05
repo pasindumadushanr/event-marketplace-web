@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Star, MapPin, Building2, BadgeCheck } from "lucide-react";
+import { Star, MapPin, Building2 } from "lucide-react";
 import { ShortlistButton } from "./ShortlistButton";
 
 export interface VendorCardProps {
@@ -72,9 +72,6 @@ export function VendorCard({
                 <h3 className="text-lg font-bold text-slate-900 truncate">
                   {business.name}
                 </h3>
-                {business.isVerified && (
-                  <BadgeCheck className="h-4 w-4 text-blue-500 shrink-0" />
-                )}
               </div>
               <div className="flex items-center gap-1 shrink-0 bg-slate-50 px-2 py-0.5 rounded-md">
                 <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />

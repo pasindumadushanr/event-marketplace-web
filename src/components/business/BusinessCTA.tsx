@@ -21,11 +21,13 @@ import api from "@/lib/api";
 import { toast } from "sonner";
 import { EventInquiryDialog } from "./EventInquiryDialog";
 import { ShortlistButton } from "@/components/discovery/ShortlistButton";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 interface BusinessCTAProps {
   businessId: string;
   bookingMethod: BookingMethod;
   startingPrice: number;
+  whatsapp?: string;
 }
 
 const parsePrice = (val: any) => {
@@ -43,11 +45,13 @@ export function BusinessCTA({
   businessId,
   bookingMethod,
   startingPrice,
+  whatsapp,
 }: BusinessCTAProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const isMessaging = false;
+  const whatsappHref = whatsappUrl(whatsapp);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [packages, setPackages] = useState<any[]>([]);
   const [selectedPackageId, setSelectedPackageId] = useState("");
@@ -190,6 +194,16 @@ export function BusinessCTA({
             </>
           )}
 
+          {whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full min-h-14 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-lg"
+            >
+              <MessageCircle className="h-5 w-5" /> WhatsApp vendor
+            </a>
+          )}
           <Button
             variant="outline"
             onClick={handleMessageVendor}
@@ -210,6 +224,32 @@ export function BusinessCTA({
             Share
           </Button>
         </div>
+
+        {!inquiryOpen && !showBookingModal && (
+          <div
+            aria-label="Quick contact"
+            className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg"
+          >
+            <div className="flex gap-3 max-w-lg mx-auto">
+              {whatsappHref && (
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 min-h-12 flex items-center justify-center gap-2 rounded-xl bg-emerald-700 text-white font-semibold"
+                >
+                  <MessageCircle className="h-5 w-5" /> WhatsApp
+                </a>
+              )}
+              <Button
+                onClick={handleMessageVendor}
+                className="flex-1 min-h-12 rounded-xl bg-slate-900 text-white font-semibold"
+              >
+                <MessageCircle className="h-5 w-5 mr-2" /> Message
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Enhanced Booking Modal */}

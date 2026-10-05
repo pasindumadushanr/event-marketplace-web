@@ -71,7 +71,7 @@ export default function PrivacyPage() {
               <Server className="h-5 w-5 text-primary" /> 4. How We Use Your Data
             </h2>
             <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
-              <li>Facilitating direct communication between clients and verified vendors.</li>
+              <li>Facilitating direct communication between clients and vendors.</li>
               <li>Transmitting automated transactional notifications (booking approvals, receipt confirmations, and message alerts).</li>
               <li>Verifying vendor legitimacy and preventing fraudulent store accounts.</li>
               <li>Continuously diagnosing performance and platform stability.</li>

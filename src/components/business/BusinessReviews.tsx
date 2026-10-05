@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Review } from '@/types/business-profile';
 import { Star, MessageCircleReply, PenLine, X, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,11 @@ export function BusinessReviews({ businessId, reviews: initialReviews, rating: i
   const [reviews, setReviews] = useState<Review[]>(initialReviews || []);
   const [rating, setRating] = useState(initialRating || 0);
   const [reviewCount, setReviewCount] = useState(initialCount || 0);
+  useEffect(() => {
+    setReviews(initialReviews || []);
+    setRating(initialRating || 0);
+    setReviewCount(initialCount || 0);
+  }, [initialReviews, initialRating, initialCount]);
 
   // Review Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,6 +72,7 @@ export function BusinessReviews({ businessId, reviews: initialReviews, rating: i
         rating: selectedRating,
         comment: comment.trim(),
         date: 'Just now',
+        isVerifiedCustomer: res.data.isVerifiedCustomer === true,
       };
 
       const updated = [newReview, ...reviews];
@@ -139,7 +145,7 @@ export function BusinessReviews({ businessId, reviews: initialReviews, rating: i
                   />
                 ))}
               </div>
-              <p className="text-xs text-slate-500 font-medium">Based on {reviewCount} verified reviews</p>
+              <p className="text-sm text-slate-500 font-medium">Based on {reviewCount} customer reviews</p>
             </div>
             
             <div className="flex-1 flex flex-col gap-2">
@@ -178,6 +184,9 @@ export function BusinessReviews({ businessId, reviews: initialReviews, rating: i
                     <div>
                       <p className="font-bold text-slate-900 text-sm sm:text-base">{review.customerName}</p>
                       <p className="text-xs text-slate-400">{review.date}</p>
+                      <p className={`text-xs mt-1 font-semibold ${review.isVerifiedCustomer ? 'text-emerald-700' : 'text-slate-500'}`} title={review.isVerifiedCustomer ? 'This account has a completed booking recorded with this vendor.' : 'We have not matched this review to a completed booking.'}>
+                        {review.isVerifiedCustomer ? 'Verified customer · completed booking' : 'Customer review · booking not verified'}
+                      </p>
                     </div>
                   </div>
                   <div className="flex gap-0.5">
@@ -271,6 +280,7 @@ export function BusinessReviews({ businessId, reviews: initialReviews, rating: i
                   Your Review
                 </label>
                 <textarea
+                  maxLength={3000}
                   required
                   rows={4}
                   value={comment}

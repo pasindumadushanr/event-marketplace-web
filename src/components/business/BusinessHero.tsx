@@ -25,11 +25,6 @@ export function BusinessHero({ business }: BusinessHeroProps) {
           <span className="bg-white/90 backdrop-blur-sm text-slate-900 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md">
             {business.categoryName}
           </span>
-          {business.isVerified && (
-            <span className="bg-blue-500/90 backdrop-blur-sm text-white text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-md flex items-center gap-1">
-              <BadgeCheck className="h-4 w-4" /> Verified
-            </span>
-          )}
         </div>
       </div>
 

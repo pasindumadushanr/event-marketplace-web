@@ -6,18 +6,18 @@ import { ShieldCheck, HeartHandshake, CreditCard, Clock, CheckCircle2, Search } 
 const features = [
   {
     icon: ShieldCheck,
-    title: 'Verified Professionals',
-    description: 'Every vendor is strictly vetted by our team to ensure premium quality and reliability.',
+    title: 'Clear Verification Labels',
+    description: 'See confirmed account email checks and learn their limits. Approval to publish is not identity or quality verification.',
   },
   {
     icon: HeartHandshake,
     title: 'Trusted Reviews',
-    description: 'Read genuine reviews and ratings from past clients before making any booking decisions.',
+    description: 'See which reviews are matched to completed bookings, and which have not been booking-verified.',
   },
   {
     icon: CreditCard,
-    title: 'Secure Booking',
-    description: 'Your payments are protected. We hold the funds securely until your event is successful.',
+    title: 'Clear Booking Terms',
+    description: 'Confirm prices, inclusions, and cancellation conditions with your vendor before committing.',
   },
   {
     icon: Clock,
@@ -32,7 +32,7 @@ const features = [
   {
     icon: Search,
     title: 'Dedicated Support',
-    description: 'Our concierge team is available 24/7 to help you plan your perfect event.',
+    description: 'Contact our support team when you need help with your account or vendor enquiries.',
   },
 ];
 

@@ -12,7 +12,7 @@ const steps = [
   {
     icon: SlidersHorizontal,
     title: '2. Compare & Select',
-    description: 'Review portfolios, read verified reviews, and compare packages side-by-side.',
+    description: 'Review portfolios, check review labels, and compare your saved vendors side-by-side.',
   },
   {
     icon: CalendarCheck,

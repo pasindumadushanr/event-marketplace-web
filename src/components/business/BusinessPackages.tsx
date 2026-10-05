@@ -130,15 +130,15 @@ export function BusinessPackages({
             )}
 
             {/* Content & Details */}
-            <div className="flex-1 flex flex-col justify-between">
+            <div className="flex-1 min-w-0 flex flex-col justify-between">
               <div>
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-3 gap-2">
                   <div>
-                    <h4 className="text-xl font-bold text-slate-900 group-hover:text-primary transition-colors">
+                    <h4 className="text-xl break-words font-bold text-slate-900 group-hover:text-primary transition-colors">
                       {pkg.name}
                     </h4>
                     {pkg.description && (
-                      <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mt-1">
+                      <p className="text-slate-600 text-sm sm:text-base break-words leading-relaxed mt-2">
                         {pkg.description}
                       </p>
                     )}
@@ -167,7 +167,7 @@ export function BusinessPackages({
                       {pkg.features.map((feature, idx) => (
                         <div
                           key={idx}
-                          className="flex items-start gap-2 text-xs text-slate-700 font-medium"
+                          className="flex items-start gap-2 text-sm text-slate-700 font-medium"
                         >
                           <Check className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                           <span>{feature}</span>
@@ -189,7 +189,7 @@ export function BusinessPackages({
                       ? setSelectedPackage(pkg)
                       : enquire(pkg)
                   }
-                  className="bg-slate-900 text-white hover:bg-primary font-bold text-xs sm:text-sm rounded-xl px-6 h-11 shadow-sm transition-all"
+                  className="w-full sm:w-auto bg-slate-900 text-white hover:bg-primary font-bold text-sm rounded-xl px-6 min-h-12 shadow-sm transition-all"
                 >
                   {Number(pkg.price) > 0
                     ? `Request this ${copy.singular}`

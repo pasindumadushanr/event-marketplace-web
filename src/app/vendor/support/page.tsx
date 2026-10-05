@@ -120,7 +120,7 @@ export default function VendorSupportPage() {
             </div>
             <h4 className="font-bold text-lg mb-2 relative z-10">Premium Support</h4>
             <p className="text-slate-300 text-sm mb-6 relative z-10">
-              As a verified vendor, you receive priority support. We typically respond within 2-4 hours during business days.
+              Contact our support team for help with your business profile, messages, or account. Response times may vary.
             </p>
             <div className="space-y-4 relative z-10">
               <div className="flex items-center gap-3">

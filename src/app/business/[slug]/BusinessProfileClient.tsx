@@ -111,7 +111,7 @@ export default function BusinessProfileClient({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans">
+    <div className="min-h-screen bg-slate-50 font-sans pb-24 lg:pb-0">
       <div className="bg-slate-900">
         <Navbar />
       </div>
@@ -175,6 +175,7 @@ export default function BusinessProfileClient({
                 businessId={business.id}
                 bookingMethod={business.bookingMethod}
                 startingPrice={business.startingPrice}
+                whatsapp={business.contact.whatsapp}
               />
               <BusinessAvailability blockedDates={business.blockedDates} />
               <BusinessHours hours={business.businessHours} />

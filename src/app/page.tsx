@@ -7,7 +7,6 @@ import { FeaturedVendors } from '@/components/home/FeaturedVendors';
 import { FeaturedPackages } from '@/components/home/FeaturedPackages';
 import { LocationGrid } from '@/components/home/LocationGrid';
 import { HowItWorks } from '@/components/home/HowItWorks';
-import { TestimonialCarousel } from '@/components/home/TestimonialCarousel';
 import { VendorCTA } from '@/components/home/VendorCTA';
 import { Footer } from '@/components/home/Footer';
 
@@ -66,7 +65,6 @@ export default function HomePage() {
         <FeaturedPackages />
         <LocationGrid />
         <HowItWorks />
-        <TestimonialCarousel />
         <VendorCTA />
       </main>
       <Footer />

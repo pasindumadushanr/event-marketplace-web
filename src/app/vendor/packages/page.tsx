@@ -378,13 +378,14 @@ export default function VendorPackagesPage() {
                     <div className="absolute top-4 left-4 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow flex items-center gap-1.5">
                       <Check className="h-3.5 w-3.5" /> Photo Loaded & Ready
                     </div>
-                    <div className="absolute inset-0 bg-slate-950/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+                    <div className="absolute inset-0 bg-slate-950/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity flex items-center justify-center gap-3">
                       <Button
                         type="button"
                         size="sm"
                         variant="secondary"
                         onClick={() => fileInputRef.current?.click()}
-                        className="text-xs font-bold shadow rounded-xl"
+                        disabled={isUploadingImage}
+                        className="min-h-11 text-sm font-bold shadow rounded-xl"
                       >
                         <Upload className="h-3.5 w-3.5 mr-1.5" /> Replace Photo
                       </Button>
@@ -393,7 +394,8 @@ export default function VendorPackagesPage() {
                         size="sm"
                         variant="destructive"
                         onClick={() => setValue("image", "")}
-                        className="text-xs font-bold shadow rounded-xl"
+                        disabled={isUploadingImage}
+                        className="min-h-11 text-sm font-bold shadow rounded-xl"
                       >
                         <X className="h-3.5 w-3.5 mr-1.5" /> Remove Photo
                       </Button>
@@ -415,7 +417,7 @@ export default function VendorPackagesPage() {
                       type="button"
                       disabled={isUploadingImage}
                       onClick={() => fileInputRef.current?.click()}
-                      className="bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow rounded-xl px-5"
+                      className="min-h-12 w-full sm:w-auto bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold shadow rounded-xl px-5"
                     >
                       {isUploadingImage ? (
                         <>
@@ -436,7 +438,7 @@ export default function VendorPackagesPage() {
                 <input
                   type="file"
                   ref={fileInputRef}
-                  accept="image/*"
+                  accept="image/jpeg,image/png,image/webp"
                   onChange={handleFileUpload}
                   className="hidden"
                 />

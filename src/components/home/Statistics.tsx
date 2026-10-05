@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import { Store, CalendarCheck, MapPin, Star } from 'lucide-react';
 
 const stats = [
-  { icon: Store, value: '1,000+', label: 'Verified Vendors' },
-  { icon: CalendarCheck, value: '5,000+', label: 'Successful Events' },
-  { icon: MapPin, value: '300+', label: 'Cities Covered' },
-  { icon: Star, value: '4.9/5', label: 'Average Rating' },
+  { icon: Store, value: 'Discover', label: 'Vendors & Venues' },
+  { icon: CalendarCheck, value: 'Plan', label: 'Event Services' },
+  { icon: MapPin, value: 'Explore', label: 'Sri Lankan Locations' },
+  { icon: Star, value: 'Compare', label: 'Customer Reviews' },
 ];
 
 export function Statistics() {
@@ -30,7 +30,7 @@ export function Statistics() {
               <div className="h-16 w-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-primary mb-2">
                 <stat.icon className="h-8 w-8" />
               </div>
-              <h3 className="text-4xl md:text-5xl font-bold tracking-tight text-white drop-shadow-sm">
+              <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-white drop-shadow-sm">
                 {stat.value}
               </h3>
               <p className="text-slate-400 font-medium tracking-wide uppercase text-sm">

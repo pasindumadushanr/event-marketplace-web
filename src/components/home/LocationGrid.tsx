@@ -110,7 +110,7 @@ export function LocationGrid() {
                       {loc.tagline}
                     </p>
                     <p className="text-[11px] text-emerald-400 font-bold mt-1">
-                      {loc.count}+ Verified Vendors
+                      {loc.count} Vendors
                     </p>
                   </div>
                   <div className="h-10 w-10 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 flex items-center justify-center text-white group-hover:bg-primary group-hover:border-primary group-hover:text-white transition-all shadow-md shrink-0">

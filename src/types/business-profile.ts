@@ -53,6 +53,7 @@ export interface Package {
 }
 
 export interface Review {
+  isVerifiedCustomer?: boolean;
   id: string;
   customerName: string;
   customerImage?: string;

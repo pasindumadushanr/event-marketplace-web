@@ -39,7 +39,6 @@ export function SimilarBusinesses({ currentCategoryId }: { currentCategoryId: st
                   </span>
                   <h3 className="text-lg font-bold text-slate-900 flex items-center gap-1">
                     {vendor.name}
-                    {vendor.isVerified && <BadgeCheck className="h-4 w-4 text-blue-500" />}
                   </h3>
                 </div>
 

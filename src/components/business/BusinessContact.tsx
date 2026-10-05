@@ -1,6 +1,7 @@
 "use client";
 
 import { Phone, Mail, Globe, Camera, MessageCircle } from "lucide-react";
+import { whatsappUrl } from "@/lib/whatsapp";
 
 interface BusinessContactProps {
   contact: {
@@ -16,6 +17,7 @@ interface BusinessContactProps {
 }
 
 export function BusinessContact({ contact }: BusinessContactProps) {
+  const whatsappHref = whatsappUrl(contact.whatsapp);
   return (
     <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
       <h3 className="text-lg font-bold text-slate-900 mb-4">
@@ -79,14 +81,16 @@ export function BusinessContact({ contact }: BusinessContactProps) {
             TikTok
           </a>
         )}
-        {contact.whatsapp && (
+        {whatsappHref && (
           <a
-            href={`https://wa.me/${contact.whatsapp.replace(/[^0-9]/g, "")}`}
+            href={whatsappHref}
+            aria-label="Contact vendor on WhatsApp (opens outside Nakathata.lk)"
             target="_blank"
             rel="noopener noreferrer"
-            className="h-10 w-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-100 transition-colors"
+            className="min-h-12 rounded-xl px-4 gap-2 bg-green-50 text-green-700 font-semibold flex items-center justify-center hover:bg-green-100 transition-colors"
           >
             <MessageCircle className="h-5 w-5" />
+            WhatsApp
           </a>
         )}
         {contact.facebook && (

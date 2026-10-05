@@ -40,7 +40,7 @@ export function FeaturedPackages() {
           >
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Exclusive Packages</h2>
             <p className="text-slate-600">
-              Curated service packages from verified event professionals, designed to make your planning effortless.
+              Explore service packages from event professionals and compare their inclusions.
             </p>
           </motion.div>
           <Link href="/search">
@@ -66,7 +66,7 @@ export function FeaturedPackages() {
             <Tag className="h-10 w-10 text-slate-300 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-slate-900 mb-1">New Packages Coming Soon</h3>
             <p className="text-slate-500 text-sm max-w-md mx-auto mb-6">
-              Our verified vendors are crafting bespoke packages. Browse our verified vendor directory to request a custom quote directly!
+              Browse the vendor directory to discuss your requirements and request a custom quote.
             </p>
             <Link href="/search">
               <button className="px-6 py-2.5 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl text-sm transition-colors shadow-sm">
@@ -116,7 +116,7 @@ export function FeaturedPackages() {
                       </h3>
                       <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
                         <Building2 className="h-3.5 w-3.5 text-slate-400" />
-                        <span>by {pkg.business?.name || 'Verified Vendor'}</span>
+                        <span>by {pkg.business?.name || 'Vendor'}</span>
                         {pkg.business?.city && <span className="text-slate-400">• {pkg.business.city}</span>}
                       </p>
                     </div>

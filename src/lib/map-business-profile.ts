@@ -55,7 +55,7 @@ export function mapBusinessData(data: any) {
       "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200",
     categoryId: data.categoryId || "",
     categoryName: data.category?.name || "Vendor",
-    isVerified: !!data.isVerified,
+    isVerified: false, // No identity/registration evidence is recorded yet.
     rating: Number(data.rating) || 0,
     reviewCount: Number(data.reviewCount) || 0,
     startingPrice: startingPrice === Infinity ? 0 : startingPrice,
@@ -70,11 +70,11 @@ export function mapBusinessData(data: any) {
     languages,
 
     verification: {
-      isBusinessVerified: !!data.isVerified,
-      isEmailVerified: true,
-      isPhoneVerified: !!data.phone,
+      isBusinessVerified: false,
+      isEmailVerified: data.verification?.isEmailVerified === true,
+      isPhoneVerified: false,
       isIdentityVerified: false,
-      isRegistrationVerified: !!data.isVerified,
+      isRegistrationVerified: false,
     },
 
     featureGroups: Array.isArray(data.profileSettings?.features)
@@ -164,7 +164,6 @@ export function mapBusinessData(data: any) {
       whatsapp:
         data.profileSettings?.whatsapp ||
         data.profileSettings?.contact?.whatsapp ||
-        data.phone ||
         "",
     },
 
@@ -202,6 +201,7 @@ export function mapBusinessData(data: any) {
           date: r.createdAt ? new Date(r.createdAt).toLocaleDateString() : "",
           comment: r.comment || "",
           vendorReply: r.reply || null,
+          isVerifiedCustomer: r.isVerifiedCustomer === true,
         }))
       : [],
   };
