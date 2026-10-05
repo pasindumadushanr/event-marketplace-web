@@ -6,10 +6,17 @@ import { Check, Clock, Package as PackageIcon, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { BookingRequestModal } from "./BookingRequestModal";
 import { Badge } from "@/components/ui/badge";
+import { serviceCardCopy, servicePriceLabel } from "@/lib/service-card-copy";
+import { useAuth } from "@/lib/auth-context";
+import { useRouter } from "next/navigation";
+import api from "@/lib/api";
+import { toast } from "sonner";
 
 interface BusinessPackagesProps {
   packages: Package[];
   businessName: string;
+  businessId?: string;
+  categoryName?: string;
   blockedDates?: string[];
   previewOnly?: boolean;
 }
@@ -17,10 +24,32 @@ interface BusinessPackagesProps {
 export function BusinessPackages({
   packages,
   businessName,
+  businessId,
+  categoryName = "",
   blockedDates = [],
   previewOnly = false,
 }: BusinessPackagesProps) {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+  const [enquiring, setEnquiring] = useState(false);
+  const copy = serviceCardCopy(categoryName);
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
+  async function enquire() {
+    if (previewOnly || enquiring || !businessId) return;
+    if (!isAuthenticated) {
+      router.push("/login");
+      return;
+    }
+    setEnquiring(true);
+    try {
+      await api.post("/chat/conversations", { businessId });
+      router.push("/account/messages");
+    } catch {
+      toast.error("Could not contact the vendor. Please try again.");
+    } finally {
+      setEnquiring(false);
+    }
+  }
 
   if (!packages || packages.length === 0) {
     return (
@@ -52,11 +81,10 @@ export function BusinessPackages({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
         <div>
           <h3 className="text-2xl font-serif font-bold text-slate-900">
-            Service Packages & Available Options
+            {copy.plural} & Available Options
           </h3>
           <p className="text-slate-500 text-xs sm:text-sm mt-0.5">
-            Browse available vehicles, packages, or rental options provided
-            directly by {businessName}.
+            Browse {copy.plural.toLowerCase()} offered by {businessName}.
           </p>
         </div>
         <Badge
@@ -114,7 +142,7 @@ export function BusinessPackages({
 
                   <div className="text-left sm:text-right shrink-0">
                     <p className="text-2xl font-black text-slate-900 tracking-tight">
-                      LKR {Number(pkg.price).toLocaleString()}
+                      {servicePriceLabel(pkg.price)}
                     </p>
                     {pkg.duration && (
                       <p className="text-xs text-slate-500 font-semibold flex items-center gap-1 sm:justify-end mt-0.5">
@@ -149,11 +177,23 @@ export function BusinessPackages({
               {/* Action Button */}
               <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end">
                 <Button
-                  disabled={previewOnly}
-                  onClick={() => setSelectedPackage(pkg)}
+                  disabled={
+                    previewOnly ||
+                    enquiring ||
+                    (Number(pkg.price) <= 0 && !businessId)
+                  }
+                  onClick={() =>
+                    Number(pkg.price) > 0
+                      ? setSelectedPackage(pkg)
+                      : void enquire()
+                  }
                   className="bg-slate-900 text-white hover:bg-primary font-bold text-xs sm:text-sm rounded-xl px-6 h-11 shadow-sm transition-all"
                 >
-                  Request this Package
+                  {Number(pkg.price) > 0
+                    ? `Request this ${copy.singular}`
+                    : enquiring
+                      ? "Connecting…"
+                      : "Enquire about pricing"}
                 </Button>
               </div>
             </div>

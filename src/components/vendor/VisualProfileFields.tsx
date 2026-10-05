@@ -2,6 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { ProfileData, Section, Service, lines } from "./visual-profile-model";
+import { serviceCardCopy } from "@/lib/service-card-copy";
 
 type Props = {
   section: Section;
@@ -397,6 +398,7 @@ export function VisualProfileFields({
       </>
     );
   if (section === "packages") {
+    const copy = serviceCardCopy(data);
     const service = data.packages.find((item) => item.id === serviceId);
     const update = (patch: Partial<Service>) =>
       setData({
@@ -408,7 +410,7 @@ export function VisualProfileFields({
     return (
       <>
         <label className="visual-field">
-          Choose a service
+          Choose a {copy.singular}
           <select
             value={serviceId}
             onChange={(e) => selectService(e.target.value)}
@@ -416,7 +418,7 @@ export function VisualProfileFields({
             <option value="">Choose…</option>
             {data.packages.map((item) => (
               <option key={item.id} value={item.id}>
-                {item.name || "New service"}
+                {item.name || `New ${copy.singular}`}
                 {item.status !== "ACTIVE" ? " (hidden)" : ""}
               </option>
             ))}
@@ -428,36 +430,47 @@ export function VisualProfileFields({
           onClick={() => selectService("__new__")}
         >
           <Plus size={14} />
-          Add a service
+          {copy.add}
         </button>
         {service && (
           <>
             {(["name", "description", "duration"] as const).map((key) => (
               <label key={key} className="visual-field">
                 {key === "name"
-                  ? "Service name"
+                  ? "Title"
                   : key === "description"
                     ? "Description"
                     : "Duration"}
                 <textarea
                   rows={key === "description" ? 3 : 1}
+                  placeholder={
+                    key === "name"
+                      ? copy.example
+                      : key === "description"
+                        ? copy.description
+                        : "Optional"
+                  }
                   value={service[key]}
                   onChange={(e) => update({ [key]: e.target.value })}
                 />
               </label>
             ))}
             <label className="visual-field">
-              Price (LKR)
+              Price (LKR) — optional
               <input
                 type="number"
                 min="0"
                 step="0.01"
-                required
-                value={service.price}
+                placeholder="Leave blank for price on request"
+                value={service.price === 0 ? "" : service.price}
                 onChange={(e) => update({ price: e.target.value })}
               />
             </label>
-            {upload("serviceImage", "Service photo")}
+            <p className="text-xs text-slate-500">
+              Leave blank or enter zero for “Price on request”. Customers will
+              enquire instead of checking out.
+            </p>
+            {upload("serviceImage", "Photo")}
             <label className="visual-field">
               What’s included — one per line
               <textarea

@@ -155,6 +155,8 @@ export default function BusinessProfileClient({
             <BusinessPackages
               packages={business.packages}
               businessName={business.name}
+              businessId={business.id}
+              categoryName={business.categoryName}
               blockedDates={business.blockedDates}
             />
             <BusinessReviews

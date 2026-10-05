@@ -7,6 +7,7 @@ import * as z from "zod";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import Link from "next/link";
+import { serviceCardCopy, servicePriceLabel } from "@/lib/service-card-copy";
 import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import {
   Plus,
@@ -43,51 +44,14 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 
-const SAMPLE_PRESETS = [
-  {
-    label: "🚗 White Mercedes-Benz",
-    url: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&auto=format&fit=crop&q=80",
-  },
-  {
-    label: "🚘 Vintage Rolls-Royce",
-    url: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?w=800&auto=format&fit=crop&q=80",
-  },
-  {
-    label: "🚐 Luxury Wedding Van",
-    url: "https://images.unsplash.com/photo-1570125909232-eb263c188f7e?w=800&auto=format&fit=crop&q=80",
-  },
-  {
-    label: "🏰 Banquet Hall Room",
-    url: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&auto=format&fit=crop&q=80",
-  },
-  {
-    label: "🌸 Floral Mandap Setup",
-    url: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&auto=format&fit=crop&q=80",
-  },
-];
-
-const QUICK_SPECS = [
-  "Uniformed Chauffeur Included",
-  "Full Air Conditioned",
-  "Silk Ribbon & Flower Bonnet Deco",
-  "100km / 8 Hours Included",
-  "Fuel & Driver Allowance Covered",
-  "Luxury Leather Interior",
-  "Backup Vehicle on Standby",
-];
-
-const DURATION_PRESETS = [
-  "8 Hours / 100km",
-  "Full Day Rental",
-  "Per Day",
-  "Per Event",
-];
-
 const packageSchema = z.object({
-  name: z.string().min(2, "Name is required"),
+  name: z.string().trim().min(2, "Enter a title of at least two characters"),
   description: z.string().optional(),
   image: z.string().optional(),
-  price: z.coerce.number().min(0, "Price must be a positive number"),
+  price: z.coerce
+    .number()
+    .finite()
+    .min(0, "Enter a price of zero or more, or leave it blank"),
   duration: z.string().optional(),
   status: z.enum(["ACTIVE", "INACTIVE", "ARCHIVED"]).default("ACTIVE"),
   features: z
@@ -100,47 +64,10 @@ type PackageFormValues = z.infer<typeof packageSchema>;
 
 export default function VendorPackagesPage() {
   const { business } = useBusinessProfile();
-  const category = (business?.category?.name || "").toLowerCase();
-  const isTransport = /car|transport|vehicle/.test(category);
-  const isPhotography = /photo|video/.test(category);
-  const isCatering = /cater|food/.test(category);
-  const isVenue = /venue|hotel|hall/.test(category);
-  const nameExample = isTransport
-    ? "Wedding car with driver"
-    : isPhotography
-      ? "Full-day wedding photography"
-      : isCatering
-        ? "Wedding buffet for 100 guests"
-        : isVenue
-          ? "Wedding hall for 200 guests"
-          : "Standard wedding package";
-  const quickSpecs = isTransport
-    ? QUICK_SPECS
-    : isPhotography
-      ? [
-          "Full-day coverage",
-          "Edited digital photos",
-          "Online gallery",
-          "Wedding album",
-        ]
-      : isCatering
-        ? [
-            "Buffet service",
-            "Serving staff",
-            "Vegetarian options",
-            "Tableware included",
-          ]
-        : isVenue
-          ? [
-              "Guest parking",
-              "Air conditioning",
-              "Tables and chairs",
-              "Bridal dressing room",
-            ]
-          : ["Setup included", "Event-day support", "Customisation available"];
-  const durations = isTransport
-    ? DURATION_PRESETS
-    : ["Per Event", "Full Day", "Half Day", "Per Hour"];
+  const copy = serviceCardCopy(business);
+  const nameExample = copy.example;
+  const quickSpecs = copy.specs;
+  const durations = copy.durations;
   const [packages, setPackages] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"list" | "editor">("list");
@@ -219,7 +146,7 @@ export default function VendorPackagesPage() {
       name: pkg.name,
       description: pkg.description || "",
       image: pkg.image || "",
-      price: Number(pkg.price),
+      price: Number(pkg.price) > 0 ? Number(pkg.price) : ("" as any),
       duration: pkg.duration || "",
       status: pkg.status,
       features:
@@ -235,8 +162,11 @@ export default function VendorPackagesPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Only image files (JPG, PNG, WEBP) are allowed");
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+      file.size > 5 * 1024 * 1024
+    ) {
+      toast.error("Choose a JPG, PNG or WebP image no larger than 5 MB");
       return;
     }
 
@@ -307,10 +237,10 @@ export default function VendorPackagesPage() {
 
       if (editingId) {
         await api.patch(`/vendor/packages/${editingId}`, payload);
-        toast.success("Package updated successfully");
+        toast.success("Listing updated successfully");
       } else {
         await api.post("/vendor/packages", payload);
-        toast.success("Package created successfully");
+        toast.success("Listing created successfully");
       }
       setViewMode("list");
       fetchPackages();
@@ -322,10 +252,10 @@ export default function VendorPackagesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this package?")) return;
+    if (!confirm("Are you sure you want to delete this listing?")) return;
     try {
       await api.delete(`/vendor/packages/${id}`);
-      toast.success("Package deleted successfully");
+      toast.success("Listing deleted successfully");
       fetchPackages();
     } catch (error) {
       toast.error("Failed to delete package");
@@ -356,7 +286,7 @@ export default function VendorPackagesPage() {
               onClick={() => setViewMode("list")}
               className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" /> Back to Packages & Fleet
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back to {copy.plural}
             </Button>
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200">
@@ -387,7 +317,7 @@ export default function VendorPackagesPage() {
               ) : editingId ? (
                 "Save Changes"
               ) : (
-                "Save Service"
+                `Save ${copy.singular}`
               )}
             </Button>
           </div>
@@ -396,11 +326,11 @@ export default function VendorPackagesPage() {
         {/* Title Header */}
         <div className="space-y-1">
           <h1 className="text-3xl font-black text-slate-900 tracking-tight">
-            {editingId ? "Edit Service" : "Add a Service"}
+            {editingId ? `Edit ${copy.singular}` : copy.add}
           </h1>
           <p className="text-slate-500 text-sm">
-            Showcase your cars, banquet halls, decor packages, or equipment with
-            photos, pricing, and key specifications.
+            {copy.description} Add a photo, title and description. Price is
+            optional.
           </p>
         </div>
 
@@ -418,7 +348,7 @@ export default function VendorPackagesPage() {
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-slate-900">
-                        Service Photo
+                        Photo
                       </h3>
                       <p className="text-xs text-slate-500">
                         Upload a crisp photo from your device or paste a web
@@ -478,7 +408,7 @@ export default function VendorPackagesPage() {
                       Upload photo from your computer or phone
                     </p>
                     <p className="text-xs text-slate-400 mb-4 max-w-sm mx-auto">
-                      Supports JPG, PNG, WEBP files up to 10MB. High quality
+                      Supports JPG, PNG, WEBP files up to 5MB. High quality
                       landscape photos look best.
                     </p>
                     <Button
@@ -522,34 +452,6 @@ export default function VendorPackagesPage() {
                     {...register("image")}
                   />
                 </div>
-
-                {/* Quick Presets for 1-Click Testing */}
-                {isTransport && (
-                  <div className="pt-1">
-                    <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">
-                      Or choose a sample photo for quick testing:
-                    </label>
-                    <div className="flex flex-wrap gap-2">
-                      {(isTransport ? SAMPLE_PRESETS.slice(0, 3) : []).map(
-                        (preset, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() =>
-                              setValue("image", preset.url, {
-                                shouldValidate: true,
-                                shouldDirty: true,
-                              })
-                            }
-                            className="text-xs px-3 py-1.5 rounded-xl bg-slate-100/80 hover:bg-amber-100 hover:border-amber-300 border border-slate-200 text-slate-800 font-semibold transition-all shadow-2xs"
-                          >
-                            {preset.label}
-                          </button>
-                        ),
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* SECTION 2: TITLE & PRICING */}
@@ -563,7 +465,8 @@ export default function VendorPackagesPage() {
                       Title & Pricing
                     </h3>
                     <p className="text-xs text-slate-500">
-                      Give your service a clear name and set the price in LKR.
+                      Add a clear title. Set a price only if you want to display
+                      one.
                     </p>
                   </div>
                 </div>
@@ -571,8 +474,7 @@ export default function VendorPackagesPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-800">
-                      Item / Package Title{" "}
-                      <span className="text-red-500">*</span>
+                      Title <span className="text-red-500">*</span>
                     </label>
                     <Input
                       placeholder={`e.g. ${nameExample}`}
@@ -588,8 +490,7 @@ export default function VendorPackagesPage() {
 
                   <div className="space-y-1.5">
                     <label className="text-sm font-bold text-slate-800">
-                      Price in Sri Lankan Rupees (LKR){" "}
-                      <span className="text-red-500">*</span>
+                      Price (LKR) — optional
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-xs font-black text-slate-400">
@@ -597,7 +498,9 @@ export default function VendorPackagesPage() {
                       </div>
                       <Input
                         type="number"
-                        placeholder="45000"
+                        placeholder="Leave blank for price on request"
+                        min="0"
+                        step="0.01"
                         className="pl-14 rounded-xl border-slate-200 h-11 font-bold text-base"
                         {...register("price")}
                       />
@@ -665,7 +568,7 @@ export default function VendorPackagesPage() {
                     Description & Inclusions (Optional)
                   </label>
                   <Textarea
-                    placeholder="Explain what customers receive, who this service is for, and any important limits or extra charges."
+                    placeholder={copy.description}
                     className="resize-none h-24 rounded-xl border-slate-200 text-sm leading-relaxed"
                     {...register("description")}
                   />
@@ -763,7 +666,7 @@ export default function VendorPackagesPage() {
                     ? "Saving..."
                     : editingId
                       ? "Save Changes"
-                      : "Save Service"}
+                      : `Save ${copy.singular}`}
                 </Button>
               </div>
             </form>
@@ -827,7 +730,7 @@ export default function VendorPackagesPage() {
                 </div>
 
                 <div className="absolute bottom-3 left-4 text-white font-black text-2xl drop-shadow">
-                  LKR {Number(currentPrice || 0).toLocaleString()}
+                  {servicePriceLabel(currentPrice)}
                 </div>
               </div>
 
@@ -884,8 +787,10 @@ export default function VendorPackagesPage() {
                   disabled
                   className="w-full bg-slate-900 text-white font-bold rounded-xl shadow-xs py-5"
                 >
-                  <CalendarCheck className="h-4 w-4 mr-2" /> Request this
-                  Package
+                  <CalendarCheck className="h-4 w-4 mr-2" />{" "}
+                  {Number(currentPrice) > 0
+                    ? `Request this ${copy.singular}`
+                    : "Enquire about pricing"}
                 </Button>
               </div>
             </div>
@@ -916,10 +821,10 @@ export default function VendorPackagesPage() {
             Back to My Business Page
           </Link>
           <h2 className="text-3xl font-black tracking-tight text-slate-900">
-            Services & Prices
+            {copy.plural}
           </h2>
           <p className="text-muted-foreground mt-1 text-slate-500 text-sm">
-            Add what you offer, what is included, and how much it costs.
+            {copy.description} Set a price, or let customers ask for a quote.
           </p>
         </div>
         <Button
@@ -927,7 +832,7 @@ export default function VendorPackagesPage() {
           className="bg-slate-900 hover:bg-slate-800 text-white shadow-sm font-semibold rounded-xl"
         >
           <Plus className="h-4 w-4 mr-2" />
-          Add Service
+          {copy.add}
         </Button>
       </div>
 
@@ -941,18 +846,18 @@ export default function VendorPackagesPage() {
             <PackageIcon className="h-8 w-8" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2">
-            Add your first service
+            Add your first {copy.singular}
           </h3>
           <p className="mb-6 text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
-            Start with one service or package. Include a clear photo, price and
-            description to help customers choose.
+            Add a photo, title and description to help customers choose. Price
+            is optional; leave it blank or enter zero for “Price on request”.
           </p>
           <Button
             onClick={handleCreateNew}
             className="bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-md px-6"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add My First Service
+            {copy.add}
           </Button>
         </div>
       ) : (
@@ -984,7 +889,7 @@ export default function VendorPackagesPage() {
                     </Badge>
                   </div>
                   <div className="absolute bottom-3 left-3 text-white font-black text-xl drop-shadow">
-                    LKR {Number(pkg.price).toLocaleString()}
+                    {servicePriceLabel(pkg.price)}
                   </div>
                 </div>
               ) : (
@@ -1034,7 +939,7 @@ export default function VendorPackagesPage() {
                   <div className="flex items-center gap-4 mt-2 text-sm text-slate-500 font-medium">
                     <span className="flex items-center gap-1 text-slate-900 font-black text-lg">
                       <Banknote className="h-4 w-4 text-slate-400" />
-                      LKR {Number(pkg.price).toLocaleString()}
+                      {servicePriceLabel(pkg.price)}
                     </span>
                   </div>
                 )}

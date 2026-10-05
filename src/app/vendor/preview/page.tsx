@@ -341,11 +341,12 @@ export default function VendorPreviewPage() {
       active === "packages" &&
       (!service ||
         !service.name.trim() ||
-        service.price === "" ||
-        !Number.isFinite(Number(service.price)) ||
+        !Number.isFinite(Number(service.price || 0)) ||
         Number(service.price) < 0)
     ) {
-      setError("Enter a service name and a valid price of zero or more.");
+      setError(
+        "Enter a title and a price of zero or more, or leave the price blank.",
+      );
       return;
     }
     setSaving(true);
@@ -612,6 +613,8 @@ export default function VendorPreviewPage() {
               <BusinessPackages
                 packages={business.packages}
                 businessName={business.name}
+                categoryName={business.categoryName}
+                businessId={business.id}
                 blockedDates={business.blockedDates}
                 previewOnly
               />,

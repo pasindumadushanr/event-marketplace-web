@@ -176,7 +176,7 @@ export function setupProgress(
           : [
               {
                 label:
-                  "Add an active service with a title, description and price (recommended)",
+                  "Add an active listing with a photo, title and description; price is optional (recommended)",
                 href: "/vendor/packages",
               },
             ],

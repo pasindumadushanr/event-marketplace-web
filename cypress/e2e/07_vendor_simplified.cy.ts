@@ -186,10 +186,8 @@ describe("Simplified vendor workspace", () => {
     cy.on("window:confirm", () => true);
     cy.contains("button", "Cancel").click();
     cy.get('button[aria-label="Edit Services & prices"]').click();
-    cy.contains("button", "Add a service").click();
-    cy.contains("label", "Service name")
-      .find("textarea")
-      .type("Wedding coverage");
+    cy.contains("button", "Add a package").click();
+    cy.contains("label", "Title").find("textarea").type("Wedding coverage");
     cy.contains("label", "Price (LKR)")
       .find("input")
       .type("45000")
@@ -333,7 +331,7 @@ describe("Simplified vendor workspace", () => {
 
   it("uses photography examples instead of car-rental defaults", () => {
     visitVendor("/vendor/packages");
-    cy.contains("button", "Add Service").click();
+    cy.contains("button", "Add a package").first().click();
     cy.get('input[name="name"]').should(
       "have.attr",
       "placeholder",
