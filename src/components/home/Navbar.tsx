@@ -92,9 +92,10 @@ function UserAccountNav() {
   );
 }
 
-export function Navbar() {
+export function Navbar({ solid = false }: { solid?: boolean }) {
   const { user, logout } = useAuth();
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollPastHeader, setIsScrolled] = useState(false);
+  const isScrolled = solid || scrollPastHeader;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 

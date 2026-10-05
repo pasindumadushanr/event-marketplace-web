@@ -50,6 +50,16 @@ const catalog = [
 ];
 
 describe("Three-level wedding categories", () => {
+  it("recovers a failed category request when the user retries", () => {
+    cy.intercept('GET', '**/business-categories', { statusCode: 500, body: { message: 'Internal server error' } });
+    cy.visit('/categories');
+    cy.contains('[role="alert"]', 'We couldn’t load categories').should('be.visible');
+    cy.intercept('GET', '**/business-categories', { body: catalog });
+    cy.contains('button', 'Try again').click();
+    cy.contains('h2', 'Wedding Cars & Transport').should('be.visible');
+    cy.get('[role="alert"]').should('not.exist');
+    cy.get('nav.fixed').should('have.class', 'bg-white/95');
+  });
   it("submits a new vendor registration with the chosen attire service", () => {
     const attire = [
       { id: 'attire', name: 'Attire & Fashion', slug: 'attire-fashion', parentId: null },

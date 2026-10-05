@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Layers3 } from "lucide-react";
 import api from "@/lib/api";
@@ -11,16 +11,21 @@ export default function CategoriesPage() {
   const [categories, setCategories] = useState<BusinessCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  useEffect(() => {
-    api
+  const loadCategories = useCallback(() => {
+    return api
       .get("/business-categories")
-      .then(({ data }) => setCategories(data))
+      .then(({ data }) => {
+        if (!Array.isArray(data)) throw new Error('Invalid category response');
+        setCategories(data);
+        setError(false);
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false));
   }, []);
+  useEffect(() => { void loadCategories(); }, [loadCategories]);
   return (
     <div className="min-h-screen bg-[#f7f8f4]">
-      <Navbar />
+      <Navbar solid />
       <main className="mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-6">
         <div className="mb-10 max-w-2xl">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
@@ -36,10 +41,12 @@ export default function CategoriesPage() {
         </div>
         {loading && <p role="status">Loading categories…</p>}
         {error && (
-          <p role="alert">
-            We couldn’t load categories. Please refresh to try again.
-          </p>
+          <div role="alert" className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
+            <p>We couldn’t load categories. Please try again.</p>
+            <button disabled={loading} onClick={() => { setLoading(true); setError(false); void loadCategories(); }} className="mt-3 rounded-lg bg-[#183e38] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">Try again</button>
+          </div>
         )}
+        {!loading && !error && !categories.length && <p>No categories are available yet. Please check back soon.</p>}
         <div className="grid items-start gap-6 md:grid-cols-2 xl:grid-cols-3">
           {categories
             .filter((item) => !item.parentId)
