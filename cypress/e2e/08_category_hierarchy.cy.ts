@@ -50,6 +50,46 @@ const catalog = [
 ];
 
 describe("Three-level wedding categories", () => {
+  it("submits a new vendor registration with the chosen attire service", () => {
+    const attire = [
+      { id: 'attire', name: 'Attire & Fashion', slug: 'attire-fashion', parentId: null },
+      { id: 'bridal', name: 'Bridal Wear', slug: 'bridal-wear', parentId: 'attire' },
+      { id: 'muslim-bridal', name: 'Muslim Bridal & Hijabs', slug: 'muslim-bridal-hijabs', parentId: 'bridal' },
+      { id: 'groom', name: 'Groom Attire', slug: 'groom-attire', parentId: 'attire' },
+      { id: 'hindu-groom', name: 'Hindu & Indian Attire', slug: 'hindu-indian-attire', parentId: 'groom' },
+    ];
+    cy.intercept('GET', '**/business-categories', { body: attire });
+    cy.intercept('GET', '**/vendor/business/onboarding/status', { body: { emailVerified: true, vendorStatus: 'NOT_STARTED' } });
+    cy.intercept('GET', '**/vendor/business', (req) => {
+      if (req.headers.authorization) req.reply({ statusCode: 404, body: {} });
+      else req.continue();
+    });
+    cy.intercept('POST', '**/vendor/business/onboarding/wizard', (req) => {
+      expect(req.body.categoryId).to.equal('hindu-groom');
+      expect(req.body.name).to.equal('Celebration Attire');
+      req.reply({ body: { id: 'new-vendor-business', ...req.body } });
+    }).as('register');
+    cy.visit('/vendor/onboarding', { onBeforeLoad(win) {
+      win.localStorage.setItem('accessToken', 'local-test-only');
+      win.localStorage.setItem('user', JSON.stringify({ id: 'new-vendor', firstName: 'Test', roleName: 'VENDOR' }));
+    } });
+    cy.get('input[name="name"]').type('Celebration Attire');
+    cy.get('input[name="email"]').type('test@example.com');
+    cy.get('input[name="phone"]').type('0771234567');
+    cy.contains('button', 'Next').click();
+    cy.contains('label', 'Main category').find('select').select('attire');
+    cy.contains('label', 'Subcategory').find('select').select('bridal');
+    cy.contains('label', 'Specific service').find('select').select('muslim-bridal');
+    cy.contains('label', 'Subcategory').find('select').select('groom');
+    cy.contains('label', 'Specific service').find('select').should('have.value', '').select('hindu-groom');
+    cy.contains('button', 'Next').click();
+    cy.contains('h3', 'Step 3: Location').should('be.visible');
+    cy.contains('button', 'Next').click();
+    cy.contains('h3', 'Step 4').should('be.visible');
+    cy.contains('button', 'Next').click();
+    cy.contains('button', 'Submit Application').click();
+    cy.wait('@register');
+  });
   beforeEach(() => {
     cy.intercept("GET", "**/business-categories", { body: catalog });
     cy.intercept("GET", "**/discovery/search*", {
