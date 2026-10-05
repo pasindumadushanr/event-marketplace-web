@@ -1,123 +1,217 @@
-'use client';
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { useSocket } from "@/lib/use-socket";
+import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
+import api from "@/lib/api";
+import {
+  readInquiryRecord,
+  inquiryStatusLabel,
+  InquiryResponse,
+} from "@/lib/inquiry-record";
+import { InquiryCard } from "./InquiryCard";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useSocket } from '@/lib/use-socket';
-import { useAuth } from '@/lib/auth-context';
-import { Button } from '@/components/ui/button';
-import { Send, User as UserIcon } from 'lucide-react';
-import api from '@/lib/api';
-
-interface Message {
+type Message = {
   id: string;
+  conversationId: string;
   senderId: string;
   content: string;
   createdAt: string;
   isRead: boolean;
-}
-
-export function ChatWindow({ conversationId, recipientName, recipientLogo }: { conversationId: string, recipientName: string, recipientLogo?: string }) {
+};
+export function ChatWindow({
+  conversationId,
+  recipientName,
+  recipientLogo,
+  vendorView = false,
+  customerId,
+}: {
+  conversationId: string;
+  recipientName: string;
+  recipientLogo?: string;
+  vendorView?: boolean;
+  customerId?: string;
+}) {
   const { user } = useAuth();
-  const { socket, joinConversation, leaveConversation, sendMessage } = useSocket();
+  const { socket, joinConversation, leaveConversation } = useSocket();
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  const [newMessage, setNewMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const end = useRef<HTMLDivElement>(null);
+  function append(message: Message) {
+    setMessages((previous) =>
+      previous.some((item) => item.id === message.id)
+        ? previous
+        : [...previous, message],
+    );
+  }
   useEffect(() => {
-    // Fetch initial messages
-    api.get(`/chat/conversations/${conversationId}/messages`).then((res) => {
-      setMessages(res.data);
-      scrollToBottom();
-    }).catch(err => console.error("Failed to load messages", err));
-
-    // Join room
-    joinConversation(conversationId);
-
-    // Listen for new messages
-    if (socket) {
-      socket.on('receive_message', (message: Message) => {
-        setMessages((prev) => [...prev, message]);
-        scrollToBottom();
-        
-        // Mark as read if we received it while window is open
-        if (message.senderId !== user?.id) {
-           api.post(`/chat/conversations/${conversationId}/read`);
-        }
+    let alive = true;
+    setLoading(true);
+    api
+      .get(`/chat/conversations/${conversationId}/messages`)
+      .then((res) => {
+        if (!alive) return;
+        setMessages(
+          (previous) =>
+            [
+              ...new Map(
+                [...res.data, ...previous].map((item) => [item.id, item]),
+              ).values(),
+            ] as Message[],
+        );
+        setError("");
+        void api
+          .post(`/chat/conversations/${conversationId}/read`)
+          .catch(() => undefined);
+      })
+      .catch(() => {
+        if (alive)
+          setError("Messages couldn’t be loaded. Please refresh to try again.");
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
       });
-    }
-
-    return () => {
-      leaveConversation(conversationId);
-      if (socket) {
-        socket.off('receive_message');
-      }
+    const join = () => joinConversation(conversationId);
+    socket?.on("connect", join);
+    if (socket?.connected) join();
+    const receive = (message: Message) => {
+      if (message.conversationId !== conversationId) return;
+      append(message);
+      if (message.senderId !== user?.id)
+        void api
+          .post(`/chat/conversations/${conversationId}/read`)
+          .catch(() => undefined);
     };
-  }, [conversationId, socket]);
-
-  const scrollToBottom = () => {
-    setTimeout(() => {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-    sendMessage(conversationId, newMessage);
-    setNewMessage('');
-  };
-
+    socket?.on("receive_message", receive);
+    return () => {
+      alive = false;
+      leaveConversation(conversationId);
+      socket?.off("receive_message", receive);
+      socket?.off("connect", join);
+    };
+  }, [conversationId, socket, joinConversation, leaveConversation, user?.id]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [messages.length]);
+  async function handleSend(event: React.FormEvent) {
+    event.preventDefault();
+    if (!newMessage.trim() || sending || loading) return;
+    setSending(true);
+    setError("");
+    try {
+      const result = await api.post(
+        `/chat/conversations/${conversationId}/messages`,
+        { content: newMessage.trim() },
+      );
+      append(result.data);
+      setNewMessage("");
+    } catch {
+      setError("Your message wasn’t sent. It is still here; please try again.");
+    } finally {
+      setSending(false);
+    }
+  }
+  const responses = new Map<string, InquiryResponse>();
+  const customer = vendorView ? customerId : user?.id;
+  for (const message of messages) {
+    const record = readInquiryRecord(message.content);
+    if (record?.kind === "RESPONSE" && message.senderId !== customer)
+      responses.set(record.inquiryId, record);
+  }
   return (
-    <div className="flex flex-col h-[600px] border border-slate-200 rounded-2xl bg-white shadow-sm overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center p-4 border-b border-slate-100 bg-slate-50">
-        <div className="h-10 w-10 rounded-full bg-slate-200 overflow-hidden flex items-center justify-center mr-3">
-          {recipientLogo ? (
-            <img src={recipientLogo} alt={recipientName} className="h-full w-full object-cover" />
-          ) : (
-            <UserIcon className="h-5 w-5 text-slate-500" />
-          )}
-        </div>
-        <h3 className="font-semibold text-slate-900">{recipientName}</h3>
-      </div>
-
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50/50">
-        {messages.length === 0 ? (
-          <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-            No messages yet. Say hello!
-          </div>
-        ) : (
-          messages.map((msg) => {
-            const isMe = msg.senderId === user?.id;
-            return (
-              <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                <div 
-                  className={`max-w-[70%] rounded-2xl px-4 py-2 text-sm ${
-                    isMe 
-                      ? 'bg-primary text-white rounded-br-none' 
-                      : 'bg-white border border-slate-200 text-slate-800 rounded-bl-none'
-                  }`}
-                >
-                  {msg.content}
-                </div>
-              </div>
-            );
-          })
+    <div className="flex h-[650px] max-h-[85vh] min-h-[450px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 p-4">
+        {recipientLogo && (
+          <img
+            src={recipientLogo}
+            alt=""
+            className="h-10 w-10 rounded-full object-cover"
+          />
         )}
-        <div ref={messagesEndRef} />
+        <div className="min-w-0">
+          <h3 className="truncate font-semibold text-slate-900">
+            {recipientName}
+          </h3>
+          <p className="text-xs text-slate-500">
+            Enquiries and messages · no date is reserved here
+          </p>
+        </div>
       </div>
-
-      {/* Input Area */}
-      <form onSubmit={handleSend} className="p-4 bg-white border-t border-slate-100 flex gap-2">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50/50 p-4">
+        {loading && <p className="text-sm text-slate-500">Loading messages…</p>}
+        {!loading && !messages.length && !error && (
+          <p className="text-sm text-slate-500">No messages yet. Say hello!</p>
+        )}
+        {messages.map((message) => {
+          const record = readInquiryRecord(message.content);
+          if (record?.kind === "INQUIRY" && message.senderId === customer)
+            return (
+              <InquiryCard
+                key={message.id}
+                inquiry={record}
+                id={message.id}
+                conversationId={conversationId}
+                response={responses.get(message.id)}
+                vendorView={vendorView}
+                onResponse={append}
+              />
+            );
+          const mine = message.senderId === user?.id;
+          return (
+            <div
+              key={message.id}
+              className={`flex ${mine ? "justify-end" : "justify-start"}`}
+            >
+              <div
+                className={`max-w-[85%] whitespace-pre-wrap break-words rounded-2xl px-4 py-3 text-sm ${mine ? "bg-[#183e38] text-white" : "border border-slate-200 bg-white text-slate-800"}`}
+              >
+                {record?.kind === "RESPONSE" ? (
+                  <>
+                    <p className="mb-1 text-xs font-semibold opacity-80">
+                      {inquiryStatusLabel[record.action]}
+                    </p>
+                    {record.text}
+                  </>
+                ) : (
+                  message.content
+                )}
+              </div>
+            </div>
+          );
+        })}
+        <div ref={end} />
+      </div>
+      {error && (
+        <p role="alert" className="px-4 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+      <form
+        onSubmit={handleSend}
+        className="flex gap-2 border-t border-slate-100 bg-white p-4"
+      >
         <input
+          aria-label="Message"
           type="text"
+          maxLength={5000}
           value={newMessage}
+          disabled={sending}
           onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-1 rounded-xl border-slate-200 focus:ring-primary focus:border-primary text-sm px-4 py-2 border"
+          placeholder="Type a message…"
+          className="min-w-0 flex-1 rounded-xl border border-slate-200 px-4 py-2 text-sm"
         />
-        <Button type="submit" size="icon" className="rounded-xl shrink-0 h-10 w-10">
-          <Send className="h-4 w-4" />
+        <Button
+          aria-label="Send message"
+          type="submit"
+          disabled={sending || loading || !newMessage.trim()}
+          size="icon"
+          className="h-10 w-10 shrink-0 rounded-xl"
+        >
+          <Send size={16} />
         </Button>
       </form>
     </div>

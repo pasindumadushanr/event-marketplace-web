@@ -137,8 +137,8 @@ describe("Business-aware service cards", () => {
         ],
       },
     });
-    cy.intercept("POST", "**/chat/conversations", {
-      body: { id: "conversation" },
+    cy.intercept("POST", "**/chat/inquiries", {
+      body: { conversationId: "conversation" },
     }).as("chat");
     let bookingRequests = 0;
     cy.intercept("POST", "**/bookings", (req) => {
@@ -156,6 +156,13 @@ describe("Business-aware service cards", () => {
     });
     cy.contains("Cakes & Available Options").should("be.visible");
     cy.contains("button", "Enquire about pricing").click();
+    cy.contains("label", "Event date").find("input").type("2099-01-01");
+    cy.contains("label", "Guest count").find("input").type("150");
+    cy.contains("label", "Event location").find("input").type("Colombo");
+    cy.contains("label", "Your requirements")
+      .find("textarea")
+      .type("A floral cake for our wedding");
+    cy.contains("button", "Send enquiry").click();
     cy.wait("@chat").its("request.body.businessId").should("eq", "vendor-test");
     cy.location("pathname").should("eq", "/account/messages");
     cy.then(() => expect(bookingRequests).to.equal(0));

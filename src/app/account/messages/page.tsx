@@ -1,30 +1,46 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import api from '@/lib/api';
-import { ChatWindow } from '@/components/chat/ChatWindow';
-import { User, MessageCircle } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { useState, useEffect } from "react";
+import api from "@/lib/api";
+import { ChatWindow } from "@/components/chat/ChatWindow";
+import { User, MessageCircle } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import { messagePreview } from "@/lib/inquiry-record";
 
 export default function CustomerMessagesPage() {
   const [conversations, setConversations] = useState<any[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    api.get('/chat/conversations').then(res => {
-      setConversations(res.data);
-      if (res.data.length > 0 && !activeId) {
-        setActiveId(res.data[0].id);
-      }
-    });
+    api
+      .get("/chat/conversations")
+      .then((res) => {
+        setConversations(res.data);
+        const requested = new URLSearchParams(window.location.search).get(
+          "conversation",
+        );
+        if (res.data.length > 0)
+          setActiveId(
+            res.data.some((item: any) => item.id === requested)
+              ? requested
+              : res.data[0].id,
+          );
+      })
+      .catch(() => setLoadError(true));
   }, []);
 
-  const activeConversation = conversations.find(c => c.id === activeId);
+  const activeConversation = conversations.find((c) => c.id === activeId);
 
   return (
     <div className="max-w-6xl mx-auto py-8 px-4 sm:px-6">
       <h1 className="text-2xl font-bold text-slate-900 mb-6">Messages</h1>
-      
+      {loadError && (
+        <p role="alert" className="mb-4 text-sm text-red-700">
+          Messages couldn’t be loaded. Please refresh to try again.
+        </p>
+      )}
+
       <div className="flex flex-col md:flex-row gap-6 h-[600px]">
         {/* Sidebar */}
         <div className="w-full md:w-1/3 bg-white border border-slate-200 rounded-2xl overflow-hidden flex flex-col">
@@ -37,30 +53,46 @@ export default function CustomerMessagesPage() {
                 No messages yet. Contact a vendor to start a conversation!
               </div>
             ) : (
-              conversations.map(conv => (
-                <div 
+              conversations.map((conv) => (
+                <div
                   key={conv.id}
                   onClick={() => setActiveId(conv.id)}
                   className={`p-4 border-b border-slate-50 cursor-pointer transition-colors flex gap-3 ${
-                    activeId === conv.id ? 'bg-slate-50 border-l-4 border-l-primary' : 'hover:bg-slate-50 border-l-4 border-l-transparent'
+                    activeId === conv.id
+                      ? "bg-slate-50 border-l-4 border-l-primary"
+                      : "hover:bg-slate-50 border-l-4 border-l-transparent"
                   }`}
                 >
                   <div className="h-10 w-10 rounded-full bg-slate-200 shrink-0 overflow-hidden">
                     {conv.business.logo ? (
-                      <img src={conv.business.logo} alt="" className="h-full w-full object-cover" />
+                      <img
+                        src={conv.business.logo}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center"><User className="h-5 w-5 text-slate-500" /></div>
+                      <div className="h-full w-full flex items-center justify-center">
+                        <User className="h-5 w-5 text-slate-500" />
+                      </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex justify-between items-center mb-1">
-                      <h4 className="font-semibold text-sm text-slate-900 truncate">{conv.business.name}</h4>
+                      <h4 className="font-semibold text-sm text-slate-900 truncate">
+                        {conv.business.name}
+                      </h4>
                       <span className="text-xs text-slate-400 shrink-0">
-                        {conv.lastMessageAt ? formatDistanceToNow(new Date(conv.lastMessageAt), { addSuffix: true }) : 'Just now'}
+                        {conv.lastMessageAt
+                          ? formatDistanceToNow(new Date(conv.lastMessageAt), {
+                              addSuffix: true,
+                            })
+                          : "Just now"}
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate">
-                      {conv.messages[0]?.content || 'Say hello!'}
+                      {messagePreview(
+                        conv.messages[0]?.content || "Say hello!",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -72,9 +104,9 @@ export default function CustomerMessagesPage() {
         {/* Main Chat Area */}
         <div className="flex-1">
           {activeConversation ? (
-            <ChatWindow 
-              key={activeConversation.id} 
-              conversationId={activeConversation.id} 
+            <ChatWindow
+              key={activeConversation.id}
+              conversationId={activeConversation.id}
               recipientName={activeConversation.business.name}
               recipientLogo={activeConversation.business.logo}
             />

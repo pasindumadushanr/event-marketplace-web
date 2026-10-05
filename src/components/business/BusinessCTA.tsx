@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import api from "@/lib/api";
 import { toast } from "sonner";
+import { EventInquiryDialog } from "./EventInquiryDialog";
 
 interface BusinessCTAProps {
   businessId: string;
@@ -44,7 +45,8 @@ export function BusinessCTA({
 }: BusinessCTAProps) {
   const router = useRouter();
   const { isAuthenticated } = useAuth();
-  const [isMessaging, setIsMessaging] = useState(false);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const isMessaging = false;
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [packages, setPackages] = useState<any[]>([]);
   const [selectedPackageId, setSelectedPackageId] = useState("");
@@ -103,20 +105,12 @@ export function BusinessCTA({
     }
   };
 
-  const handleMessageVendor = async () => {
+  const handleMessageVendor = () => {
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
-
-    setIsMessaging(true);
-    try {
-      await api.post("/chat/conversations", { businessId });
-      router.push("/account/messages");
-    } catch (error) {
-      console.error("Failed to start chat:", error);
-      setIsMessaging(false);
-    }
+    setInquiryOpen(true);
   };
 
   const tomorrow = new Date();
@@ -174,7 +168,7 @@ export function BusinessCTA({
                 {isMessaging ? "Connecting..." : "Request a Quote"}
               </Button>
               <p className="text-xs text-center text-slate-500 font-medium">
-                Get a custom proposal within 24 hours.
+                Share your event details and ask for a personalised quote.
               </p>
             </>
           )}
@@ -414,6 +408,11 @@ export function BusinessCTA({
           </div>
         </div>
       )}
+      <EventInquiryDialog
+        open={inquiryOpen}
+        onClose={() => setInquiryOpen(false)}
+        businessId={businessId}
+      />
     </>
   );
 }

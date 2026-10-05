@@ -5,6 +5,7 @@ import api from "@/lib/api";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import { User, MessageCircle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { messagePreview } from "@/lib/inquiry-record";
 
 export default function VendorMessagesPage() {
   const [conversations, setConversations] = useState<any[]>([]);
@@ -94,7 +95,9 @@ export default function VendorMessagesPage() {
                       </span>
                     </div>
                     <p className="text-xs text-slate-500 truncate">
-                      {conv.messages[0]?.content || "Started a conversation"}
+                      {messagePreview(
+                        conv.messages[0]?.content || "Started a conversation",
+                      )}
                     </p>
                   </div>
                 </button>
@@ -119,6 +122,8 @@ export default function VendorMessagesPage() {
             <ChatWindow
               key={activeConversation.id}
               conversationId={activeConversation.id}
+              vendorView
+              customerId={activeConversation.customer.id}
               recipientName={`${activeConversation.customer.firstName} ${activeConversation.customer.lastName}`}
               recipientLogo={activeConversation.customer.profileImage}
             />

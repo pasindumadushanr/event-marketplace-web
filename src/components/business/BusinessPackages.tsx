@@ -9,8 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { serviceCardCopy, servicePriceLabel } from "@/lib/service-card-copy";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
-import api from "@/lib/api";
-import { toast } from "sonner";
+import { EventInquiryDialog } from "./EventInquiryDialog";
 
 interface BusinessPackagesProps {
   packages: Package[];
@@ -30,26 +29,29 @@ export function BusinessPackages({
   previewOnly = false,
 }: BusinessPackagesProps) {
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-  const [enquiring, setEnquiring] = useState(false);
+  const [inquiryOpen, setInquiryOpen] = useState(false);
+  const [inquiryListing, setInquiryListing] = useState<Package | undefined>();
   const copy = serviceCardCopy(categoryName);
   const { isAuthenticated } = useAuth();
   const router = useRouter();
-  async function enquire() {
-    if (previewOnly || enquiring || !businessId) return;
+  function enquire(listing?: Package) {
+    if (previewOnly || !businessId) return;
     if (!isAuthenticated) {
       router.push("/login");
       return;
     }
-    setEnquiring(true);
-    try {
-      await api.post("/chat/conversations", { businessId });
-      router.push("/account/messages");
-    } catch {
-      toast.error("Could not contact the vendor. Please try again.");
-    } finally {
-      setEnquiring(false);
-    }
+    setInquiryListing(listing);
+    setInquiryOpen(true);
   }
+  const inquiryDialog = businessId && (
+    <EventInquiryDialog
+      open={inquiryOpen}
+      onClose={() => setInquiryOpen(false)}
+      businessId={businessId}
+      businessName={businessName}
+      listing={inquiryListing}
+    />
+  );
 
   if (!packages || packages.length === 0) {
     return (
@@ -67,11 +69,13 @@ export function BusinessPackages({
           event's unique needs rather than set pricing tiers.
         </p>
         <Button
-          disabled={previewOnly}
+          disabled={previewOnly || !businessId}
+          onClick={() => enquire()}
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
         >
           Request a Custom Quote
         </Button>
+        {inquiryDialog}
       </div>
     );
   }
@@ -178,22 +182,18 @@ export function BusinessPackages({
               <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end">
                 <Button
                   disabled={
-                    previewOnly ||
-                    enquiring ||
-                    (Number(pkg.price) <= 0 && !businessId)
+                    previewOnly || (Number(pkg.price) <= 0 && !businessId)
                   }
                   onClick={() =>
                     Number(pkg.price) > 0
                       ? setSelectedPackage(pkg)
-                      : void enquire()
+                      : enquire(pkg)
                   }
                   className="bg-slate-900 text-white hover:bg-primary font-bold text-xs sm:text-sm rounded-xl px-6 h-11 shadow-sm transition-all"
                 >
                   {Number(pkg.price) > 0
                     ? `Request this ${copy.singular}`
-                    : enquiring
-                      ? "Connecting…"
-                      : "Enquire about pricing"}
+                    : "Enquire about pricing"}
                 </Button>
               </div>
             </div>
@@ -201,6 +201,7 @@ export function BusinessPackages({
         ))}
       </div>
 
+      {inquiryDialog}
       <BookingRequestModal
         pkg={selectedPackage}
         isOpen={!!selectedPackage}
