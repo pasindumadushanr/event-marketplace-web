@@ -8,6 +8,7 @@ import { Camera, Image as ImageIcon, Save } from 'lucide-react';
 import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import { CategorySelector } from '@/components/categories/CategorySelector';
 
 export default function GeneralSettingsPage() {
   const { business, updateBusinessLocally } = useBusinessProfile();
@@ -142,6 +143,7 @@ export default function GeneralSettingsPage() {
       </div>
 
       {/* Basic Info */}
+      <CategorySelector required value={formData.categoryId} onChange={(categoryId) => setFormData((previous) => ({ ...previous, categoryId }))} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2 md:col-span-2">
           <label className="text-sm font-medium text-slate-700">Business Name *</label>

@@ -108,7 +108,7 @@ export function Navbar() {
 
   const links = [
     { name: 'Home', href: '/' },
-    { name: 'Categories', href: '/#categories' },
+    { name: 'Categories', href: '/categories' },
     { name: 'Vendors', href: '/search' },
     { name: 'Locations', href: '/locations' },
     { name: 'Packages', href: '/#packages' },

@@ -46,7 +46,7 @@ export function CategoryCarousel() {
     const fetchCategories = async () => {
       try {
         const res = await api.get('/business-categories');
-        setCategories(res.data);
+        setCategories(res.data.filter((category: { parentId?: string; status?: string }) => !category.parentId && (!category.status || category.status === 'ACTIVE')));
       } catch (err) {
         console.error('Failed to load categories from database:', err);
       } finally {
@@ -102,7 +102,7 @@ export function CategoryCarousel() {
             <div className="flex -ml-4">
               {categories.map((category, index) => {
                 const imgUrl = category.image || category.coverImage || categoryImageMap[category.slug] || defaultImage;
-                const count = category._count?.businesses ?? category.businessCount ?? 0;
+                const count = category.businessCount ?? category._count?.businesses ?? 0;
 
                 return (
                   <motion.div 
@@ -113,7 +113,7 @@ export function CategoryCarousel() {
                     transition={{ duration: 0.4, delay: index * 0.05 }}
                     className="flex-[0_0_80%] sm:flex-[0_0_40%] md:flex-[0_0_25%] min-w-0 pl-4"
                   >
-                    <Link href={`/search?q=${encodeURIComponent(category.name)}`}>
+                    <Link href={`/c/${category.slug}`}>
                       <div className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow">
                         {/* Image */}
                         <img 
