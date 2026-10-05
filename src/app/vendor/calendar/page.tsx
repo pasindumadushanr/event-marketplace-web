@@ -44,8 +44,8 @@ export default function VendorCalendarPage() {
     setIsLoading(true);
     try {
       const [bookingsRes, businessRes] = await Promise.all([
-        api.get("/bookings/vendor").catch(() => ({ data: [] })),
-        api.get("/vendor/business").catch(() => ({ data: null })),
+        api.get("/bookings/vendor"),
+        api.get("/vendor/business"),
       ]);
 
       // Only show confirmed and completed bookings on the calendar

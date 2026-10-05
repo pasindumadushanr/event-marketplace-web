@@ -9,6 +9,7 @@
     "lint": "eslint",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run --browser electron --headless",
+    "check:production": "node scripts/check-production.mjs",
     "test:e2e": "cypress run"
   },
   "dependencies": {

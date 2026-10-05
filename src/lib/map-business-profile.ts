@@ -115,7 +115,7 @@ export function mapBusinessData(data: any) {
       : [],
 
     bookingMethod: data.profileSettings?.bookingMethod || "DIRECT_BOOKING",
-    blockedDates: parseArrayOrDelimited(data.profileSettings?.blockedDates),
+    blockedDates: parseArrayOrDelimited(data.unavailableDates ?? data.profileSettings?.blockedDates),
 
     businessHours: (() => {
       const defaultHours: Record<string, string> = {

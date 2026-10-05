@@ -1,18 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Save, CalendarDays, FileText, Phone } from 'lucide-react';
-import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
-import { toast } from 'sonner';
-import api from '@/lib/api';
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Save, CalendarDays, FileText, Phone } from "lucide-react";
+import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
+import { toast } from "sonner";
+import api from "@/lib/api";
 
 export default function BookingSettingsPage() {
   const { business, updateBusinessLocally } = useBusinessProfile();
   const [isLoading, setIsLoading] = useState(false);
-  const [bookingMethod, setBookingMethod] = useState('REQUEST_QUOTE');
+  const [bookingMethod, setBookingMethod] = useState("REQUEST_QUOTE");
+  const [capacity, setCapacity] = useState(1);
 
   useEffect(() => {
+    setCapacity(business?.profileSettings?.maxBookingsPerDay || 1);
     if (business && business.profileSettings?.bookingMethod) {
       setBookingMethod(business.profileSettings.bookingMethod);
     }
@@ -24,14 +26,15 @@ export default function BookingSettingsPage() {
     try {
       const payload = {
         profileSettings: {
-          bookingMethod
-        }
+          bookingMethod,
+          maxBookingsPerDay: capacity,
+        },
       };
-      await api.patch('/vendor/business', payload);
+      await api.patch("/vendor/business", payload);
       updateBusinessLocally(payload);
-      toast.success('Booking settings saved successfully!');
+      toast.success("Booking settings saved successfully!");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to save settings');
+      toast.error(error.response?.data?.message || "Failed to save settings");
     } finally {
       setIsLoading(false);
     }
@@ -39,59 +42,76 @@ export default function BookingSettingsPage() {
 
   const methods = [
     {
-      id: 'DIRECT_BOOKING',
-      title: 'Direct Booking',
-      description: 'Allow customers to book dates and packages instantly through the platform. Best for venues and simple packages.',
-      icon: CalendarDays
+      id: "DIRECT_BOOKING",
+      title: "Direct Booking",
+      description:
+        "Allow customers to book dates and packages instantly through the platform. Best for venues and simple packages.",
+      icon: CalendarDays,
     },
     {
-      id: 'REQUEST_QUOTE',
-      title: 'Request a Quote',
-      description: 'Customers submit their requirements, and you provide a custom proposal. Best for highly customized services like photography.',
-      icon: FileText
+      id: "REQUEST_QUOTE",
+      title: "Request a Quote",
+      description:
+        "Customers submit their requirements, and you provide a custom proposal. Best for highly customized services like photography.",
+      icon: FileText,
     },
     {
-      id: 'CONTACT_ONLY',
-      title: 'Contact Only',
-      description: 'Display your contact information and require customers to call or message you directly to discuss bookings.',
-      icon: Phone
-    }
+      id: "CONTACT_ONLY",
+      title: "Contact Only",
+      description:
+        "Display your contact information and require customers to call or message you directly to discuss bookings.",
+      icon: Phone,
+    },
   ];
 
   return (
     <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
       <div>
         <h2 className="text-2xl font-bold text-slate-900">Booking Settings</h2>
-        <p className="text-slate-500 mt-1">How would you like customers to engage with your profile?</p>
+        <p className="text-slate-500 mt-1">
+          How would you like customers to engage with your profile?
+        </p>
       </div>
 
       <div className="space-y-4">
         {methods.map((method) => {
           const isSelected = bookingMethod === method.id;
           return (
-            <div 
+            <div
               key={method.id}
               onClick={() => setBookingMethod(method.id)}
               className={`p-6 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-4 ${
-                isSelected ? 'border-primary bg-primary/5 shadow-md shadow-primary/5' : 'border-slate-200 bg-white hover:border-slate-300'
+                isSelected
+                  ? "border-primary bg-primary/5 shadow-md shadow-primary/5"
+                  : "border-slate-200 bg-white hover:border-slate-300"
               }`}
             >
-              <div className={`h-12 w-12 rounded-full flex items-center justify-center shrink-0 ${
-                isSelected ? 'bg-primary text-white' : 'bg-slate-100 text-slate-500'
-              }`}>
+              <div
+                className={`h-12 w-12 rounded-full flex items-center justify-center shrink-0 ${
+                  isSelected
+                    ? "bg-primary text-white"
+                    : "bg-slate-100 text-slate-500"
+                }`}
+              >
                 <method.icon className="h-6 w-6" />
               </div>
               <div>
-                <h3 className={`text-lg font-bold ${isSelected ? 'text-primary' : 'text-slate-900'}`}>
+                <h3
+                  className={`text-lg font-bold ${isSelected ? "text-primary" : "text-slate-900"}`}
+                >
                   {method.title}
                 </h3>
                 <p className="text-slate-500 mt-1">{method.description}</p>
               </div>
               <div className="ml-auto shrink-0 pt-2">
-                <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${
-                  isSelected ? 'border-primary' : 'border-slate-300'
-                }`}>
-                  {isSelected && <div className="h-3 w-3 rounded-full bg-primary" />}
+                <div
+                  className={`h-6 w-6 rounded-full border-2 flex items-center justify-center ${
+                    isSelected ? "border-primary" : "border-slate-300"
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="h-3 w-3 rounded-full bg-primary" />
+                  )}
                 </div>
               </div>
             </div>
@@ -99,9 +119,42 @@ export default function BookingSettingsPage() {
         })}
       </div>
 
+      <div className="rounded-2xl border bg-white p-6 space-y-2">
+        <label
+          htmlFor="booking-capacity"
+          className="block font-semibold text-slate-900"
+        >
+          Bookings you can handle per day
+        </label>
+        <p className="text-sm text-slate-500">
+          Use 1 if you work on one event each day. Increase this if your team,
+          vehicles or services can support multiple events. Dates become
+          unavailable when confirmed bookings reach this limit.
+        </p>
+        <input
+          id="booking-capacity"
+          type="number"
+          min={1}
+          max={100}
+          required
+          value={capacity}
+          onChange={(event) => setCapacity(Number(event.target.value))}
+          className="rounded-lg border p-3 w-28"
+        />
+      </div>
       <div className="pt-6 border-t border-slate-100 flex justify-end">
-        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-white min-w-[150px]">
-          {isLoading ? 'Saving...' : <><Save className="mr-2 h-4 w-4" /> Save Changes</>}
+        <Button
+          type="submit"
+          disabled={isLoading}
+          className="bg-primary hover:bg-primary/90 text-white min-w-[150px]"
+        >
+          {isLoading ? (
+            "Saving..."
+          ) : (
+            <>
+              <Save className="mr-2 h-4 w-4" /> Save Changes
+            </>
+          )}
         </Button>
       </div>
     </form>

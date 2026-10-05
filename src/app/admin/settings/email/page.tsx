@@ -23,7 +23,7 @@ export default function EmailSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await api.get('/admin/cms/public/settings/email');
+        const res = await api.get('/admin/cms/settings/email');
         if (res.data) setSettings(res.data);
       } catch (error) {
         // Ignored if not found

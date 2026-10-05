@@ -15,8 +15,9 @@ async function getPage(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const page = await getPage(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const page = await getPage(slug);
   if (!page) return { title: 'Page Not Found' };
   
   return {
@@ -25,8 +26,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function DynamicCmsPage({ params }: { params: { slug: string } }) {
-  const page = await getPage(params.slug);
+export default async function DynamicCmsPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const page = await getPage(slug);
   
   if (!page) {
     notFound();

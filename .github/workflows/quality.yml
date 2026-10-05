@@ -1,0 +1,28 @@
+name: Frontend checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:3021
+          NEXT_PUBLIC_SITE_URL: https://www.luxeevents.fun
+      - run: npx tsc --noEmit
+      - name: Browser regression tests (isolated fixture API)
+        run: |
+          node cypress/fixture-api.mjs &
+          NEXT_PUBLIC_API_URL=http://127.0.0.1:3021 npm run start > /tmp/frontend-test.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://localhost:3000 >/dev/null && break; sleep 2; done
+          npx cypress run --browser chrome --spec "cypress/e2e/10_vendor_profile_recovery.cy.ts,cypress/e2e/11_nonpayment_readiness.cy.ts"

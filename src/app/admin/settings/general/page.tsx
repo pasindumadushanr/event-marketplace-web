@@ -20,7 +20,7 @@ export default function GeneralSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await api.get('/admin/cms/public/settings/general');
+        const res = await api.get('/admin/cms/settings/general');
         if (res.data) setSettings(res.data);
       } catch (error) {
         // It's okay if not found initially

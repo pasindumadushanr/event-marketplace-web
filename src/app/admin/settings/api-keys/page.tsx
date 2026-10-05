@@ -20,7 +20,7 @@ export default function ApiKeysSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await api.get('/admin/cms/public/settings/apikeys');
+        const res = await api.get('/admin/cms/settings/apikeys');
         if (res.data) setSettings(res.data);
       } catch (error) {
         // Ignored
