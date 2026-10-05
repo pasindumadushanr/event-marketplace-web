@@ -9,7 +9,7 @@ import { Footer } from '@/components/home/Footer';
 const navItems = [
   { href: '/account/profile', label: 'Personal Info', icon: User },
   { href: '/account/bookings', label: 'My Bookings', icon: CalendarDays },
-  { href: '/account/favorites', label: 'Favorites', icon: Heart },
+  { href: '/account/favorites', label: 'My shortlist', icon: Heart },
   { href: '/account/settings', label: 'Account Settings', icon: Settings },
 ];
 
@@ -52,7 +52,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
         </aside>
 
         {/* Main Content Area */}
-        <div className="flex-1 pt-2 md:pt-16">
+        <div className="flex-1 min-w-0 pt-2 md:pt-16">
           {children}
         </div>
 

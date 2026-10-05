@@ -91,7 +91,7 @@ export function BusinessReviews({ businessId, reviews: initialReviews, rating: i
   const ratingLabels = ['Select rating', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'];
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 mb-8">
+    <div id="reviews" className="scroll-mt-32 bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 mb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">

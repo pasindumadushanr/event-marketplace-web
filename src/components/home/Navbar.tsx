@@ -73,7 +73,7 @@ function UserAccountNav() {
         <DropdownMenuItem>
           <Link href="/account/favorites" className="cursor-pointer flex items-center w-full">
             <Heart className="mr-2 h-4 w-4" />
-            <span>Saved Favorites</span>
+            <span>My shortlist</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem>

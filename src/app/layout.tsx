@@ -56,6 +56,7 @@ export const metadata: Metadata = {
 };
 
 import { AuthProvider } from "@/lib/auth-context";
+import { ShortlistProvider } from "@/lib/shortlist-context";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
@@ -87,7 +88,7 @@ export default function RootLayout({
               }).replace(/</g, "\\u003c"),
             }}
           />
-          {children}
+          <ShortlistProvider>{children}</ShortlistProvider>
           <Toaster />
         </AuthProvider>
         {process.env.NEXT_PUBLIC_GA_ID && (

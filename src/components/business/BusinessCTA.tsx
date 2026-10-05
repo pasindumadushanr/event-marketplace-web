@@ -20,6 +20,7 @@ import { useAuth } from "@/lib/auth-context";
 import api from "@/lib/api";
 import { toast } from "sonner";
 import { EventInquiryDialog } from "./EventInquiryDialog";
+import { ShortlistButton } from "@/components/discovery/ShortlistButton";
 
 interface BusinessCTAProps {
   businessId: string;
@@ -201,12 +202,7 @@ export function BusinessCTA({
         </div>
 
         <div className="mt-6 pt-6 border-t border-slate-100 flex justify-center gap-4">
-          <Button
-            variant="outline"
-            className="flex-1 rounded-xl font-semibold border-slate-200"
-          >
-            Save to Favorites
-          </Button>
+          <ShortlistButton businessId={businessId} />
           <Button
             variant="outline"
             className="flex-1 rounded-xl font-semibold border-slate-200"
