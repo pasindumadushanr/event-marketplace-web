@@ -88,6 +88,7 @@ const navConfig = [
   { href: '/admin/support', label: 'Support Inbox', icon: Bell },
   { href: '/admin/notifications', label: 'Notifications', icon: Bell },
   { href: '/admin/security', label: 'Security', icon: Shield },
+  { href: '/admin/activity', label: 'Activity History', icon: FileText },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -100,16 +101,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     // If the path is /admin/login, we don't need to enforce auth here
     if (pathname === '/admin/login') return;
     
-    if (!isLoading && !isAuthenticated) {
+    if (!isLoading && (!isAuthenticated || !['ADMIN', 'SUPER_ADMIN'].includes(user?.roleName || ''))) {
       router.push('/admin/login');
     }
-  }, [isAuthenticated, isLoading, router, pathname]);
+  }, [isAuthenticated, isLoading, router, pathname, user?.roleName]);
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
   }
 
-  if (isLoading || !isAuthenticated) {
+  if (isLoading || !isAuthenticated || !['ADMIN', 'SUPER_ADMIN'].includes(user?.roleName || '')) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
 

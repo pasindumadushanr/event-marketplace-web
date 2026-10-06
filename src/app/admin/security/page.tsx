@@ -28,8 +28,9 @@ export default function SecurityPage() {
         currentPassword: passwords.current,
         newPassword: passwords.new
       });
-      toast.success('Password updated successfully');
+      toast.success('Password updated. Please sign in again on your devices.');
       setPasswords({ current: '', new: '', confirm: '' });
+      logout();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to update password');
     } finally {
@@ -38,12 +39,13 @@ export default function SecurityPage() {
   };
 
   const handleLogoutAll = async () => {
-    if (!confirm("Are you sure you want to log out of all other devices? You will stay logged in here.")) return;
+    if (!confirm("Log out of all devices, including this one? You will need to sign in again.")) return;
     
     setIsLoggingOutAll(true);
     try {
       await api.post('/users/me/logout-all');
-      toast.success('Successfully logged out of all other devices');
+      toast.success('All sessions ended. Please sign in again.');
+      logout();
     } catch (error) {
       toast.error('Failed to logout devices');
     } finally {
@@ -114,14 +116,14 @@ export default function SecurityPage() {
           <CardContent className="space-y-4">
             <p className="text-sm text-zinc-500">
               If you notice suspicious activity or left your account logged in on a public device, 
-              you can instantly invalidate all other sessions.
+              you can invalidate all sessions, including this device. You will need to sign in again.
             </p>
             <Button 
               variant="destructive" 
               onClick={handleLogoutAll} 
               disabled={isLoggingOutAll}
             >
-              {isLoggingOutAll ? 'Processing...' : 'Log out of all other devices'}
+              {isLoggingOutAll ? 'Processing...' : 'Log out of all devices'}
             </Button>
           </CardContent>
         </Card>

@@ -41,6 +41,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  useEffect(() => {
+    const expired = (event: Event) => {
+      setUser(null);
+      const role = (event as CustomEvent).detail?.role;
+      router.push(['ADMIN', 'SUPER_ADMIN'].includes(role) ? '/admin/login' : role === 'VENDOR' ? '/vendor/login' : '/login');
+    };
+    window.addEventListener('nakathata:session-expired', expired);
+    return () => window.removeEventListener('nakathata:session-expired', expired);
+  }, [router]);
+
   const login = useCallback((accessToken: string, refreshToken: string, userData: any) => {
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('refreshToken', refreshToken);
@@ -58,12 +68,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [router]);
 
   const logout = useCallback(() => {
+    const wasAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(user?.roleName || '');
     const wasVendor = user?.roleName === 'VENDOR' || (user as any)?.role?.name === 'VENDOR';
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     setUser(null);
-    if (wasVendor) {
+    if (wasAdmin) {
+      router.push('/admin/login');
+    } else if (wasVendor) {
       router.push('/vendor/login');
     } else {
       router.push('/login');

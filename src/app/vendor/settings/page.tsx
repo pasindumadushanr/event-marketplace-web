@@ -22,6 +22,7 @@ const profileSchema = z.object({
 });
 
 const passwordSchema = z.object({
+  currentPassword: z.string().min(1, 'Current password is required'),
   password: z.string().min(6, 'Password must be at least 6 characters').optional().or(z.literal('')),
   confirmPassword: z.string().optional().or(z.literal('')),
 }).refine((data) => {
@@ -38,7 +39,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 export default function VendorSettingsPage() {
-  const { user, updateUser } = useAuth();
+  const { user, updateUser, logout } = useAuth();
   const { business, updateBusinessLocally } = useBusinessProfile();
   const [isSaving, setIsSaving] = useState(false);
   const [isPasswordSaving, setIsPasswordSaving] = useState(false);
@@ -116,9 +117,10 @@ export default function VendorSettingsPage() {
     
     setIsPasswordSaving(true);
     try {
-      await api.patch('/users/me', { password: data.password });
-      toast.success('Password updated successfully');
-      resetPassword({ password: '', confirmPassword: '' });
+      await api.patch('/users/me/password', { currentPassword: data.currentPassword, newPassword: data.password });
+      toast.success('Password updated. Please sign in again.');
+      resetPassword({ currentPassword: '', password: '', confirmPassword: '' });
+      logout();
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to update password');
     } finally {
@@ -188,6 +190,11 @@ export default function VendorSettingsPage() {
               </div>
               
               <form onSubmit={handleSubmitPassword(onSubmitPassword)} className="p-6 space-y-6">
+                <div className="space-y-2">
+                  <label htmlFor="vendor-current-password" className="text-sm font-medium text-slate-900">Current Password</label>
+                  <Input id="vendor-current-password" type="password" autoComplete="current-password" {...registerPassword('currentPassword')} />
+                  {passwordErrors.currentPassword && <p className="text-xs text-red-500">{passwordErrors.currentPassword.message}</p>}
+                </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-slate-900">New Password</label>
                   <Input type="password" {...registerPassword('password')} />

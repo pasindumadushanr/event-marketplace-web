@@ -283,8 +283,6 @@ describe("Gradual languages and nationwide launch support", () => {
       },
     );
     cy.visit("/admin/launch", { onBeforeLoad: (win) => auth(win, "CUSTOMER") });
-    cy.contains("Launch support is available to administrators only.").should(
-      "be.visible",
-    );
+    cy.location('pathname').should('equal', '/admin/login');
   });
 });
