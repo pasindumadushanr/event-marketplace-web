@@ -140,7 +140,7 @@ describe("Vendor approval workspace", () => {
     cy.document().then((doc) =>
       expect(doc.documentElement.scrollWidth).to.be.at.most(390),
     );
-    cy.screenshot("approval-queue-phone");
+    cy.screenshot("approval-queue-phone", { capture: "viewport" });
   });
   it("recovers from a queue error while preserving filters", () => {
     let calls = 0;

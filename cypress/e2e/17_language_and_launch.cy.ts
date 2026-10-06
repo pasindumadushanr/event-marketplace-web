@@ -72,7 +72,7 @@ describe("Gradual languages and nationwide launch support", () => {
     cy.document().then((doc) =>
       expect(doc.documentElement.scrollWidth).to.be.at.most(390),
     );
-    cy.screenshot("tamil-registration-phone");
+    cy.screenshot("tamil-registration-phone", { capture: "viewport" });
     cy.visit("/vendor/register");
     cy.contains(translate("ta", "Create Vendor Account")).should("be.visible");
     cy.get('fieldset button[lang="ta"]').should(
@@ -119,7 +119,7 @@ describe("Gradual languages and nationwide launch support", () => {
     cy.document().then((doc) =>
       expect(doc.documentElement.scrollWidth).to.be.at.most(390),
     );
-    cy.screenshot("tamil-setup-phone");
+    cy.screenshot("tamil-setup-phone", { capture: "viewport" });
   });
   it("keeps onboarding fields while switching languages and offers every district", () => {
     vendorMocks();

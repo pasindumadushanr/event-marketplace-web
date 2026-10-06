@@ -1,262 +1,393 @@
-'use client';
+"use client";
 
-import { useAuth } from '@/lib/auth-context';
-import { useEffect, useState } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import Link from 'next/link';
-import { 
-  LayoutDashboard, Users, Store, Settings, LogOut, Menu,
-  CalendarCheck, FileText, CreditCard, BarChart, Bell, Shield, ChevronDown
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
+import { useAuth } from "@/lib/auth-context";
+import { useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
+import {
+  LayoutDashboard,
+  Users,
+  Store,
+  Settings,
+  LogOut,
+  Menu,
+  CalendarCheck,
+  FileText,
+  CreditCard,
+  BarChart3,
+  Bell,
+  Shield,
+  ChevronDown,
+  ArrowUpRight,
+  ClipboardCheck,
+  Headphones,
+  Sparkles,
+  type LucideIcon,
+} from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet";
+import "./admin.css";
 
-const navConfig = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/launch', label: 'Launch Support', icon: Store },
+type NavItem = {
+  label: string;
+  icon: LucideIcon;
+  href?: string;
+  children?: { href: string; label: string }[];
+};
+const navGroups: { title: string; items: NavItem[] }[] = [
   {
-    label: 'User Management',
-    icon: Users,
-    value: 'users',
-    children: [
-      { href: '/admin/users', label: 'All Users' },
-      { href: '/admin/users/customers', label: 'Customers' },
-      { href: '/admin/users/vendors', label: 'Vendors' },
-      { href: '/admin/vendors/approvals', label: 'Vendor Approvals' },
-      { href: '/admin/users/admins', label: 'Admins' },
-      { href: '/admin/users/roles', label: 'Roles' },
-      { href: '/admin/users/permissions', label: 'Permissions' },
-    ]
+    title: "Workspace",
+    items: [
+      { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+      {
+        href: "/admin/vendors/approvals",
+        label: "Vendor Approvals",
+        icon: ClipboardCheck,
+      },
+      { href: "/admin/launch", label: "Launch Support", icon: Store },
+      { href: "/admin/support", label: "Support Inbox", icon: Headphones },
+      { href: "/admin/bookings", label: "Bookings", icon: CalendarCheck },
+    ],
   },
   {
-    label: 'Business Management',
-    icon: Store,
-    value: 'business',
-    children: [
-      { href: '/admin/business', label: 'Businesses' },
-      { href: '/admin/business/categories', label: 'Categories' },
-      { href: '/admin/business/packages', label: 'Packages' },
-    ]
+    title: "Manage",
+    items: [
+      {
+        label: "User Management",
+        icon: Users,
+        children: [
+          { href: "/admin/users", label: "All Users" },
+          { href: "/admin/users/customers", label: "Customers" },
+          { href: "/admin/users/vendors", label: "Vendors" },
+          { href: "/admin/users/admins", label: "Admins" },
+          { href: "/admin/users/roles", label: "Roles" },
+          { href: "/admin/users/permissions", label: "Permissions" },
+        ],
+      },
+      {
+        label: "Business Management",
+        icon: Store,
+        children: [
+          { href: "/admin/business", label: "Businesses" },
+          { href: "/admin/business/categories", label: "Categories" },
+          { href: "/admin/business/packages", label: "Packages" },
+        ],
+      },
+      {
+        label: "Memberships",
+        icon: CreditCard,
+        children: [
+          { href: "/admin/subscriptions/plans", label: "Plans & Pricing" },
+          {
+            href: "/admin/subscriptions/vendors",
+            label: "Vendor Subscriptions",
+          },
+        ],
+      },
+      {
+        label: "CMS",
+        icon: FileText,
+        children: [
+          { href: "/admin/cms/pages", label: "Pages" },
+          { href: "/admin/cms/blog", label: "Blog" },
+          { href: "/admin/cms/banners", label: "Banners" },
+          { href: "/admin/cms/faq", label: "FAQ" },
+          { href: "/admin/cms/terms", label: "Terms & Conditions" },
+          { href: "/admin/cms/privacy", label: "Privacy Policy" },
+          { href: "/admin/cms/settings", label: "Global Settings" },
+        ],
+      },
+      { href: "/admin/payments", label: "Payments", icon: CreditCard },
+      { href: "/admin/reports", label: "Reports", icon: BarChart3 },
+    ],
   },
   {
-    label: 'Booking Management',
-    icon: CalendarCheck,
-    value: 'bookings',
-    children: [
-      { href: '/admin/bookings', label: 'All Bookings' },
-    ]
+    title: "Administration",
+    items: [
+      { href: "/admin/notifications", label: "Notifications", icon: Bell },
+      { href: "/admin/activity", label: "Activity History", icon: FileText },
+      { href: "/admin/security", label: "Security", icon: Shield },
+      {
+        label: "Settings",
+        icon: Settings,
+        children: [
+          { href: "/admin/settings/general", label: "General" },
+          { href: "/admin/settings/seo", label: "SEO" },
+          { href: "/admin/settings/email", label: "Email" },
+          { href: "/admin/settings/social", label: "Social Media" },
+          { href: "/admin/settings/api-keys", label: "API Keys" },
+        ],
+      },
+    ],
   },
-  {
-    label: 'Memberships',
-    icon: CreditCard,
-    value: 'memberships',
-    children: [
-      { href: '/admin/subscriptions/plans', label: 'Plans & Pricing' },
-      { href: '/admin/subscriptions/vendors', label: 'Vendor Subscriptions' },
-    ]
-  },
-  {
-    label: 'CMS',
-    icon: FileText,
-    value: 'cms',
-    children: [
-      { href: '/admin/cms/pages', label: 'Pages' },
-      { href: '/admin/cms/blog', label: 'Blog' },
-      { href: '/admin/cms/banners', label: 'Banners' },
-      { href: '/admin/cms/faq', label: 'FAQ' },
-      { href: '/admin/cms/terms', label: 'Terms & Conditions' },
-      { href: '/admin/cms/privacy', label: 'Privacy Policy' },
-      { href: '/admin/cms/settings', label: 'Global Settings' },
-    ]
-  },
-  {
-    label: 'Settings',
-    icon: Settings,
-    value: 'settings',
-    children: [
-      { href: '/admin/settings/general', label: 'General' },
-      { href: '/admin/settings/seo', label: 'SEO' },
-      { href: '/admin/settings/email', label: 'Email' },
-      { href: '/admin/settings/social', label: 'Social Media' },
-      { href: '/admin/settings/api-keys', label: 'API Keys' },
-    ]
-  },
-  { href: '/admin/payments', label: 'Payments', icon: CreditCard },
-  { href: '/admin/reports', label: 'Reports', icon: BarChart },
-  { href: '/admin/support', label: 'Support Inbox', icon: Bell },
-  { href: '/admin/notifications', label: 'Notifications', icon: Bell },
-  { href: '/admin/security', label: 'Security', icon: Shield },
-  { href: '/admin/activity', label: 'Activity History', icon: FileText },
 ];
-
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { user, isAuthenticated, isLoading, logout } = useAuth();
-  const router = useRouter();
-  const pathname = usePathname();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  useEffect(() => {
-    // If the path is /admin/login, we don't need to enforce auth here
-    if (pathname === '/admin/login') return;
-    
-    if (!isLoading && (!isAuthenticated || !['ADMIN', 'SUPER_ADMIN'].includes(user?.roleName || ''))) {
-      router.push('/admin/login');
-    }
-  }, [isAuthenticated, isLoading, router, pathname, user?.roleName]);
-
-  if (pathname === '/admin/login') {
-    return <>{children}</>;
-  }
-
-  if (isLoading || !isAuthenticated || !['ADMIN', 'SUPER_ADMIN'].includes(user?.roleName || '')) {
-    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
-  }
-
-  const NavLinks = () => {
-    const [openItems, setOpenItems] = useState<string[]>(
-      navConfig
-        .filter(item => item.children && item.children.some(child => pathname === child.href || pathname.startsWith(child.href + '/')))
-        .map(item => item.value as string)
-    );
-
-    const toggleItem = (val: string) => {
-      setOpenItems(prev => prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]);
-    };
-
-    return (
-      <div className="w-full space-y-1">
-        {navConfig.map((item, index) => {
-          if (!item.children) {
-            const isActive = pathname === item.href;
-            return (
-              <div key={index} className="px-1">
-                <Link
-                  href={item.href!}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all ${
-                    isActive
-                      ? 'bg-zinc-800 text-white font-medium'
-                      : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                  }`}
-                >
-                  {item.icon && <item.icon className="h-4 w-4" />}
-                  {item.label}
-                </Link>
-              </div>
-            );
-          }
-
-          const isOpen = openItems.includes(item.value);
-
-          return (
-            <div key={item.value} className="px-1">
-              <button
-                onClick={() => toggleItem(item.value)}
-                className={`flex w-full items-center justify-between rounded-lg px-3 py-2 transition-all hover:bg-zinc-800 hover:text-white ${
-                  isOpen ? 'text-white' : 'text-zinc-400'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  {item.icon && <item.icon className="h-4 w-4" />}
-                  {item.label}
-                </div>
-                <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              <div className={`overflow-hidden transition-all duration-200 ease-in-out ${isOpen ? 'max-h-96 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
-                <div className="flex flex-col space-y-1 pl-9 pr-2">
-                  {item.children.map((child) => {
-                    const isChildActive = pathname === child.href;
-                    return (
+const allItems = navGroups.flatMap((group) => group.items);
+function activeHref(path: string, href: string) {
+  return path === href || (href !== "/admin" && path.startsWith(href + "/"));
+}
+function pageContext(path: string) {
+  const candidates = allItems.flatMap<{
+    href: string;
+    label: string;
+    section: string;
+  }>((item) =>
+    item.children
+      ? item.children.map((child) => ({ ...child, section: item.label }))
+      : item.href
+        ? [{ href: item.href, label: item.label, section: "Workspace" }]
+        : [],
+  );
+  return candidates
+    .filter((item) => item.href && activeHref(path, item.href))
+    .sort((a, b) => (b.href?.length || 0) - (a.href?.length || 0))[0];
+}
+function Navigation({
+  pathname,
+  onNavigate,
+}: {
+  pathname: string;
+  onNavigate: () => void;
+}) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const selectedHref = pageContext(pathname)?.href;
+  return (
+    <nav aria-label="Admin navigation" className="space-y-6 px-4 py-5">
+      {navGroups.map((group) => (
+        <div key={group.title}>
+          <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+            {group.title}
+          </p>
+          <div className="space-y-1">
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              if (item.href)
+                return (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    onClick={onNavigate}
+                    aria-current={
+                      selectedHref === item.href ? "page" : undefined
+                    }
+                    className="admin-nav-link"
+                  >
+                    <Icon aria-hidden="true" size={18} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              const containsActive = item.children?.some(
+                (child) => child.href === selectedHref,
+              );
+              const expansionKey = `${pathname}:${item.label}`;
+              const isOpen = expanded[expansionKey] ?? containsActive ?? false;
+              const panelId = `admin-nav-${item.label.toLowerCase().replaceAll(" ", "-")}`;
+              return (
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() =>
+                      setExpanded((old) => ({
+                        ...old,
+                        [expansionKey]: !isOpen,
+                      }))
+                    }
+                    className={`admin-nav-link w-full ${containsActive ? "text-white" : ""}`}
+                  >
+                    <Icon aria-hidden="true" size={18} />
+                    <span className="flex-1 text-left">{item.label}</span>
+                    <ChevronDown
+                      aria-hidden="true"
+                      size={15}
+                      className={isOpen ? "rotate-180" : ""}
+                    />
+                  </button>
+                  <div
+                    id={panelId}
+                    hidden={!isOpen}
+                    className="ml-5 mt-1 space-y-1 border-l border-white/15 pl-3"
+                  >
+                    {item.children?.map((child) => (
                       <Link
                         key={child.href}
                         href={child.href}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className={`rounded-md px-3 py-1.5 text-sm transition-all ${
-                          isChildActive
-                            ? 'bg-zinc-800 text-white font-medium'
-                            : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'
-                        }`}
+                        onClick={onNavigate}
+                        aria-current={
+                          child.href === selectedHref ? "page" : undefined
+                        }
+                        className="admin-nav-link text-xs"
                       >
                         {child.label}
                       </Link>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </nav>
+  );
+}
+function Brand() {
+  return (
+    <Link href="/admin" className="flex items-center gap-3 px-6 py-6">
+      <BrandLogo className="w-16 rounded-lg" />
+      <span>
+        <span className="block font-semibold tracking-tight text-white">
+          Nakathata.lk
+        </span>
+        <span className="mt-0.5 block text-[10px] uppercase tracking-[0.17em] text-slate-400">
+          Admin workspace
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+export default function AdminLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, isAuthenticated, isLoading, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const authorized =
+    isAuthenticated && ["ADMIN", "SUPER_ADMIN"].includes(user?.roleName || "");
+  useEffect(() => {
+    if (pathname !== "/admin/login" && !isLoading && !authorized)
+      router.push("/admin/login");
+  }, [authorized, isLoading, router, pathname]);
+  if (pathname === "/admin/login") return <>{children}</>;
+  if (isLoading || !authorized)
+    return (
+      <div
+        role="status"
+        className="flex min-h-screen items-center justify-center gap-3 bg-slate-50 text-sm text-slate-600"
+      >
+        <Sparkles className="size-5 animate-pulse text-teal-700" />
+        Opening your workspace…
       </div>
     );
-  };
-
+  const context = pageContext(pathname);
+  const footer = (
+    <div className="border-t border-white/10 p-4">
+      <Link
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="admin-nav-link"
+      >
+        <ArrowUpRight aria-hidden="true" size={18} />
+        View website
+      </Link>
+      <button type="button" onClick={logout} className="admin-nav-link w-full">
+        <LogOut aria-hidden="true" size={18} />
+        Logout
+      </button>
+    </div>
+  );
   return (
-    <div className="min-h-screen bg-zinc-50 flex">
-      {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col bg-zinc-950 text-white fixed h-full z-10">
-        <div className="h-16 flex items-center px-6 border-b border-zinc-800">
-          <span className="font-bold text-lg tracking-tight">Nakathata.lk Admin</span>
+    <div className="admin-workspace flex min-h-screen bg-[#f3f6f8] text-slate-800">
+      <a
+        href="#admin-page"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-white focus:p-3"
+      >
+        Skip to page content
+      </a>
+      <aside className="admin-sidebar fixed inset-y-0 left-0 z-30 hidden w-[272px] flex-col lg:flex">
+        <Brand />
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <Navigation pathname={pathname} onNavigate={() => {}} />
         </div>
-        <div className="flex-1 py-4 overflow-y-auto no-scrollbar">
-          <NavLinks />
-        </div>
-        <div className="p-4 border-t border-zinc-800">
-          <Button variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800" onClick={logout}>
-            <LogOut className="h-4 w-4 mr-2" />
-            Logout
-          </Button>
-        </div>
+        {footer}
       </aside>
-
-      {/* Main Content */}
-      <main className="flex-1 md:ml-64 flex flex-col min-h-screen overflow-hidden">
-        {/* Mobile Header & Desktop Topbar */}
-        <header className="h-16 flex items-center justify-between md:justify-end px-4 md:px-8 border-b bg-white sticky top-0 z-10">
-          <div className="md:hidden flex items-center">
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger className="p-2 hover:bg-zinc-100 rounded-md">
-                <Menu className="h-5 w-5" />
+      <div className="min-w-0 flex-1 lg:ml-[272px]">
+        <header className="sticky top-0 z-20 flex min-h-20 items-center justify-between gap-3 border-b border-slate-200/80 bg-white/95 px-4 backdrop-blur-md sm:px-8">
+          <div className="flex min-w-0 items-center gap-3">
+            <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+              <SheetTrigger
+                aria-label="Open navigation"
+                className="rounded-xl border border-slate-200 p-2.5 text-slate-700 lg:hidden"
+              >
+                <Menu size={20} />
               </SheetTrigger>
-              <SheetContent side="left" className="w-64 bg-zinc-950 text-white border-zinc-800 p-0 flex flex-col">
-                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                <div className="h-16 flex items-center px-6 border-b border-zinc-800 shrink-0">
-                  <span className="font-bold text-lg tracking-tight">Nakathata.lk Admin</span>
+              <SheetContent
+                side="left"
+                className="admin-sidebar w-[min(85vw,300px)]! gap-0 border-0 p-0 text-white"
+              >
+                <SheetTitle className="sr-only">Admin navigation</SheetTitle>
+                <SheetDescription className="sr-only">
+                  Choose a section of the admin workspace.
+                </SheetDescription>
+                <Brand />
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                  <Navigation
+                    pathname={pathname}
+                    onNavigate={() => setMobileOpen(false)}
+                  />
                 </div>
-                <div className="flex-1 py-4 overflow-y-auto no-scrollbar">
-                  <NavLinks />
-                </div>
-                <div className="p-4 border-t border-zinc-800 shrink-0">
-                  <Button variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-zinc-800" onClick={logout}>
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Logout
-                  </Button>
-                </div>
+                {footer}
               </SheetContent>
             </Sheet>
-            <span className="ml-4 font-bold text-lg tracking-tight md:hidden">Nakathata.lk Admin</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium leading-none">{user?.firstName} {user?.lastName}</p>
-              <p className="text-xs text-zinc-500 mt-1">{user?.email}</p>
+            <div className="min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+                {context?.section || "Administration"}
+              </p>
+              <p className="truncate text-sm font-semibold text-slate-800">
+                {context?.label || "Admin workspace"}
+              </p>
             </div>
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-zinc-900 text-white text-xs">
-                {user?.firstName?.charAt(0) || 'A'}
-              </AvatarFallback>
-            </Avatar>
+          </div>
+          <div className="flex shrink-0 items-center gap-3 sm:gap-5">
+            <Link
+              href="/admin/support"
+              aria-label="Open support inbox"
+              className="hidden rounded-full border border-slate-200 p-2.5 text-slate-500 transition hover:bg-slate-50 sm:block"
+            >
+              <Headphones size={18} />
+            </Link>
+            <div className="hidden border-l border-slate-200 pl-5 text-right sm:block">
+              <p className="text-sm font-semibold">
+                {user?.firstName} {user?.lastName}
+              </p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {user?.roleName === "SUPER_ADMIN"
+                  ? "Super administrator"
+                  : "Administrator"}
+              </p>
+            </div>
+            <span
+              aria-label={`${user?.firstName || "Admin"} account`}
+              className="flex size-10 items-center justify-center rounded-full border border-teal-200 bg-teal-50 text-sm font-semibold text-teal-800"
+            >
+              {user?.firstName?.charAt(0) || "A"}
+              {user?.lastName?.charAt(0)}
+            </span>
           </div>
         </header>
-
-        {/* Page Content */}
-        <div className="flex-1 p-4 md:p-8 overflow-y-auto bg-zinc-50">
+        <main
+          id="admin-page"
+          tabIndex={-1}
+          className="admin-page mx-auto max-w-[1600px] p-4 outline-none sm:p-8 xl:p-10"
+        >
           {children}
-        </div>
-      </main>
+        </main>
+        <footer className="flex flex-wrap items-center justify-between gap-2 px-4 pb-6 text-[11px] text-slate-400 sm:px-8 xl:px-10">
+          <span>Nakathata.lk · Administration</span>
+          <span>Made for your everyday operations</span>
+        </footer>
+      </div>
     </div>
   );
 }
