@@ -15,6 +15,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/
 
 const navConfig = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/launch', label: 'Launch Support', icon: Store },
   {
     label: 'User Management',
     icon: Users,

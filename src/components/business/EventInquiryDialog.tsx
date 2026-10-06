@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import api from "@/lib/api";
+import { useLanguage, LanguageSwitch } from "@/lib/language";
 
 export function EventInquiryDialog({
   open,
@@ -26,6 +27,7 @@ export function EventInquiryDialog({
   listing?: { id: string; name: string };
 }) {
   const [eventDate, setEventDate] = useState("");
+  const { language, t } = useLanguage();
   const [location, setLocation] = useState("");
   const [guests, setGuests] = useState("");
   const [requirements, setRequirements] = useState("");
@@ -54,10 +56,12 @@ export function EventInquiryDialog({
       !eventDate ||
       eventDate < today ||
       payload.location.length < 2 ||
+      payload.location.length > 250 ||
       !Number.isInteger(payload.guestCount) ||
       payload.guestCount < 1 ||
       payload.guestCount > 100000 ||
-      payload.requirements.length < 10
+      payload.requirements.length < 10 ||
+      payload.requirements.length > 3000
     ) {
       setError(
         "Add a future event date, location, guest count and at least 10 characters describing your requirements.",
@@ -86,7 +90,7 @@ export function EventInquiryDialog({
     } catch (err: any) {
       const message = err?.response?.data?.message;
       setError(
-        typeof message === "string"
+        language === "en" && typeof message === "string"
           ? message
           : "Your enquiry wasn’t sent. Your details are still here; please try again.",
       );
@@ -101,19 +105,27 @@ export function EventInquiryDialog({
         if (!value && !busy) onClose();
       }}
     >
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
+      <DialogContent
+        lang={language}
+        className="max-h-[90vh] overflow-y-auto sm:max-w-lg"
+      >
+        <LanguageSwitch disabled={busy} />
         <DialogHeader>
-          <DialogTitle>Tell us about your event</DialogTitle>
+          <DialogTitle>{t("Tell us about your event")}</DialogTitle>
           <DialogDescription>
-            Send an enquiry to {businessName || "this vendor"}
-            {listing ? ` about ${listing.name}` : ""}. This does not make a
-            booking or reserve your date.
+            {t("Send an enquiry to {vendor}", {
+              vendor: businessName || t("this vendor"),
+            })}
+            {listing
+              ? ` ${t("about {listing}", { listing: listing.name })}`
+              : ""}
+            . {t("This does not make a booking or reserve your date.")}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={submit} className="mt-3 space-y-4">
+        <form noValidate onSubmit={submit} className="mt-3 space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-              Event date
+              {t("Event date")}
               <input
                 disabled={busy}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-normal"
@@ -125,7 +137,7 @@ export function EventInquiryDialog({
               />
             </label>
             <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-              Guest count
+              {t("Guest count")}
               <input
                 disabled={busy}
                 className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-normal"
@@ -141,7 +153,7 @@ export function EventInquiryDialog({
             </label>
           </div>
           <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-            Event location
+            {t("Event location")}
             <input
               disabled={busy}
               className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-normal"
@@ -149,11 +161,11 @@ export function EventInquiryDialog({
               maxLength={250}
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="Venue, city or area"
+              placeholder={t("Venue, city or area")}
             />
           </label>
           <label className="flex flex-col gap-2 text-sm font-medium text-slate-700">
-            Your requirements
+            {t("Your requirements")}
             <textarea
               disabled={busy}
               className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 font-normal"
@@ -163,12 +175,14 @@ export function EventInquiryDialog({
               rows={4}
               value={requirements}
               onChange={(e) => setRequirements(e.target.value)}
-              placeholder="Tell the vendor what you need, your preferences and any important details."
+              placeholder={t(
+                "Tell the vendor what you need, your preferences and any important details.",
+              )}
             />
           </label>
           {error && (
             <p role="alert" className="text-sm text-red-700">
-              {error}
+              {t(error)}
             </p>
           )}
           <div className="flex justify-end gap-3">
@@ -178,10 +192,10 @@ export function EventInquiryDialog({
               disabled={busy}
               onClick={onClose}
             >
-              Cancel
+              {t("Cancel")}
             </Button>
             <Button type="submit" disabled={busy}>
-              {busy ? "Sending…" : "Send enquiry"}
+              {t(busy ? "Sending…" : "Send enquiry")}
             </Button>
           </div>
         </form>

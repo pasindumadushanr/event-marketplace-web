@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLanguage, LanguageSwitch } from "@/lib/language";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -19,6 +20,7 @@ import { setupProgress } from "./setup-progress";
 const icons = [Building2, Images, Package, Phone, Eye, Rocket];
 
 export function GuidedSetup() {
+  const { language, t } = useLanguage();
   const { business, updateBusinessLocally } = useBusinessProfile();
   const [resources, setResources] = useState<{
     packages: any[];
@@ -53,16 +55,16 @@ export function GuidedSetup() {
   if (error && !resources)
     return (
       <section className="vendor-panel p-6" role="alert">
-        {error}{" "}
+        {t(error)}{" "}
         <button className="underline" onClick={load}>
-          Try again
+          {t("Try again")}
         </button>
       </section>
     );
   if (!resources)
     return (
       <section className="vendor-panel p-6" aria-busy="true">
-        Checking your setup…
+        {t("Checking your setup…")}
       </section>
     );
   const progress = setupProgress(
@@ -82,8 +84,10 @@ export function GuidedSetup() {
       updateBusinessLocally({ status: "ACTIVE" });
     } catch (err: any) {
       setError(
-        err?.response?.data?.message ||
-          "Could not publish your page. Please try again.",
+        language === "en"
+          ? err?.response?.data?.message ||
+              "Could not publish your page. Please try again."
+          : "Could not publish your page. Please try again.",
       );
     } finally {
       setBusy(false);
@@ -91,29 +95,32 @@ export function GuidedSetup() {
   }
   return (
     <section
+      lang={language}
       id="business-setup"
       className="vendor-panel overflow-hidden"
       aria-labelledby="setup-title"
     >
       <div className="border-b border-slate-100 bg-[#f3f6f1] p-6 sm:p-8">
+        <LanguageSwitch disabled={busy} />
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-xs font-semibold uppercase tracking-widest text-[#867043]">
-              One step at a time
+              {t("One step at a time")}
             </p>
             <h2
               id="setup-title"
               className="mt-2 text-2xl font-semibold text-[#183e38]"
             >
-              Your page setup checklist
+              {t("Your page setup checklist")}
             </h2>
             <p className="mt-2 text-sm text-slate-600">
-              Start anywhere. Save each section, then check how your page looks
-              to customers.
+              {t(
+                "Start anywhere. Save each section, then check how your page looks to customers.",
+              )}
             </p>
           </div>
           <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-[#36564c]">
-            {count} of 6 steps complete
+            {t("{count} of 6 steps complete", { count })}
           </span>
         </div>
         <div
@@ -134,7 +141,7 @@ export function GuidedSetup() {
             href={next.issues[0]?.href || next.href}
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[#183e38] px-5 py-3 text-sm font-semibold text-white"
           >
-            Continue setup: {next.title}
+            {t("Continue setup:")} {t(next.title)}
             <ArrowRight size={16} />
           </Link>
         )}
@@ -157,18 +164,18 @@ export function GuidedSetup() {
                   {step.done ? (
                     <span className="flex items-center gap-1">
                       <Check size={14} />
-                      Complete
+                      {t("Complete")}
                     </span>
                   ) : (
-                    `Step ${index + 1}`
+                    t("Step {number}", { number: index + 1 })
                   )}
                 </span>
               </div>
               <h3 className="mt-4 font-semibold text-slate-900">
-                {index + 1}. {step.title}
+                {index + 1}. {t(step.title)}
               </h3>
               <p className="mt-2 text-xs leading-5 text-slate-600">
-                {step.issues.length ? "What’s missing:" : step.hint}
+                {t(step.issues.length ? "What’s missing:" : step.hint)}
               </p>
               {!!step.issues.length && (
                 <ul className="mt-2 space-y-2">
@@ -178,7 +185,7 @@ export function GuidedSetup() {
                         className="text-xs leading-5 text-[#8a632b] underline underline-offset-2"
                         href={issue.href}
                       >
-                        {issue.label}
+                        {t(issue.label)}
                       </Link>
                     </li>
                   ))}
@@ -191,7 +198,7 @@ export function GuidedSetup() {
                     disabled={!progress.canPublish || busy}
                     className="mt-4 rounded-lg bg-[#183e38] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {busy ? "Publishing…" : "Publish my page"}
+                    {t(busy ? "Publishing…" : "Publish my page")}
                   </button>
                 )
               ) : (
@@ -199,7 +206,7 @@ export function GuidedSetup() {
                   href={step.href}
                   className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-[#36564c]"
                 >
-                  {step.done ? "Review / edit" : "Open section"}
+                  {t(step.done ? "Review / edit" : "Open section")}
                   <ArrowRight size={14} />
                 </Link>
               )}
@@ -208,12 +215,13 @@ export function GuidedSetup() {
         })}
       </ol>
       <p className="px-6 pb-6 text-xs text-slate-500 sm:px-8">
-        Progress is based on saved details. Extra settings and portfolio photos
-        are optional. Saving does not publish your page.
+        {t(
+          "Progress is based on saved details. Extra settings and portfolio photos are optional. Saving does not publish your page.",
+        )}
       </p>
       {error && (
         <p role="alert" className="px-6 pb-6 text-sm text-red-700">
-          {error}
+          {t(error)}
         </p>
       )}
     </section>

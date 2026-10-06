@@ -1,18 +1,20 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/language";
 
-export function GoogleAuthButton({ mode }: { mode: 'login' | 'register' }) {
+export function GoogleAuthButton({ mode }: { mode: "login" | "register" }) {
+  const { t } = useLanguage();
   const handleGoogleAuth = () => {
     // Redirect to the backend Google OAuth endpoint
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/auth/google`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/auth/google`;
   };
 
   return (
-    <Button 
-      variant="outline" 
-      type="button" 
-      className="w-full h-11 text-base font-medium shadow-sm transition-all hover:shadow-md hover:bg-zinc-50" 
+    <Button
+      variant="outline"
+      type="button"
+      className="w-full h-11 text-base font-medium shadow-sm transition-all hover:shadow-md hover:bg-zinc-50"
       onClick={handleGoogleAuth}
     >
       <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -34,7 +36,7 @@ export function GoogleAuthButton({ mode }: { mode: 'login' | 'register' }) {
         />
         <path d="M1 1h22v22H1z" fill="none" />
       </svg>
-      {mode === 'login' ? 'Continue with Google' : 'Sign up with Google'}
+      {mode === "login" ? "Continue with Google" : t("Sign up with Google")}
     </Button>
   );
 }
