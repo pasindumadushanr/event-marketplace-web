@@ -1,234 +1,384 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import api from '@/lib/api';
-import { toast } from 'sonner';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import api from "@/lib/api";
+import { SRI_LANKA_DISTRICTS } from "@/lib/districts";
+import { BusinessCategory, categoryPath } from "@/lib/categories";
+import { Button } from "@/components/ui/button";
+import { Search, Clock, ArrowUpRight, FileCheck2 } from "lucide-react";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from '@/components/ui/badge';
+  ApplicationSummary,
+  reviewDate,
+  statusLabel,
+  WaitingBadge,
+} from "@/components/admin/application-review";
 
-interface Application {
-  id: string;
-  name: string;
-  description: string;
-  email: string;
-  phone: string;
-  vendorStatus: string;
-  createdAt: string;
-  address: string;
-  city: string;
-  vendor: {
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  category: {
-    name: string;
-  };
-}
-
+type Queue = {
+  items: ApplicationSummary[];
+  total: number;
+  pageSize: number;
+  counts: { pending: number; approved: number; rejected: number };
+};
+const emptyFilters = { q: "", district: "", categoryId: "", from: "", to: "" };
 export default function VendorApprovalsPage() {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [selectedApp, setSelectedApp] = useState<Application | null>(null);
-  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
-  const [rejectReason, setRejectReason] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-
+  const [draft, setDraft] = useState(emptyFilters);
+  const [filters, setFilters] = useState(emptyFilters);
+  const [status, setStatus] = useState("PENDING");
+  const [page, setPage] = useState(1);
+  const [data, setData] = useState<Queue | null>(null);
+  const [categories, setCategories] = useState<BusinessCategory[]>([]);
+  const [categoryError, setCategoryError] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [retry, setRetry] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   useEffect(() => {
-    fetchApplications();
-  }, []);
-
-  const fetchApplications = async () => {
-    try {
-      const res = await api.get('/admin/vendors/applications?status=UNDER_REVIEW');
-      setApplications(res.data);
-    } catch (error) {
-      toast.error('Failed to load applications');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleApprove = async (id: string) => {
-    setIsProcessing(true);
-    try {
-      await api.patch(`/admin/vendors/applications/${id}/approve`);
-      toast.success('Vendor application approved successfully!');
-      setSelectedApp(null);
-      fetchApplications();
-    } catch (error) {
-      toast.error('Failed to approve application');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleReject = async () => {
-    if (!rejectReason) {
-      toast.error('Please provide a reason for rejection');
-      return;
-    }
-    setIsProcessing(true);
-    try {
-      await api.patch(`/admin/vendors/applications/${selectedApp?.id}/reject`, { reason: rejectReason });
-      toast.success('Vendor application rejected.');
-      setIsRejectModalOpen(false);
-      setSelectedApp(null);
-      fetchApplications();
-    } catch (error) {
-      toast.error('Failed to reject application');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  if (isLoading) return <div className="p-8">Loading applications...</div>;
-
+    api
+      .get("/business-categories")
+      .then((res) => {
+        setCategories(res.data);
+        setCategoryError(false);
+      })
+      .catch(() => setCategoryError(true));
+  }, [retry]);
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError(false);
+    setData(null);
+    api
+      .get("/admin/vendors/applications", {
+        params: { ...filters, status, page, workspace: "1" },
+      })
+      .then((res) => {
+        if (Array.isArray(res.data))
+          throw new Error("Workspace backend not deployed");
+        if (active) setData(res.data);
+      })
+      .catch(() => {
+        if (active) setError(true);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [filters, status, page, retry]);
+  const field =
+    "w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm";
   return (
-    <div className="space-y-6 relative">
-      <div>
-        <h2 className="text-2xl font-bold tracking-tight text-slate-900">Vendor Approvals</h2>
-        <p className="text-slate-500 mt-1">Review and approve new vendor onboarding applications.</p>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Business Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Vendor</TableHead>
-              <TableHead>Submitted On</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {applications.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="text-center h-32 text-slate-500">
-                  No pending applications found.
-                </TableCell>
-              </TableRow>
-            ) : (
-              applications.map((app) => (
-                <TableRow key={app.id}>
-                  <TableCell className="font-medium">{app.name}</TableCell>
-                  <TableCell>{app.category?.name || 'N/A'}</TableCell>
-                  <TableCell>
-                    {app.vendor.firstName} {app.vendor.lastName}
-                    <br/>
-                    <span className="text-xs text-slate-500">{app.vendor.email}</span>
-                  </TableCell>
-                  <TableCell>{new Date(app.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-100">
-                      Under Review
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm" onClick={() => setSelectedApp(app)}>
-                      Review
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* Review Modal */}
-      {selectedApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h3 className="text-2xl font-bold mb-2">Review Application</h3>
-            <p className="text-slate-500 mb-6">Review the business details before making a decision.</p>
-
-            <div className="space-y-6 my-4">
-              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg">
-                <div>
-                  <p className="text-xs font-semibold uppercase text-slate-500">Business Name</p>
-                  <p className="font-medium">{selectedApp.name}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase text-slate-500">Category</p>
-                  <p className="font-medium">{selectedApp.category?.name}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase text-slate-500">Email</p>
-                  <p className="font-medium">{selectedApp.email}</p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase text-slate-500">Phone</p>
-                  <p className="font-medium">{selectedApp.phone}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-xs font-semibold uppercase text-slate-500">Location</p>
-                  <p className="font-medium">{selectedApp.address}, {selectedApp.city}</p>
-                </div>
-                <div className="col-span-2">
-                  <p className="text-xs font-semibold uppercase text-slate-500">Description</p>
-                  <p className="text-sm mt-1 text-slate-700">{selectedApp.description || 'No description provided.'}</p>
-                </div>
-              </div>
-
-              <div className="bg-slate-50 p-4 rounded-lg">
-                <p className="text-xs font-semibold uppercase text-slate-500 mb-2">Vendor Account Details</p>
-                <p className="font-medium">{selectedApp.vendor.firstName} {selectedApp.vendor.lastName}</p>
-                <p className="text-sm text-slate-600">{selectedApp.vendor.email}</p>
-              </div>
-            </div>
-
-            <div className="flex justify-end gap-3 mt-8">
-              <Button variant="ghost" onClick={() => setSelectedApp(null)}>
-                Cancel
-              </Button>
-              <Button variant="outline" onClick={() => setIsRejectModalOpen(true)} className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
-                Reject Application
-              </Button>
-              <Button onClick={() => handleApprove(selectedApp.id)} disabled={isProcessing} className="bg-green-600 hover:bg-green-700 text-white">
-                {isProcessing ? 'Processing...' : 'Approve & Activate'}
-              </Button>
-            </div>
-          </div>
+    <section className="mx-auto max-w-7xl space-y-6">
+      <header className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-teal-700">
+            Review workspace
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold text-slate-900">
+            Vendor applications
+          </h1>
+          <p className="mt-2 max-w-2xl text-sm text-slate-500">
+            Review the oldest submissions first. Ask for missing information,
+            keep private notes, and make clear decisions.
+          </p>
         </div>
-      )}
-
-      {/* Reject Reason Modal */}
-      {isRejectModalOpen && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50">
-          <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6">
-            <h3 className="text-xl font-bold mb-2">Reject Application</h3>
-            <p className="text-slate-500 mb-4 text-sm">
-              Please provide a reason for rejecting this application. This will be sent to the vendor.
-            </p>
-            <div className="py-2">
-              <Textarea
-                placeholder="e.g. Please provide a valid business registration number..."
-                value={rejectReason}
-                onChange={(e) => setRejectReason(e.target.value)}
-                className="min-h-[100px]"
+        <Button
+          type="button"
+          variant="outline"
+          className="xl:hidden"
+          aria-controls="application-filters"
+          aria-expanded={filtersOpen}
+          onClick={() => setFiltersOpen((value) => !value)}
+        >
+          Filters
+          {Object.values(filters).filter(Boolean).length > 0
+            ? ` (${Object.values(filters).filter(Boolean).length})`
+            : ""}
+        </Button>
+        <div className="hidden rounded-2xl bg-teal-50 p-4 text-teal-800 sm:block">
+          <FileCheck2 className="h-7 w-7" />
+        </div>
+      </header>
+      <form
+        aria-label="Application filters"
+        id="application-filters"
+        className={`${filtersOpen ? "block" : "hidden"} rounded-2xl border bg-white p-4 sm:p-6 xl:block`}
+        onSubmit={(event) => {
+          event.preventDefault();
+          setFilters({ ...draft });
+          setPage(1);
+          setFiltersOpen(false);
+        }}
+      >
+        <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+          <label className="text-xs font-medium text-slate-600">
+            Search business or vendor
+            <div className="relative mt-2">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+              <input
+                aria-label="Search applications"
+                maxLength={150}
+                className={field + " pl-9"}
+                placeholder="Name, email or phone"
+                value={draft.q}
+                onChange={(e) => setDraft({ ...draft, q: e.target.value })}
               />
             </div>
-            <div className="flex justify-end gap-3 mt-6">
-              <Button variant="ghost" onClick={() => setIsRejectModalOpen(false)}>Cancel</Button>
-              <Button variant="destructive" onClick={handleReject} disabled={isProcessing}>
-                Confirm Rejection
-              </Button>
-            </div>
-          </div>
+          </label>
+          <label className="text-xs font-medium text-slate-600">
+            District
+            <select
+              aria-label="District"
+              className={field + " mt-2"}
+              value={draft.district}
+              onChange={(e) => setDraft({ ...draft, district: e.target.value })}
+            >
+              <option value="">All districts</option>
+              {SRI_LANKA_DISTRICTS.map((d) => (
+                <option key={d}>{d}</option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs font-medium text-slate-600">
+            Category
+            <select
+              aria-label="Category"
+              className={field + " mt-2"}
+              value={draft.categoryId}
+              onChange={(e) =>
+                setDraft({ ...draft, categoryId: e.target.value })
+              }
+            >
+              <option value="">All categories</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {categoryPath(categories, c.id)
+                    .map((x) => x.name)
+                    .join(" › ")}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs font-medium text-slate-600">
+            Submitted from
+            <input
+              aria-label="Submitted from"
+              type="date"
+              className={field + " mt-2"}
+              value={draft.from}
+              max={draft.to || undefined}
+              onChange={(e) => setDraft({ ...draft, from: e.target.value })}
+            />
+          </label>
+          <label className="text-xs font-medium text-slate-600">
+            Submitted to
+            <input
+              aria-label="Submitted to"
+              type="date"
+              className={field + " mt-2"}
+              value={draft.to}
+              min={draft.from || undefined}
+              onChange={(e) => setDraft({ ...draft, to: e.target.value })}
+            />
+          </label>
         </div>
+        {categoryError && (
+          <p role="alert" className="mt-3 text-xs text-amber-800">
+            Category options could not load. Other filters still work.{" "}
+            <button
+              type="button"
+              className="underline"
+              onClick={() => setRetry((v) => v + 1)}
+            >
+              Retry
+            </button>
+          </p>
+        )}
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button type="submit">Apply filters</Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setDraft(emptyFilters);
+              setFilters(emptyFilters);
+              setStatus("PENDING");
+              setPage(1);
+            }}
+          >
+            Reset filters
+          </Button>
+        </div>
+      </form>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div
+          role="tablist"
+          aria-label="Application queues"
+          className="flex flex-wrap gap-2"
+        >
+          {[
+            { value: "PENDING", label: "Pending", count: data?.counts.pending },
+            {
+              value: "APPROVED",
+              label: "Approved",
+              count: data?.counts.approved,
+            },
+            {
+              value: "REJECTED",
+              label: "Rejected",
+              count: data?.counts.rejected,
+            },
+          ].map((tab) => {
+            const selected =
+              status === tab.value ||
+              (tab.value === "PENDING" &&
+                ["UNDER_REVIEW", "NEEDS_INFO"].includes(status));
+            return (
+              <button
+                role="tab"
+                aria-selected={selected}
+                key={tab.value}
+                onClick={() => {
+                  setStatus(tab.value);
+                  setPage(1);
+                }}
+                className={
+                  "rounded-xl px-4 py-2.5 text-sm font-medium " +
+                  (selected
+                    ? "bg-slate-900 text-white"
+                    : "border bg-white text-slate-600")
+                }
+              >
+                {tab.label}
+                {tab.count !== undefined && (
+                  <span className="ml-2 opacity-70">{tab.count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <label className="flex items-center gap-2 text-sm text-slate-500">
+          Status
+          <select
+            aria-label="Application status"
+            className="max-w-48 rounded-xl border bg-white p-2 text-sm"
+            value={status}
+            onChange={(e) => {
+              setStatus(e.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="PENDING">All pending</option>
+            <option value="UNDER_REVIEW">Under review</option>
+            <option value="NEEDS_INFO">Needs information</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="SUSPENDED">Suspended</option>
+            <option value="ALL">All statuses</option>
+          </select>
+        </label>
+      </div>
+      <p className="flex items-center gap-2 text-xs text-slate-500">
+        <Clock className="h-4 w-4 shrink-0" />
+        Oldest submission first. Older applications use their business creation
+        date; resubmissions use the new submission date.
+      </p>
+      {loading ? (
+        <p role="status" className="rounded-2xl border bg-white p-8">
+          Loading applications…
+        </p>
+      ) : error ? (
+        <div role="alert" className="rounded-2xl border bg-white p-8">
+          <p>Applications could not load. Your filters are kept.</p>
+          <Button className="mt-4" onClick={() => setRetry((v) => v + 1)}>
+            Try again
+          </Button>
+        </div>
+      ) : (
+        data && (
+          <>
+            {!data.items.length ? (
+              <div className="rounded-2xl border bg-white p-10 text-center">
+                <FileCheck2 className="mx-auto mb-3 h-8 w-8 text-slate-400" />
+                <h2 className="font-semibold">No matching applications</h2>
+                <p className="mt-2 text-sm text-slate-500">
+                  Try a different status or clear the filters.
+                </p>
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {data.items.map((app) => (
+                  <li
+                    key={app.id}
+                    className="rounded-2xl border bg-white p-5 transition-shadow hover:shadow-sm"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h2 className="break-words text-lg font-semibold">
+                            {app.name}
+                          </h2>
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs">
+                            {statusLabel(app.vendorStatus)}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-sm text-slate-500">
+                          {app.category?.name} ·{" "}
+                          {[app.city, app.district]
+                            .filter(Boolean)
+                            .join(", ") || "Location not provided"}
+                        </p>
+                        <p className="mt-2 break-all text-sm">
+                          {app.vendor.firstName} {app.vendor.lastName}{" "}
+                          <span className="text-slate-500">
+                            · {app.vendor.email}
+                          </span>
+                        </p>
+                      </div>
+                      <WaitingBadge application={app} />
+                    </div>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-4">
+                      <p className="text-xs text-slate-500">
+                        Submitted {reviewDate(app.submittedAt || app.createdAt)}{" "}
+                        · {app._count?.documents || 0} documents ·{" "}
+                        {app._count?.galleries || 0} gallery items
+                      </p>
+                      <Link
+                        className="inline-flex items-center gap-2 rounded-xl bg-teal-900 px-4 py-2.5 text-sm font-medium text-white"
+                        href={"/admin/vendors/approvals/" + app.id}
+                      >
+                        Review application
+                        <ArrowUpRight className="h-4 w-4" />
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
+              <p>
+                {data.total} matches · Page {page}
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  disabled={page === 1}
+                  onClick={() => setPage((v) => v - 1)}
+                >
+                  Previous
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={page * data.pageSize >= data.total}
+                  onClick={() => setPage((v) => v + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          </>
+        )
       )}
-    </div>
+    </section>
   );
 }

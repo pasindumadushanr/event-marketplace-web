@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { LanguageSwitch, useLanguage } from "@/lib/language";
@@ -25,6 +27,15 @@ export default function VendorOnboardingWizard() {
   const { language, t } = useLanguage();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const {
+    business,
+    isLoading: profileLoading,
+    refreshBusiness,
+  } = useBusinessProfile();
+  const isRevision = ["NEEDS_INFO", "REJECTED"].includes(
+    business?.vendorStatus,
+  );
+  const [loadedId, setLoadedId] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -41,6 +52,18 @@ export default function VendorOnboardingWizard() {
     logo: "",
     coverImage: "",
   });
+
+  useEffect(() => {
+    if (isRevision && business && loadedId !== business.id) {
+      setFormData(
+        (previous) =>
+          Object.fromEntries(
+            Object.keys(previous).map((key) => [key, business[key] || ""]),
+          ) as typeof previous,
+      );
+      setLoadedId(business.id);
+    }
+  }, [business, isRevision, loadedId]);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -101,7 +124,13 @@ export default function VendorOnboardingWizard() {
         return;
       }
 
-      await api.post("/vendor/business/onboarding/wizard", payload);
+      await api.post(
+        isRevision
+          ? "/vendor/business/onboarding/resubmit"
+          : "/vendor/business/onboarding/wizard",
+        payload,
+      );
+      await refreshBusiness();
       toast.success(t("Application submitted successfully!"));
       router.push("/vendor");
     } catch (error: any) {
@@ -123,12 +152,34 @@ export default function VendorOnboardingWizard() {
     { title: "Review", icon: FileText },
   ];
 
+  if (profileLoading)
+    return (
+      <p role="status" className="p-8">
+        Loading application…
+      </p>
+    );
+
   return (
     <div
       lang={language}
       className="py-8 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto"
     >
       <div>
+        {isRevision && (
+          <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-3">
+            <h1 className="text-xl font-semibold">Update your application</h1>
+            <p className="whitespace-pre-wrap">
+              {business.informationRequest || business.rejectionReason}
+            </p>
+            <p>
+              Your existing details and photos are kept. Correct what was
+              requested, then submit again on the last step.
+            </p>
+            <Link href="/vendor/documents" className="underline">
+              Upload requested documents
+            </Link>
+          </div>
+        )}
         <div className="text-center mb-12">
           <LanguageSwitch disabled={isSubmitting} />
           <h2 className="text-3xl font-extrabold text-slate-900">

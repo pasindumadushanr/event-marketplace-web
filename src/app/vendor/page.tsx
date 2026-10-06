@@ -23,6 +23,9 @@ export default function VendorDashboardPage() {
 
   const [status, setStatus] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState<string | null>(null);
+  const [informationRequest, setInformationRequest] = useState<string | null>(
+    null,
+  );
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
 
   const fetchStatus = useCallback(async () => {
@@ -32,6 +35,7 @@ export default function VendorDashboardPage() {
       const { data } = await api.get("/vendor/business/onboarding/status");
       setStatus(data.vendorStatus);
       setRejectionReason(data.rejectionReason);
+      setInformationRequest(data.informationRequest);
     } catch (err) {
       console.error(err);
     } finally {
@@ -97,6 +101,34 @@ export default function VendorDashboardPage() {
       </div>
     );
   }
+
+  if (status === "NEEDS_INFO")
+    return (
+      <div className="mx-auto max-w-2xl rounded-2xl border bg-white p-6 sm:p-10 space-y-5">
+        <h2 className="text-2xl font-semibold">
+          A few more details are needed
+        </h2>
+        <p className="text-slate-600">
+          Your application is not rejected. Please address the review team’s
+          request, then resubmit it.
+        </p>
+        <div className="whitespace-pre-wrap rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
+          {informationRequest ||
+            "Please contact support for the requested details."}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={() => router.push("/vendor/onboarding")}>
+            Update & Resubmit Application
+          </Button>
+          <Link
+            className="inline-flex items-center rounded-lg border px-4 py-2 text-sm"
+            href="/vendor/documents"
+          >
+            Upload requested documents
+          </Link>
+        </div>
+      </div>
+    );
 
   // --- REJECTED STATE ---
   if (status === "REJECTED") {

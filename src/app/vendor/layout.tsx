@@ -56,6 +56,7 @@ export default function VendorLayout({
   const allowedRoutes = [
     "/vendor",
     "/vendor/onboarding",
+    "/vendor/documents",
     "/vendor/settings",
     "/vendor/notifications",
     "/vendor/support",
