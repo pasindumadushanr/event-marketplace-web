@@ -1,15 +1,21 @@
-import { notFound } from 'next/navigation';
-import { Calendar, User, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import { Navbar } from '@/components/home/Navbar';
-import { Footer } from '@/components/home/Footer';
-import { sanitizeHtml } from '@/lib/sanitize';
+import { notFound } from "next/navigation";
+import { Calendar, User, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Navbar } from "@/components/home/Navbar";
+import { Footer } from "@/components/home/Footer";
+import { sanitizeHtml } from "@/lib/sanitize";
+import { pageMetadata, breadcrumbs, jsonLd } from "@/lib/seo";
+import { PUBLIC_API_URL, SITE_URL } from "@/lib/site-url";
 
 async function getBlogPost(slug: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/cms/public/blog/${slug}`, {
-      next: { revalidate: 60 }
-    });
+    const res = await fetch(
+      `${PUBLIC_API_URL}/admin/cms/public/blog/${encodeURIComponent(slug)}`,
+      {
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(10000),
+      },
+    );
     if (!res.ok) return null;
     return res.json();
   } catch (error) {
@@ -17,62 +23,133 @@ async function getBlogPost(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const post = await getBlogPost(slug);
-  if (!post) return { title: 'Post Not Found' };
-  
+  if (!post)
+    return { title: "Post Not Found", robots: { index: false, follow: false } };
+
+  const metadata = pageMetadata(
+    `${post.metaTitle || post.title} | Nakathata.lk`,
+    post.metaDescription || post.excerpt || "Read this article on Nakathata.lk",
+    `/blog/${encodeURIComponent(slug)}`,
+    post.coverImage,
+  );
   return {
-    title: `${post.metaTitle || post.title} | Nakathata.lk`,
-    description: post.metaDescription || post.excerpt || 'Read this article on Nakathata.lk',
+    ...metadata,
+    openGraph: {
+      ...metadata.openGraph,
+      type: "article" as const,
+      publishedTime: post.publishedAt || undefined,
+      modifiedTime: post.updatedAt || undefined,
+    },
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function BlogPostPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const post = await getBlogPost(slug);
-  
+
   if (!post) {
     notFound();
   }
 
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd({
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            headline: post.title,
+            description: post.metaDescription || post.excerpt || undefined,
+            image: post.coverImage || undefined,
+            datePublished: post.publishedAt || undefined,
+            dateModified: post.updatedAt || undefined,
+            mainEntityOfPage: `${SITE_URL}/blog/${encodeURIComponent(slug)}`,
+            publisher: { "@id": `${SITE_URL}/#organization` },
+            author: post.author
+              ? {
+                  "@type": "Person",
+                  name: `${post.author.firstName} ${post.author.lastName}`.trim(),
+                }
+              : { "@id": `${SITE_URL}/#organization` },
+          }),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: jsonLd(
+            breadcrumbs([
+              { name: "Home", path: "/" },
+              { name: "Blog", path: "/blog" },
+              { name: post.title, path: `/blog/${encodeURIComponent(slug)}` },
+            ]),
+          ),
+        }}
+      />
       <Navbar />
-      
+
       <main className="pt-24 pb-16">
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Link href="/blog" className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 mb-8 transition-colors">
+          <Link
+            href="/blog"
+            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 mb-8 transition-colors"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to all posts
           </Link>
-          
+
           <div className="text-center mb-10">
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-900 mb-6">
               {post.title}
             </h1>
-            
+
             <div className="flex items-center justify-center text-sm text-zinc-500 gap-6">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
-                <span>{new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                <span>
+                  {new Date(post.publishedAt).toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <User className="w-4 h-4" />
-                <span>{post.author ? `${post.author.firstName} ${post.author.lastName}` : 'System'}</span>
+                <span>
+                  {post.author
+                    ? `${post.author.firstName} ${post.author.lastName}`
+                    : "System"}
+                </span>
               </div>
             </div>
           </div>
 
           {post.coverImage && (
             <div className="w-full aspect-[21/9] rounded-2xl overflow-hidden mb-12 shadow-md">
-              <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+              <img
+                src={post.coverImage}
+                alt={post.title}
+                className="w-full h-full object-cover"
+              />
             </div>
           )}
 
           {/* Render Rich HTML Content */}
-          <div 
+          <div
             className="prose prose-zinc lg:prose-lg mx-auto prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }} 
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </article>
       </main>

@@ -1,13 +1,19 @@
-import { notFound } from 'next/navigation';
-import { Navbar } from '@/components/home/Navbar';
-import { Footer } from '@/components/home/Footer';
-import { sanitizeHtml } from '@/lib/sanitize';
+import { notFound } from "next/navigation";
+import { Navbar } from "@/components/home/Navbar";
+import { Footer } from "@/components/home/Footer";
+import { sanitizeHtml } from "@/lib/sanitize";
+import { pageMetadata } from "@/lib/seo";
+import { PUBLIC_API_URL } from "@/lib/site-url";
 
 async function getPage(slug: string) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/cms/public/pages/${slug}`, {
-      next: { revalidate: 60 }
-    });
+    const res = await fetch(
+      `${PUBLIC_API_URL}/admin/cms/public/pages/${encodeURIComponent(slug)}`,
+      {
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(10000),
+      },
+    );
     if (!res.ok) return null;
     return res.json();
   } catch (error) {
@@ -15,21 +21,31 @@ async function getPage(slug: string) {
   }
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const page = await getPage(slug);
-  if (!page) return { title: 'Page Not Found' };
-  
-  return {
-    title: `${page.metaTitle || page.title} | Nakathata.lk`,
-    description: page.metaDescription || 'Nakathata.lk',
-  };
+  if (!page)
+    return { title: "Page Not Found", robots: { index: false, follow: false } };
+
+  return pageMetadata(
+    `${page.metaTitle || page.title} | Nakathata.lk`,
+    page.metaDescription || page.title || "Nakathata.lk",
+    `/${encodeURIComponent(slug)}`,
+  );
 }
 
-export default async function DynamicCmsPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function DynamicCmsPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
   const { slug } = await params;
   const page = await getPage(slug);
-  
+
   if (!page) {
     notFound();
   }
@@ -37,7 +53,7 @@ export default async function DynamicCmsPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      
+
       <main className="pt-24 pb-16">
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -47,9 +63,9 @@ export default async function DynamicCmsPage({ params }: { params: Promise<{ slu
           </div>
 
           {/* Render Rich HTML Content */}
-          <div 
+          <div
             className="prose prose-zinc lg:prose-lg mx-auto prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content) }} 
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content) }}
           />
         </article>
       </main>

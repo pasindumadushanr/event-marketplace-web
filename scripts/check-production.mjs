@@ -1,5 +1,5 @@
 // Read-only checks. Never submits forms, bookings, messages or payments.
-const site = (process.env.SITE_URL || "https://www.luxeevents.fun").replace(
+const site = (process.env.SITE_URL || "https://nakathata.lk").replace(
   /\/$/,
   "",
 );

@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { Calendar, User } from 'lucide-react';
 import { Navbar } from '@/components/home/Navbar';
 import { Footer } from '@/components/home/Footer';
+import { pageMetadata } from '@/lib/seo';
+import { PUBLIC_API_URL } from '@/lib/site-url';
 
 async function getBlogPosts() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/blog`, {
+    const res = await fetch(`${PUBLIC_API_URL}/admin/cms/public/blog`, {
       next: { revalidate: 60 }, // Revalidate every 60 seconds
       signal: AbortSignal.timeout(5000) // Prevent build hangs if API is unreachable
     });
@@ -16,10 +18,7 @@ async function getBlogPosts() {
   }
 }
 
-export const metadata = {
-  title: 'Blog | Nakathata.lk',
-  description: 'Read our latest articles, news, and event planning tips.',
-};
+export const metadata = pageMetadata('Wedding Planning Tips & Event Guides | Nakathata.lk', 'Read wedding planning ideas, event guides and vendor tips for celebrations in Sri Lanka.', '/blog');
 
 export default async function BlogListingPage() {
   const posts = await getBlogPosts();

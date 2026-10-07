@@ -34,6 +34,49 @@ createServer((request, response) => {
         { slug: business.id, updatedAt: "2026-10-05T00:00:00Z" },
       ]),
     );
+  else if (request.url === "/business-categories")
+    response.end(
+      JSON.stringify([
+        {
+          id: "photo",
+          name: "Photography",
+          slug: "photography",
+          parentId: null,
+          status: "ACTIVE",
+          businessCount: 1,
+        },
+      ]),
+    );
+  else if (request.url === "/admin/cms/public/blog")
+    response.end(
+      JSON.stringify([
+        {
+          slug: "wedding-guide",
+          title: "Wedding Planning Guide",
+          excerpt: "Plan your Sri Lankan wedding.",
+          publishedAt: "2026-10-05T00:00:00Z",
+        },
+      ]),
+    );
+  else if (request.url === "/admin/cms/public/blog/wedding-guide")
+    response.end(
+      JSON.stringify({
+        slug: "wedding-guide",
+        title: "Wedding Planning Guide",
+        excerpt: "Plan your Sri Lankan wedding.",
+        content: "<p>Wedding planning in Sri Lanka</p>",
+        publishedAt: "2026-10-05T00:00:00Z",
+      }),
+    );
+  else if (
+    request.url?.startsWith("/discovery/search?categorySlug=photography")
+  )
+    response.end(
+      JSON.stringify({
+        data: [{ ...business, rating: 0, reviewCount: 0, startingPrice: 0 }],
+        meta: { total: 1, page: 1, totalPages: 1 },
+      }),
+    );
   else if (request.url?.startsWith("/discovery/search"))
     response.end(
       JSON.stringify({ data: [], meta: { total: 0, page: 1, totalPages: 0 } }),
