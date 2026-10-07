@@ -1,5 +1,38 @@
 import { jsonLd } from "../../src/lib/seo";
 describe("Official domain and technical SEO", () => {
+  it("declares crawlable emblem favicons while preserving the full organization logo", () => {
+    cy.request("/").then((response) => {
+      const doc = new DOMParser().parseFromString(response.body, "text/html");
+      expect(
+        doc
+          .querySelector(
+            'link[rel="icon"][href="/images/brand/favicon-96.png"]',
+          )
+          ?.getAttribute("sizes"),
+      ).to.equal("96x96");
+      expect(
+        doc.querySelector('link[rel="icon"][href="/favicon.ico"]'),
+      ).not.to.equal(null);
+      expect(
+        doc.querySelector('link[rel="apple-touch-icon"]')?.getAttribute("href"),
+      ).to.equal("/images/brand/favicon-180.png");
+      expect(response.body).to.contain(
+        "https://nakathata.lk/images/brand/nakathata-logo.jpg",
+      );
+    });
+    for (const path of [
+      "/favicon.ico",
+      "/images/brand/favicon-96.png",
+      "/images/brand/favicon-180.png",
+      "/images/brand/favicon-512.png",
+    ]) {
+      cy.request({ url: path, encoding: "binary" }).then((response) => {
+        expect(response.status).to.equal(200);
+        expect(response.headers["content-type"]).to.contain("image/");
+        expect(response.body.length).to.be.lessThan(300000);
+      });
+    }
+  });
   it("uses self-referencing canonicals and social URLs on public pages", () => {
     for (const path of [
       "/",

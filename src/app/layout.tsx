@@ -24,12 +24,14 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/images/brand/nakathata-logo.jpg",
-        type: "image/jpeg",
-        sizes: "2048x2048",
+        url: "/images/brand/favicon-96.png",
+        type: "image/png",
+        sizes: "96x96",
       },
+      { url: "/favicon.ico", type: "image/x-icon", sizes: "32x32 48x48 64x64 256x256" },
     ],
-    apple: [{ url: "/images/brand/nakathata-logo.jpg", sizes: "2048x2048" }],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/images/brand/favicon-180.png", type: "image/png", sizes: "180x180" }],
   },
   openGraph: {
     siteName: "Nakathata.lk",
