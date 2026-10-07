@@ -23,7 +23,7 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-sm text-slate-500 mt-2">
-            Last Updated: September 2026 • We respect your privacy and protect your personal information.
+            Last Updated: October 2026 • We respect your privacy and protect your personal information.
           </p>
         </div>
 
@@ -91,10 +91,25 @@ export default function PrivacyPage() {
             </p>
           </section>
 
-          {/* Section 6 */}
+          <section className="space-y-3 border-t border-slate-100 pt-6">
+            <h2 className="text-xl font-bold text-slate-900">6. Spam Prevention with Google reCAPTCHA</h2>
+            <p>
+              We use Google reCAPTCHA to help protect registration, contact, support, and password-recovery
+              requests from automated abuse. When you submit a protected form, Google may process
+              technical information such as your IP address, browser information, and interaction signals
+              to assess whether the request is legitimate. This security check is separate from website analytics.
+            </p>
+            <p>
+              Google&apos;s <a href="https://policies.google.com/privacy" className="text-primary underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and{' '}
+              <a href="https://policies.google.com/terms" className="text-primary underline" target="_blank" rel="noopener noreferrer">Terms of Service</a> apply.
+              If verification prevents you from submitting a form, contact us using the contact details on our Contact Page.
+            </p>
+          </section>
+
+          {/* Section 7 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Mail className="h-5 w-5 text-primary" /> 6. Contact Us
+              <Mail className="h-5 w-5 text-primary" /> 7. Contact Us
             </h2>
             <p>
               If you have any questions or concerns regarding our privacy practices, please contact us via our{' '}

@@ -82,6 +82,10 @@ describe("Gradual languages and nationwide launch support", () => {
     );
   });
   it("retains English API field names and vendor role while submitting localized registration", () => {
+    cy.intercept('GET', 'https://www.google.com/recaptcha/api.js*', {
+      headers: { 'content-type': 'application/javascript' },
+      body: 'window.grecaptcha = { ready: function(cb) { cb(); }, execute: function() { return Promise.resolve("test-register-token"); } };',
+    });
     cy.intercept("POST", "**/auth/register", (req) => {
       expect(req.body).to.include({
         firstName: "Nimali",

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import api from '@/lib/api';
+import { submissionError } from '@/lib/recaptcha';
 import { toast } from 'sonner';
 import { useAuth } from '@/lib/auth-context';
 import { LifeBuoy, Mail, PhoneCall, BookOpen, MessageSquare, Loader2 } from 'lucide-react';
@@ -40,7 +41,7 @@ export default function VendorSupportPage() {
       toast.success('Support ticket submitted successfully. Our team will get back to you soon.');
       reset();
     } catch (error) {
-      toast.error('Failed to submit support ticket.');
+      toast.error(submissionError(error, 'Failed to submit support ticket.'));
     } finally {
       setIsSubmitting(false);
     }

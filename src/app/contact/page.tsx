@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { MapPin, Phone, Mail, Send, ExternalLink, ArrowUpRight, MessageCircle, Sparkles, CheckCircle2, LoaderCircle } from 'lucide-react';
 import api from '@/lib/api';
+import { submissionError } from '@/lib/recaptcha';
 
 const socialLinks = [
   {
@@ -81,8 +82,8 @@ export default function ContactPage() {
       toast.success('Your message has been sent successfully!');
       reset();
       setIsSent(true);
-    } catch {
-      toast.error('Failed to send message. Please try again.');
+    } catch (error) {
+      toast.error(submissionError(error, 'Failed to send message. Please try again.'));
     } finally {
       setIsSubmitting(false);
     }

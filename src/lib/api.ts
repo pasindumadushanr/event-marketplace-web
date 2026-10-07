@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { recaptchaToken } from './recaptcha';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
@@ -7,8 +8,18 @@ const api = axios.create({
   },
 });
 
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   if (typeof window !== 'undefined') {
+    const protectedActions: Record<string, string> = {
+      '/auth/register': 'register',
+      '/auth/forgot-password': 'forgot_password',
+      '/contact': 'contact',
+    };
+    const action = protectedActions[config.url || ''];
+    if (config.method?.toLowerCase() === 'post' && action) {
+      const token = await recaptchaToken(action);
+      if (token) config.headers['X-Recaptcha-Token'] = token;
+    }
     const token = localStorage.getItem('accessToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
