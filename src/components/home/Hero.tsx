@@ -69,69 +69,103 @@ export function Hero() {
         >
           <form
             onSubmit={handleSearchSubmit}
-            className="bg-white p-2 rounded-2xl shadow-2xl max-w-4xl mx-auto flex flex-col md:flex-row gap-2"
+            className="bg-white p-2.5 rounded-2xl shadow-2xl max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1.2fr_1fr_1.15fr_auto] gap-2 text-left"
           >
             {/* Keyword Input */}
-            <div className="flex-1 flex items-center px-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-colors">
+            <div className="min-w-0 h-20 flex items-center gap-3 px-4 bg-slate-50 rounded-xl border border-transparent focus-within:border-primary/50 focus-within:bg-white transition-colors">
               <Search className="h-5 w-5 text-slate-400 shrink-0" />
-              <Input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="What are you looking for?"
-                className="border-0 bg-transparent focus-visible:ring-0 shadow-none text-base md:text-lg h-14"
-              />
+              <div className="min-w-0 flex-1">
+                <label
+                  htmlFor="home-search-query"
+                  className="text-[11px] font-semibold uppercase tracking-wider text-slate-500"
+                >
+                  Looking for
+                </label>
+                <Input
+                  id="home-search-query"
+                  type="text"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="What are you looking for?"
+                  className="border-0 bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-0 rounded-none"
+                />
+              </div>
             </div>
 
             {/* Category Select */}
-            <div className="w-full md:w-56 flex items-center px-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-colors">
+            <div className="min-w-0 h-20 flex items-center gap-3 px-4 bg-slate-50 rounded-xl border border-transparent focus-within:border-primary/50 focus-within:bg-white transition-colors">
               <Grid className="h-5 w-5 text-slate-400 shrink-0" />
-              <select
-                aria-label="Category"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-transparent border-0 focus:ring-0 text-slate-700 h-14 px-3 outline-none cursor-pointer text-sm font-medium"
-              >
-                <option value="">All Categories</option>
-                {homeCategories.map((item) => (
-                  <option key={item.slug} value={item.slug}>
-                    {item.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 25 Districts Location Select */}
-            <div className="w-full md:w-64 shrink-0 px-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-colors">
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 text-slate-400 shrink-0" />
-                <select
-                  aria-label="Location"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full bg-transparent border-0 focus:ring-0 text-slate-700 h-14 px-3 outline-none cursor-pointer text-sm font-medium"
+              <div className="min-w-0 flex-1">
+                <label
+                  htmlFor="home-search-category"
+                  className="text-[11px] font-semibold uppercase tracking-wider text-slate-500"
                 >
-                  <option value="">Any Location (All 25 Districts)</option>
-                  <option value="__custom_town__">Type a town / city…</option>
-                  {SRI_LANKA_PROVINCES_DISTRICTS.map((group) => (
-                    <optgroup key={group.province} label={group.province}>
-                      {group.districts.map((d) => (
-                        <option key={d} value={d}>
-                          {d}
-                        </option>
-                      ))}
-                    </optgroup>
+                  Category
+                </label>
+                <select
+                  id="home-search-category"
+                  aria-label="Category"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full min-w-0 bg-transparent border-0 focus:ring-0 text-slate-700 h-8 outline-none cursor-pointer text-sm font-medium"
+                >
+                  <option value="">All Categories</option>
+                  {homeCategories.map((item) => (
+                    <option key={item.slug} value={item.slug}>
+                      {item.label}
+                    </option>
                   ))}
                 </select>
               </div>
-              {city === "__custom_town__" && (
-                <div className="pb-3 space-y-1 text-left">
+            </div>
+
+            {/* 25 Districts Location Select */}
+            <div className="min-w-0 h-20 flex items-center gap-3 px-4 bg-slate-50 rounded-xl border border-transparent focus-within:border-primary/50 focus-within:bg-white transition-colors">
+              <MapPin className="h-5 w-5 text-slate-400 shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
                   <label
-                    htmlFor="home-custom-town"
-                    className="text-xs font-medium text-slate-600"
+                    htmlFor={
+                      city === "__custom_town__"
+                        ? "home-custom-town"
+                        : "home-search-location"
+                    }
+                    className="text-[11px] font-semibold uppercase tracking-wider text-slate-500"
                   >
-                    Town / city
+                    {city === "__custom_town__" ? "Town / city" : "Location"}
                   </label>
+                  {city === "__custom_town__" && (
+                    <button
+                      type="button"
+                      onClick={() => setCity("")}
+                      className="text-xs font-medium text-teal-700 hover:text-teal-900 focus-visible:outline-2 focus-visible:outline-primary rounded-sm"
+                      aria-label="Change location selection"
+                    >
+                      Change
+                    </button>
+                  )}
+                </div>
+                {city !== "__custom_town__" ? (
+                  <select
+                    id="home-search-location"
+                    aria-label="Location"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full min-w-0 bg-transparent border-0 focus:ring-0 text-slate-700 h-8 outline-none cursor-pointer text-sm font-medium"
+                  >
+                    <option value="">All districts</option>
+                    <option value="__custom_town__">Type a town / city…</option>
+                    {SRI_LANKA_PROVINCES_DISTRICTS.map((group) => (
+                      <optgroup key={group.province} label={group.province}>
+                        {group.districts.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                ) : (
                   <Input
                     id="home-custom-town"
                     value={customTown}
@@ -140,17 +174,19 @@ export function Hero() {
                     required
                     pattern={".*\\S.*"}
                     maxLength={120}
-                    className="bg-white h-10"
+                    autoFocus
+                    className="border-0 bg-transparent focus-visible:ring-0 shadow-none text-sm h-8 px-0 rounded-none"
                   />
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
             {/* Submit Button */}
             <Button
               type="submit"
-              className="h-14 px-8 text-base md:text-lg bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl w-full md:w-auto shadow-md"
+              className="h-14 md:h-20 px-6 text-base bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl w-full shadow-md gap-2"
             >
+              <Search className="h-4 w-4" aria-hidden="true" />
               Search
             </Button>
           </form>

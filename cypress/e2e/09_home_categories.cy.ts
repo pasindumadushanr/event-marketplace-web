@@ -135,6 +135,27 @@ describe("Homepage category search", () => {
     cy.get("#home-custom-town").type("  Walasmulla  ");
     cy.get("#home-custom-town")
       .closest("form")
+      .invoke("outerHeight")
+      .should("be.lessThan", 110);
+    cy.get("#home-custom-town")
+      .closest("form")
+      .parent()
+      .should("have.css", "opacity", "1")
+      .and("have.css", "transform", "none");
+    cy.get("#home-custom-town")
+      .closest("form")
+      .scrollIntoView({ offset: { top: -180, left: 0 } });
+    cy.screenshot("custom-town-desktop-viewport", { capture: "viewport" });
+    cy.viewport(390, 844);
+    cy.get("#home-custom-town")
+      .closest("form")
+      .scrollIntoView({ offset: { top: -180, left: 0 } });
+    cy.screenshot("custom-town-mobile-viewport", { capture: "viewport" });
+    cy.document().then((doc) =>
+      expect(doc.documentElement.scrollWidth).to.be.at.most(390),
+    );
+    cy.get("#home-custom-town")
+      .closest("form")
       .contains("button", "Search")
       .click();
     cy.location("search")
@@ -164,6 +185,7 @@ describe("Homepage category search", () => {
       .should("have.prop", "validity")
       .its("valid")
       .should("eq", false);
+    cy.get('button[aria-label="Change location selection"]').click();
     cy.get('select[aria-label="Location"]').select("Colombo");
     cy.get("#home-custom-town").should("not.exist");
     cy.get('select[aria-label="Location"]').select("");
