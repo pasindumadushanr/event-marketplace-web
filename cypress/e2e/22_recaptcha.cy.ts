@@ -57,7 +57,9 @@ describe("reCAPTCHA protected forms", () => {
     cy.visit("/contact");
     fillContact();
     cy.contains("button", "Send Message").click();
-    cy.contains("Security verification could not load.").should("be.visible");
+    cy.contains("Security verification could not complete.").should(
+      "be.visible",
+    );
     cy.get("@unexpectedRequest").should("not.have.been.called");
     cy.contains("button", "Send Message").should("be.enabled");
   });
@@ -94,5 +96,49 @@ describe("reCAPTCHA protected forms", () => {
     cy.get("form").submit();
     cy.wait("@registration");
     cy.contains("Security verification failed.").should("be.visible");
+  });
+  it("shows a configuration error without sending a signup request", () => {
+    cy.intercept("GET", "https://www.google.com/recaptcha/api.js*", {
+      headers: { "content-type": "application/javascript" },
+      body: `window.grecaptcha = { ready: function(cb) { cb(); }, execute: function() { throw new Error("Invalid site key or not loaded in api.js"); } };`,
+    });
+    const request = cy.stub().as("unexpectedSignup");
+    cy.intercept("POST", "**/auth/register", request);
+    cy.visit("/vendor/register");
+    cy.get("#firstName").type("Test");
+    cy.get("#lastName").type("Vendor");
+    cy.get("#email").type("vendor@example.com");
+    cy.get("#phone").type("0771234567");
+    cy.get("#password").type("TestPassword123");
+    cy.get("form").submit();
+    cy.contains("Security verification is not configured correctly.").should(
+      "be.visible",
+    );
+    cy.get("@unexpectedSignup").should("not.have.been.called");
+    cy.get("#email").should("have.value", "vendor@example.com");
+    cy.contains("button", "Continue to Onboarding").should("be.enabled");
+  });
+  it("recovers a blocked primary script without duplicating the form request", () => {
+    cy.intercept("GET", "https://www.google.com/recaptcha/api.js*", {
+      forceNetworkError: true,
+    });
+    cy.intercept("GET", "https://www.recaptcha.net/recaptcha/api.js*", {
+      headers: { "content-type": "application/javascript" },
+      body: `window.grecaptcha = { ready: function(cb) { cb(); }, execute: function(key, options) { return Promise.resolve("fallback-" + options.action); } };`,
+    }).as("fallbackScript");
+    let requests = 0;
+    cy.intercept("POST", "**/contact", (req) => {
+      requests++;
+      expect(req.headers["x-recaptcha-token"]).to.eq("fallback-contact");
+      req.reply({ body: { success: true } });
+    }).as("contact");
+    cy.visit("/contact");
+    fillContact();
+    cy.contains("button", "Send Message").click();
+    cy.wait("@fallbackScript");
+    cy.wait("@contact");
+    cy.contains("Your message has been sent successfully!")
+      .should("be.visible")
+      .then(() => expect(requests).to.eq(1));
   });
 });
