@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import api from '@/lib/api';
-import { toast } from 'sonner';
-import { useAuth } from '@/lib/auth-context';
+import { useEffect, useState } from "react";
+import api from "@/lib/api";
+import { isAxiosError } from "axios";
+import { toast } from "sonner";
+import { useAuth } from "@/lib/auth-context";
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +21,7 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
-  DropdownMenuPortal,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -29,12 +29,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Mail } from 'lucide-react';
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MoreHorizontal, Mail } from "lucide-react";
 
 interface User {
   id: string;
@@ -56,7 +56,7 @@ interface UserTableProps {
 
 export function UserTable({ roles }: UserTableProps) {
   const { user } = useAuth();
-  const isSuperAdmin = user?.roleName === 'SUPER_ADMIN';
+  const isSuperAdmin = user?.roleName === "SUPER_ADMIN";
 
   const [users, setUsers] = useState<User[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
@@ -64,23 +64,27 @@ export function UserTable({ roles }: UserTableProps) {
 
   // Contact Modal State
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [selectedUserForContact, setSelectedUserForContact] = useState<User | null>(null);
-  const [contactSubject, setContactSubject] = useState('');
-  const [contactMessage, setContactMessage] = useState('');
+  const [selectedUserForContact, setSelectedUserForContact] =
+    useState<User | null>(null);
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
   const [isSendingContact, setIsSendingContact] = useState(false);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
-      const query = roles && roles.length > 0 ? `?roles=${roles.join(',')}` : '';
+      const query =
+        roles && roles.length > 0 ? `?roles=${roles.join(",")}` : "";
       const [usersRes, plansRes] = await Promise.all([
         api.get(`/users${query}`),
-        roles?.includes('VENDOR') ? api.get('/subscriptions/plans') : Promise.resolve({ data: [] })
+        roles?.includes("VENDOR")
+          ? api.get("/subscriptions/plans")
+          : Promise.resolve({ data: [] }),
       ]);
       setUsers(usersRes.data);
       if (plansRes.data) setPlans(plansRes.data);
     } catch (error) {
-      toast.error('Failed to load data');
+      toast.error("Failed to load data");
     } finally {
       setIsLoading(false);
     }
@@ -95,38 +99,44 @@ export function UserTable({ roles }: UserTableProps) {
       await api.patch(`/users/${userId}/status`, { status: newStatus });
       toast.success(`User status updated to ${newStatus}`);
       fetchData(); // Refresh data
-    } catch (error) {
-      toast.error('Failed to update status');
+    } catch (error: unknown) {
+      toast.error(
+        (isAxiosError(error) && error.response?.data?.message) || "Failed to update status",
+      );
     }
   };
 
   const handleGrantSubscription = async (userId: string, planId: string) => {
     try {
       await api.post(`/subscriptions/vendors/${userId}/grant-free`, { planId });
-      toast.success('Granted free subscription to vendor!');
+      toast.success("Granted free subscription to vendor!");
       fetchData();
     } catch (error: any) {
-      toast.error(`Failed to grant subscription: ${error?.response?.data?.message || error.message}`);
+      toast.error(
+        `Failed to grant subscription: ${error?.response?.data?.message || error.message}`,
+      );
     }
   };
 
   const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUserForContact || !contactSubject || !contactMessage) return;
-    
+
     setIsSendingContact(true);
     try {
       await api.post(`/users/${selectedUserForContact.id}/contact`, {
         subject: contactSubject,
         message: contactMessage,
-        method: 'EMAIL'
+        method: "EMAIL",
       });
-      toast.success('Message sent successfully!');
+      toast.success("Message sent successfully!");
       setIsContactModalOpen(false);
-      setContactSubject('');
-      setContactMessage('');
+      setContactSubject("");
+      setContactMessage("");
     } catch (error: any) {
-      toast.error(`Failed to send message: ${error.response?.data?.message || error.message}`);
+      toast.error(
+        `Failed to send message: ${error.response?.data?.message || error.message}`,
+      );
     } finally {
       setIsSendingContact(false);
     }
@@ -134,15 +144,21 @@ export function UserTable({ roles }: UserTableProps) {
 
   const openContactModal = (user: User) => {
     setSelectedUserForContact(user);
-    setContactSubject('');
-    setContactMessage('');
+    setContactSubject("");
+    setContactMessage("");
     setIsContactModalOpen(true);
   };
 
-  const isVendorTable = roles?.includes('VENDOR');
+  const isVendorTable = roles?.includes("VENDOR");
 
   return (
     <div className="rounded-md border bg-white shadow-sm">
+      {!isSuperAdmin && (
+        <p className="border-b px-4 py-3 text-sm text-muted-foreground">
+          You can contact users here. Suspending or reactivating accounts
+          requires a Super Admin.
+        </p>
+      )}
       <Table>
         <TableHeader>
           <TableRow>
@@ -152,123 +168,173 @@ export function UserTable({ roles }: UserTableProps) {
             {isVendorTable && <TableHead>Subscription</TableHead>}
             <TableHead>Status</TableHead>
             <TableHead>Joined</TableHead>
-            <TableHead className="w-[80px]"></TableHead>
+            <TableHead className="w-[140px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell colSpan={isVendorTable ? 7 : 6} className="h-24 text-center">
+              <TableCell
+                colSpan={isVendorTable ? 7 : 6}
+                className="h-24 text-center"
+              >
                 Loading users...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={isVendorTable ? 7 : 6} className="h-24 text-center">
+              <TableCell
+                colSpan={isVendorTable ? 7 : 6}
+                className="h-24 text-center"
+              >
                 No users found.
               </TableCell>
             </TableRow>
           ) : (
             users.map((user) => {
               const latestSub = user.vendorSubscriptions?.[0];
-              const isSubActive = latestSub?.status === 'ACTIVE';
-              
+              const isSubActive = latestSub?.status === "ACTIVE";
+
               return (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">
-                  {user.firstName} {user.lastName}
-                </TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Badge variant="outline" className="bg-zinc-100 text-zinc-800">
-                    {user.role?.name || 'UNKNOWN'}
-                  </Badge>
-                </TableCell>
-                {isVendorTable && (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">
+                    {user.firstName} {user.lastName}
+                  </TableCell>
+                  <TableCell>{user.email}</TableCell>
                   <TableCell>
-                    {latestSub ? (
-                       <Badge variant={isSubActive ? 'default' : 'secondary'} className={isSubActive ? 'bg-primary' : ''}>
-                         {latestSub.status}
-                       </Badge>
-                    ) : (
-                      <Badge variant="secondary">NONE</Badge>
+                    <Badge
+                      variant="outline"
+                      className="bg-zinc-100 text-zinc-800"
+                    >
+                      {user.role?.name || "UNKNOWN"}
+                    </Badge>
+                  </TableCell>
+                  {isVendorTable && (
+                    <TableCell>
+                      {latestSub ? (
+                        <Badge
+                          variant={isSubActive ? "default" : "secondary"}
+                          className={isSubActive ? "bg-primary" : ""}
+                        >
+                          {latestSub.status}
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">NONE</Badge>
+                      )}
+                    </TableCell>
+                  )}
+                  <TableCell>
+                    <Badge
+                      variant={
+                        user.status === "ACTIVE" ? "default" : "destructive"
+                      }
+                      className={
+                        user.status === "ACTIVE"
+                          ? "bg-green-600 hover:bg-green-700"
+                          : ""
+                      }
+                    >
+                      {user.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {new Intl.DateTimeFormat("en-US", {
+                      timeZone: "Asia/Colombo",
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: true,
+                    }).format(
+                      new Date(
+                        isVendorTable && user.businesses?.[0]?.createdAt
+                          ? user.businesses[0].createdAt
+                          : user.createdAt,
+                      ),
                     )}
                   </TableCell>
-                )}
-                <TableCell>
-                  <Badge 
-                    variant={user.status === 'ACTIVE' ? 'default' : 'destructive'}
-                    className={user.status === 'ACTIVE' ? 'bg-green-600 hover:bg-green-700' : ''}
-                  >
-                    {user.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="whitespace-nowrap">
-                  {new Intl.DateTimeFormat('en-US', {
-                    timeZone: 'Asia/Colombo',
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: true
-                  }).format(new Date(isVendorTable && user.businesses?.[0]?.createdAt ? user.businesses[0].createdAt : user.createdAt))}
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="h-8 w-8 p-0 inline-flex items-center justify-center rounded-md hover:bg-zinc-100 transition-colors">
-                      <span className="sr-only">Open menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <div className="px-2 py-1.5 text-sm font-semibold">Actions</div>
-                      <DropdownMenuItem onClick={() => openContactModal(user)}>
-                        <Mail className="mr-2 h-4 w-4" />
-                        Contact User
-                      </DropdownMenuItem>
-                      {isVendorTable && isSuperAdmin && (
-                        <DropdownMenuSub>
-                          <DropdownMenuSubTrigger>Grant Free Sub</DropdownMenuSubTrigger>
-                          <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                              {plans.length === 0 ? (
-                                <DropdownMenuItem disabled>No plans available</DropdownMenuItem>
-                              ) : (
-                                plans.map(plan => (
-                                  <DropdownMenuItem 
-                                    key={plan.id}
-                                    onClick={() => handleGrantSubscription(user.id, plan.id)}
-                                  >
-                                    {plan.name} ({plan.durationDays} days)
-                                  </DropdownMenuItem>
-                                ))
-                              )}
-                            </DropdownMenuSubContent>
-                          </DropdownMenuPortal>
-                        </DropdownMenuSub>
-                      )}
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="min-h-11 cursor-pointer gap-2"
+                        aria-label={`Contact ${user.firstName} ${user.lastName}`}
+                        onClick={() => openContactModal(user)}
+                      >
+                        <Mail className="h-4 w-4" />
+                        Contact
+                      </Button>
                       {isSuperAdmin && (
-                        user.status === 'ACTIVE' ? (
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(user.id, 'SUSPENDED')}
-                            className="text-red-600 focus:text-red-600"
+                        <DropdownMenu modal={false}>
+                          <DropdownMenuTrigger
+                            aria-label={`More actions for ${user.firstName} ${user.lastName}`}
+                            className="h-11 w-11 p-0 inline-flex cursor-pointer items-center justify-center rounded-md hover:bg-zinc-100 transition-colors"
                           >
-                            Suspend User
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem 
-                            onClick={() => handleStatusChange(user.id, 'ACTIVE')}
-                            className="text-green-600 focus:text-green-600"
-                          >
-                            Activate User
-                          </DropdownMenuItem>
-                        )
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="min-w-52">
+                            <div className="px-2 py-1.5 text-sm font-semibold">
+                              Actions
+                            </div>
+                            {isVendorTable && isSuperAdmin && (
+                              <DropdownMenuSub>
+                                <DropdownMenuSubTrigger>
+                                  Grant Free Sub
+                                </DropdownMenuSubTrigger>
+                                <DropdownMenuSubContent>
+                                  {plans.length === 0 ? (
+                                    <DropdownMenuItem disabled>
+                                      No plans available
+                                    </DropdownMenuItem>
+                                  ) : (
+                                    plans.map((plan) => (
+                                      <DropdownMenuItem
+                                        key={plan.id}
+                                        onClick={() =>
+                                          handleGrantSubscription(
+                                            user.id,
+                                            plan.id,
+                                          )
+                                        }
+                                      >
+                                        {plan.name} ({plan.durationDays} days)
+                                      </DropdownMenuItem>
+                                    ))
+                                  )}
+                                </DropdownMenuSubContent>
+                              </DropdownMenuSub>
+                            )}
+                            {isSuperAdmin &&
+                              (user.status === "ACTIVE" ? (
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(user.id, "SUSPENDED")
+                                  }
+                                  className="text-red-600 focus:text-red-600"
+                                >
+                                  Suspend User
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleStatusChange(user.id, "ACTIVE")
+                                  }
+                                  className="text-green-600 focus:text-green-600"
+                                >
+                                  Activate User
+                                </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            )})
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>
@@ -279,14 +345,22 @@ export function UserTable({ roles }: UserTableProps) {
           <DialogHeader>
             <DialogTitle>Contact User</DialogTitle>
             <DialogDescription>
-              Send an email directly to {selectedUserForContact?.firstName} {selectedUserForContact?.lastName} ({selectedUserForContact?.email}).
+              Send an email directly to {selectedUserForContact?.firstName}{" "}
+              {selectedUserForContact?.lastName} (
+              {selectedUserForContact?.email}).
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleContactSubmit}>
             <div className="grid gap-4 py-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">Subject</label>
+                <label
+                  htmlFor="user-contact-subject"
+                  className="text-sm font-medium"
+                >
+                  Subject
+                </label>
                 <Input
+                  id="user-contact-subject"
                   placeholder="e.g. Missing Application Details"
                   value={contactSubject}
                   onChange={(e) => setContactSubject(e.target.value)}
@@ -294,8 +368,14 @@ export function UserTable({ roles }: UserTableProps) {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">Message</label>
+                <label
+                  htmlFor="user-contact-message"
+                  className="text-sm font-medium"
+                >
+                  Message
+                </label>
                 <Textarea
+                  id="user-contact-message"
                   placeholder="Type your message here..."
                   className="min-h-[120px]"
                   value={contactMessage}
@@ -305,11 +385,15 @@ export function UserTable({ roles }: UserTableProps) {
               </div>
             </div>
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsContactModalOpen(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setIsContactModalOpen(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSendingContact}>
-                {isSendingContact ? 'Sending...' : 'Send Message'}
+                {isSendingContact ? "Sending..." : "Send Message"}
               </Button>
             </DialogFooter>
           </form>
