@@ -1,11 +1,12 @@
-import { Navbar } from '@/components/home/Navbar';
-import { Footer } from '@/components/home/Footer';
-import { ShieldCheck, Lock, Eye, Server, RefreshCw, Mail } from 'lucide-react';
-import Link from 'next/link';
+import { Navbar } from "@/components/home/Navbar";
+import { Footer } from "@/components/home/Footer";
+import { ShieldCheck, Lock, Eye, Server, RefreshCw, Mail } from "lucide-react";
+import Link from "next/link";
 
 export const metadata = {
-  title: 'Privacy Policy | Nakathata.lk Marketplace',
-  description: 'Learn how Nakathata.lk protects your personal data, handles booking information, and ensures safe, encrypted transactions.',
+  title: "Privacy Policy | Nakathata.lk Marketplace",
+  description:
+    "Learn how Nakathata.lk protects your personal data, handles booking information, and ensures safe, encrypted transactions.",
 };
 
 export default function PrivacyPage() {
@@ -23,7 +24,8 @@ export default function PrivacyPage() {
             Privacy Policy
           </h1>
           <p className="text-sm text-slate-500 mt-2">
-            Last Updated: October 2026 • We respect your privacy and protect your personal information.
+            Last Updated: October 2026 • We respect your privacy and protect
+            your personal information.
           </p>
         </div>
 
@@ -32,10 +34,16 @@ export default function PrivacyPage() {
           {/* Section 1 */}
           <section className="space-y-3">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-primary" /> 1. Commitment to Privacy
+              <ShieldCheck className="h-5 w-5 text-primary" /> 1. Commitment to
+              Privacy
             </h2>
             <p>
-              At Nakathata.lk (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;), we recognize the sensitivity of the personal, logistical, and financial details involved in planning weddings, galas, and celebrations. This policy explains how we collect, safeguard, and utilize your information across our website and services.
+              At Nakathata.lk (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or
+              &ldquo;us&rdquo;), we recognize the sensitivity of the personal,
+              logistical, and financial details involved in planning weddings,
+              galas, and celebrations. This policy explains how we collect,
+              safeguard, and utilize your information across our website and
+              services.
             </p>
           </section>
 
@@ -44,65 +52,140 @@ export default function PrivacyPage() {
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <Eye className="h-5 w-5 text-primary" /> 2. Information We Collect
             </h2>
-            <p>We only gather details necessary to facilitate seamless marketplace transactions:</p>
+            <p>
+              We only gather details necessary to facilitate seamless
+              marketplace transactions:
+            </p>
             <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
-              <li><strong>Client Data:</strong> Name, email address, telephone number, event date, venue location, and package preferences provided during account creation or booking.</li>
-              <li><strong>Vendor Data:</strong> Commercial legal name, trading name, contact details, business registration numbers, government ID documents, bank settlement details, and portfolio media.</li>
-              <li><strong>Technical Logs:</strong> IP address, device telemetry, browser type, and interaction cookies utilized to enhance security and session stability.</li>
+              <li>
+                <strong>Client Data:</strong> Name, email address, telephone
+                number, event date, venue location, and package preferences
+                provided during account creation or booking.
+              </li>
+              <li>
+                <strong>Vendor Data:</strong> Commercial legal name, trading
+                name, contact details, business registration numbers, government
+                ID documents, bank settlement details, and portfolio media.
+              </li>
+              <li>
+                <strong>Technical Logs:</strong> IP address, device telemetry,
+                browser type, and interaction cookies utilized to enhance
+                security and session stability.
+              </li>
+              <li>
+                <strong>Optional Nearby Search:</strong> When you choose Use my
+                location and grant browser permission, we send your current
+                coordinates to our server to find vendors within 50 km. Search
+                coordinates remain in page memory, are not saved to your
+                account, and are not intentionally recorded in our application
+                logs or analytics. Turn off nearby search or leave the page to
+                stop using them. Vendor business coordinates are saved when a
+                vendor explicitly chooses Save Changes and are treated as public
+                business-location information.
+              </li>
             </ul>
           </section>
 
           {/* Section 3 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Lock className="h-5 w-5 text-primary" /> 3. Payment & Financial Security
+              <Lock className="h-5 w-5 text-primary" /> 3. Payment & Financial
+              Security
             </h2>
             <p>
-              Your financial safety is paramount. All payment operations (such as booking advance deposits) are processed via <strong>256-bit TLS/SSL encrypted channels</strong> with certified payment gateways compliant with PCI-DSS standards.
+              Your financial safety is paramount. All payment operations (such
+              as booking advance deposits) are processed via{" "}
+              <strong>256-bit TLS/SSL encrypted channels</strong> with certified
+              payment gateways compliant with PCI-DSS standards.
             </p>
             <p>
-              Nakathata.lk <strong>never stores full credit or debit card numbers, CVC codes, or banking PINs</strong> on our application servers.
+              Nakathata.lk{" "}
+              <strong>
+                never stores full credit or debit card numbers, CVC codes, or
+                banking PINs
+              </strong>{" "}
+              on our application servers.
             </p>
           </section>
 
           {/* Section 4 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <Server className="h-5 w-5 text-primary" /> 4. How We Use Your Data
+              <Server className="h-5 w-5 text-primary" /> 4. How We Use Your
+              Data
             </h2>
             <ul className="list-disc pl-5 space-y-1.5 text-slate-600">
-              <li>Facilitating direct communication between clients and vendors.</li>
-              <li>Transmitting automated transactional notifications (booking approvals, receipt confirmations, and message alerts).</li>
-              <li>Verifying vendor legitimacy and preventing fraudulent store accounts.</li>
-              <li>Continuously diagnosing performance and platform stability.</li>
+              <li>
+                Facilitating direct communication between clients and vendors.
+              </li>
+              <li>
+                Transmitting automated transactional notifications (booking
+                approvals, receipt confirmations, and message alerts).
+              </li>
+              <li>
+                Verifying vendor legitimacy and preventing fraudulent store
+                accounts.
+              </li>
+              <li>
+                Continuously diagnosing performance and platform stability.
+              </li>
             </ul>
           </section>
 
           {/* Section 5 */}
           <section className="space-y-3 border-t border-slate-100 pt-6">
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <RefreshCw className="h-5 w-5 text-primary" /> 5. Data Rights & Retention
+              <RefreshCw className="h-5 w-5 text-primary" /> 5. Data Rights &
+              Retention
             </h2>
             <p>
-              You maintain full ownership of your personal profile. You may access, amend, or request complete deletion of your account and personal data at any time by navigating to your Account Settings or contacting our Data Compliance team at{' '}
-              <a href="mailto:privacy@nakathata.lk" className="text-primary font-bold hover:underline">
+              You maintain full ownership of your personal profile. You may
+              access, amend, or request complete deletion of your account and
+              personal data at any time by navigating to your Account Settings
+              or contacting our Data Compliance team at{" "}
+              <a
+                href="mailto:privacy@nakathata.lk"
+                className="text-primary font-bold hover:underline"
+              >
                 privacy@nakathata.lk
-              </a>.
+              </a>
+              .
             </p>
           </section>
 
           <section className="space-y-3 border-t border-slate-100 pt-6">
-            <h2 className="text-xl font-bold text-slate-900">6. Spam Prevention with Google reCAPTCHA</h2>
+            <h2 className="text-xl font-bold text-slate-900">
+              6. Spam Prevention with Google reCAPTCHA
+            </h2>
             <p>
-              We use Google reCAPTCHA to help protect registration, contact, support, and password-recovery
-              requests from automated abuse. When you submit a protected form, Google may process
-              technical information such as your IP address, browser information, and interaction signals
-              to assess whether the request is legitimate. This security check is separate from website analytics.
+              We use Google reCAPTCHA to help protect registration, contact,
+              support, and password-recovery requests from automated abuse. When
+              you submit a protected form, Google may process technical
+              information such as your IP address, browser information, and
+              interaction signals to assess whether the request is legitimate.
+              This security check is separate from website analytics.
             </p>
             <p>
-              Google&apos;s <a href="https://policies.google.com/privacy" className="text-primary underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and{' '}
-              <a href="https://policies.google.com/terms" className="text-primary underline" target="_blank" rel="noopener noreferrer">Terms of Service</a> apply.
-              If verification prevents you from submitting a form, contact us using the contact details on our Contact Page.
+              Google&apos;s{" "}
+              <a
+                href="https://policies.google.com/privacy"
+                className="text-primary underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Privacy Policy
+              </a>{" "}
+              and{" "}
+              <a
+                href="https://policies.google.com/terms"
+                className="text-primary underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Terms of Service
+              </a>{" "}
+              apply. If verification prevents you from submitting a form,
+              contact us using the contact details on our Contact Page.
             </p>
           </section>
 
@@ -112,11 +195,19 @@ export default function PrivacyPage() {
               <Mail className="h-5 w-5 text-primary" /> 7. Contact Us
             </h2>
             <p>
-              If you have any questions or concerns regarding our privacy practices, please contact us via our{' '}
-              <Link href="/contact" className="text-primary font-bold hover:underline">
+              If you have any questions or concerns regarding our privacy
+              practices, please contact us via our{" "}
+              <Link
+                href="/contact"
+                className="text-primary font-bold hover:underline"
+              >
                 Contact Page
-              </Link>{' '}
-              or email us directly at <span className="font-semibold text-slate-900">support@nakathata.lk</span>.
+              </Link>{" "}
+              or email us directly at{" "}
+              <span className="font-semibold text-slate-900">
+                support@nakathata.lk
+              </span>
+              .
             </p>
           </section>
         </div>

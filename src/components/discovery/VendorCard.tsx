@@ -16,6 +16,7 @@ export interface VendorCardProps {
     startingPrice: number;
     rating: number;
     reviewCount: number;
+    distanceKm?: number | null;
   };
   initialIsFavorite?: boolean;
   onFavoriteChange?: (isFavorite: boolean) => void;
@@ -28,7 +29,7 @@ export function VendorCard({
 }: VendorCardProps) {
   return (
     <Link href={`/business/${business.id}`} className="group block">
-      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full h-[400px]">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full min-h-[400px]">
         {/* Image Section */}
         <div className="relative h-[220px] w-full bg-slate-100 overflow-hidden shrink-0">
           {business.coverImage ? (
@@ -67,6 +68,11 @@ export function VendorCard({
           </div>
 
           <div className="mt-6 flex flex-col flex-1">
+            {typeof business.distanceKm === "number" && (
+              <p className="text-xs font-medium text-teal-700 mb-1">
+                About {business.distanceKm.toFixed(1)} km away
+              </p>
+            )}
             <div className="flex items-center justify-between gap-2 mb-1">
               <div className="flex items-center gap-1.5 overflow-hidden">
                 <h3 className="text-lg font-bold text-slate-900 truncate">
