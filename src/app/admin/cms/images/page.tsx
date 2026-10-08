@@ -7,12 +7,13 @@ import api from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useSiteMedia, type SiteMedia } from "@/lib/site-media";
+import { imageGuidelines } from "@/lib/image-guidelines";
 
 const slots = [
   {
     key: "heroImage",
     title: "Homepage hero",
-    hint: "Use a wide photograph, ideally 1920 × 1080. The image is cropped to fill the background.",
+    hint: "The main background photograph behind the homepage heading and search bar.",
   },
   {
     key: "logoImage",
@@ -27,7 +28,7 @@ const slots = [
   ...["Colombo", "Kandy", "Galle", "Negombo"].map((name) => ({
     key: `location${name}`,
     title: `${name} location picture`,
-    hint: "Shown in Browse by Location on the homepage. Portrait or square photographs work best.",
+    hint: "Shown in Browse by Location on the homepage.",
   })),
 ] as const;
 
@@ -41,16 +42,12 @@ function validUrl(url: string) {
   }
 }
 
-function ImagePreview({
-  url,
-  title,
-  logo,
-}: {
-  url: string;
-  title: string;
-  logo: boolean;
-}) {
+function ImagePreview({ url, title }: { url: string; title: string }) {
   const [failed, setFailed] = useState(false);
+  const [dimensions, setDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   if (failed)
     return (
       <p role="status" className="px-4 text-center text-sm text-amber-700">
@@ -58,12 +55,25 @@ function ImagePreview({
       </p>
     );
   return (
-    <img
-      src={url}
-      alt={`${title} preview`}
-      className={`w-full h-full ${logo ? "object-contain" : "object-cover"}`}
-      onError={() => setFailed(true)}
-    />
+    <div className="relative h-full w-full">
+      <img
+        src={url}
+        alt={`${title} preview`}
+        className="w-full h-full object-contain"
+        onLoad={(event) =>
+          setDimensions({
+            width: event.currentTarget.naturalWidth,
+            height: event.currentTarget.naturalHeight,
+          })
+        }
+        onError={() => setFailed(true)}
+      />
+      {dimensions && (
+        <span className="absolute bottom-2 right-2 rounded-md bg-white/95 border border-slate-200 px-2 py-1 text-[11px] text-slate-700 shadow-sm">
+          Actual: {dimensions.width} × {dimensions.height} px
+        </span>
+      )}
+    </div>
   );
 }
 
@@ -217,22 +227,16 @@ export default function WebsiteImagesPage() {
     const value = category
       ? draft.categoryImages?.[key] || ""
       : String(draft[key as keyof SiteMedia] || "");
+    const guideline = imageGuidelines(key, category);
     return (
       <section
         key={key}
         className="bg-white border border-slate-200 rounded-2xl overflow-hidden"
         aria-label={title}
       >
-        <div
-          className={`h-40 flex items-center justify-center bg-slate-50 border-b ${key === "logoImage" ? "p-6" : ""}`}
-        >
+        <div className="h-40 flex items-center justify-center bg-slate-50 border-b">
           {value && validUrl(value) ? (
-            <ImagePreview
-              key={value}
-              url={value}
-              title={title}
-              logo={key === "logoImage"}
-            />
+            <ImagePreview key={value} url={value} title={title} />
           ) : (
             <div className="text-center text-slate-400 text-sm">
               <ImageIcon className="h-8 w-8 mx-auto mb-2" />
@@ -242,6 +246,13 @@ export default function WebsiteImagesPage() {
         </div>
         <div className="p-5 space-y-3">
           <h2 className="font-semibold text-slate-900">{title}</h2>
+          <div className="rounded-lg bg-teal-50 border border-teal-100 px-3 py-2 space-y-1">
+            <p className="text-xs font-semibold text-teal-900">
+              Recommended: {guideline.size}{" "}
+              <span className="font-normal">({guideline.ratio})</span>
+            </p>
+            <p className="text-xs leading-5 text-teal-800">{guideline.tip}</p>
+          </div>
           <p className="text-xs text-slate-500 min-h-10">{hint}</p>
           <label
             className="block text-xs font-medium text-slate-600"
@@ -309,6 +320,12 @@ export default function WebsiteImagesPage() {
         search icon and social-sharing artwork are separate from the website
         logo.
       </div>
+      <p className="text-sm text-slate-600">
+        Pixel sizes are recommendations, not upload requirements. Previews show
+        the full image, and your original file is not cropped during upload.
+        Hero and card images fill responsive frames on the website, so some
+        edges may still be cropped. The website logo is shown in full.
+      </p>
       {dirty && (
         <p role="status" className="text-sm font-medium text-amber-700">
           You have unpublished image changes.

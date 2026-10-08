@@ -155,4 +155,33 @@ describe("Website image controls", () => {
     );
     cy.get("#image-url-heroImage").should("have.value", "");
   });
+  it("shows recommended pixel sizes and the full image with its actual dimensions", () => {
+    visitAdmin();
+    cy.get('section[aria-label="Homepage hero"]')
+      .should("contain", "1920 × 1080 px")
+      .and("contain", "16:9");
+    cy.get('section[aria-label="Website logo"]')
+      .should("contain", "800 × 500 px")
+      .and("contain", "without cropping");
+    cy.get('section[aria-label="Default package picture"]').should(
+      "contain",
+      "1200 × 900 px",
+    );
+    cy.get('section[aria-label="Colombo location picture"]').should(
+      "contain",
+      "800 × 1000 px",
+    );
+    cy.get('section[aria-label="Photographers"]').should(
+      "contain",
+      "800 × 1000 px",
+    );
+    cy.get("#image-url-heroImage").type("/images/brand/favicon-96.png");
+    cy.get('img[alt="Homepage hero preview"]').should(
+      "have.css",
+      "object-fit",
+      "contain",
+    );
+    cy.contains("Actual: 96 × 96 px").scrollIntoView().should("be.visible");
+    cy.contains("not cropped during upload").should("be.visible");
+  });
 });
