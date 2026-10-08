@@ -14,7 +14,7 @@ export function NewsletterForm() {
   const [failed, setFailed] = useState(false);
   return (
     <form
-      className="w-full md:w-auto max-w-md space-y-3"
+      className="w-full space-y-3"
       onSubmit={async (event) => {
         event.preventDefault();
         setBusy(true);
@@ -33,7 +33,7 @@ export function NewsletterForm() {
         }
       }}
     >
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative w-full">
           <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-500" />
           <Input
@@ -44,13 +44,13 @@ export function NewsletterForm() {
             onChange={(event) => setEmail(event.target.value)}
             type="email"
             placeholder="Enter your email"
-            className="pl-10 h-12 bg-slate-950 border-slate-800 text-white focus-visible:ring-primary w-full"
+            className="pl-10 h-12 bg-white border-white/80 text-slate-900 placeholder:text-slate-500 focus-visible:ring-primary w-full rounded-xl"
           />
         </div>
         <Button
           type="submit"
           disabled={busy || !consent}
-          className="h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-6"
+          className="h-12 bg-primary hover:bg-primary/90 text-slate-950 font-semibold px-6 rounded-xl shrink-0"
         >
           {busy ? "Saving…" : "Subscribe"}
         </Button>
@@ -58,6 +58,7 @@ export function NewsletterForm() {
       <label className="flex items-start gap-2 text-xs text-slate-300">
         <input
           type="checkbox"
+          className="mt-0.5 accent-amber-400 shrink-0"
           required
           checked={consent}
           onChange={(event) => setConsent(event.target.checked)}

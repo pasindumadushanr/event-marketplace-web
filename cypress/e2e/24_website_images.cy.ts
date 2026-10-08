@@ -154,6 +154,5 @@ describe("Website image controls", () => {
       "be.visible",
     );
     cy.get("#image-url-heroImage").should("have.value", "");
-    cy.screenshot("website-images-mobile", { capture: "viewport" });
   });
 });

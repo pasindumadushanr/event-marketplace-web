@@ -1,111 +1,222 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { BrandLogo } from '@/components/brand/BrandLogo';
-import { Globe, Camera, MessageCircle, Briefcase } from 'lucide-react';
-import { NewsletterForm } from './NewsletterForm';
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
+import {
+  Globe,
+  Camera,
+  MessageCircle,
+  Briefcase,
+  MapPin,
+  Sparkles,
+  ArrowUpRight,
+} from "lucide-react";
+import { NewsletterForm } from "./NewsletterForm";
+
+type FooterContent = {
+  description?: string;
+  copyright?: string;
+  subtext?: string;
+  socials?: {
+    website?: string;
+    instagram?: string;
+    facebook?: string;
+    linkedin?: string;
+  };
+};
+
+const linkGroups = [
+  {
+    title: "Explore",
+    links: [
+      ["Categories", "/#categories"],
+      ["Vendors", "/search"],
+      ["Packages", "/#packages"],
+      ["Locations", "/locations"],
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      ["About Us", "/about"],
+      ["Become a Vendor", "/vendor/register"],
+      ["Careers", "/careers"],
+      ["Blog", "/blog"],
+      ["Contact", "/contact"],
+    ],
+  },
+  {
+    title: "Support",
+    links: [
+      ["FAQ", "/faq"],
+      ["Terms of Service", "/terms"],
+      ["Privacy Policy", "/privacy"],
+      ["Trust & Safety", "/trust"],
+    ],
+  },
+];
 
 export function Footer() {
-  const [cms, setCms] = useState<any>(null);
-
+  const [cms, setCms] = useState<FooterContent | null>(null);
   useEffect(() => {
+    let active = true;
     async function getFooterSettings() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/admin/cms/public/settings/FOOTER_CONTENT`);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/cms/public/settings/FOOTER_CONTENT`,
+        );
         if (res.ok) {
           const data = await res.json();
-          setCms(data.value ?? data);
+          if (active) setCms(data.value ?? data);
         }
-      } catch (error) {
-        console.error('Failed to fetch footer settings:', error);
+      } catch {
+        /* Original footer copy remains available when CMS is offline. */
       }
     }
-    getFooterSettings();
+    void getFooterSettings();
+    return () => {
+      active = false;
+    };
   }, []);
 
-  const description = cms?.description || 'The premier destination for luxury events. Discover, compare, and book the finest vendors and venues with ease and security.';
-  const copyright = cms?.copyright || `© ${new Date().getFullYear()} Nakathata.lk Marketplace. All rights reserved.`;
-  const subtext = cms?.subtext || 'Designed for Premium Events';
-  const socials = cms?.socials || { website: 'https://nakathata.lk', instagram: 'https://www.instagram.com/nakathata.lk/', facebook: 'https://web.facebook.com/profile.php?id=61595001868271', linkedin: '#' };
+  const description =
+    cms?.description ||
+    "Find the people and places that make your celebration special. Explore wedding venues and event professionals across Sri Lanka, all in one place.";
+  const copyright =
+    cms?.copyright ||
+    `© ${new Date().getFullYear()} Nakathata.lk. All rights reserved.`;
+  const subtext = cms?.subtext || "Weddings. Events. Everything together.";
+  const socials = {
+    website: "https://nakathata.lk",
+    instagram: "https://www.instagram.com/nakathata.lk/",
+    facebook: "https://web.facebook.com/profile.php?id=61595001868271",
+    linkedin: "",
+    ...cms?.socials,
+  };
+  const socialLinks = [
+    { label: "Visit our website", href: socials.website, icon: Globe },
+    {
+      label: "Follow Nakathata on Instagram",
+      href: socials.instagram,
+      icon: Camera,
+    },
+    {
+      label: "Follow Nakathata on Facebook",
+      href: socials.facebook,
+      icon: MessageCircle,
+    },
+    {
+      label: "Follow Nakathata on LinkedIn",
+      href: socials.linkedin,
+      icon: Briefcase,
+    },
+  ].filter((link) => link.href && /^https?:\/\//i.test(link.href));
 
   return (
-    <footer className="bg-slate-950 text-slate-300 pt-20 pb-10">
+    <footer className="relative bg-[#faf8f3] text-slate-600 border-t border-[#e9e2d3] pt-12 sm:pt-16 pb-6 sm:pb-8">
+      <div
+        aria-hidden="true"
+        className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent"
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Newsletter Section */}
-        <div className="flex flex-col md:flex-row items-center justify-between p-10 bg-slate-900 rounded-3xl mb-16 border border-slate-800">
-          <div className="mb-6 md:mb-0 md:mr-8 text-center md:text-left">
-            <h3 className="text-2xl font-bold text-white mb-2">Subscribe to our Newsletter</h3>
-            <p className="text-slate-400">Get the latest wedding trends, event tips, and exclusive offers.</p>
+        <section
+          aria-labelledby="footer-newsletter-title"
+          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 sm:p-8 lg:p-10 mb-12 sm:mb-16 shadow-xl shadow-slate-900/10"
+        >
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-32 w-80 h-80 rounded-full border border-primary/20 pointer-events-none"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute -right-2 -top-16 w-48 h-48 rounded-full border border-primary/10 pointer-events-none"
+          />
+          <div className="relative grid lg:grid-cols-[1fr_0.9fr] items-center gap-6 lg:gap-12">
+            <div>
+              <p className="flex items-center gap-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-amber-300 mb-3">
+                <Sparkles className="h-4 w-4 shrink-0" />A little inspiration
+                for your big day
+              </p>
+              <h2
+                id="footer-newsletter-title"
+                className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-3"
+              >
+                Make every celebration special.
+              </h2>
+              <p className="text-sm leading-relaxed text-slate-300 max-w-md">
+                Wedding ideas, planning tips, and fresh inspiration—delivered to
+                your inbox.
+              </p>
+            </div>
+            <NewsletterForm />
           </div>
-          <NewsletterForm />
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16">
-          
-          <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-6">
-              <BrandLogo className="w-48" />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.7fr_1fr_1fr_1fr] gap-x-6 gap-y-10 lg:gap-12 pb-10 sm:pb-12">
+          <div className="col-span-2 md:col-span-3 lg:col-span-1">
+            <Link
+              href="/"
+              aria-label="Nakathata.lk home"
+              className="inline-flex bg-white rounded-2xl border border-[#ece5d7] p-3 shadow-sm mb-5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4"
+            >
+              <BrandLogo className="w-36 sm:w-40 rounded-none" />
             </Link>
-            <p className="text-slate-400 leading-relaxed mb-6 max-w-sm">
-              {description}
+            <p className="text-sm leading-7 max-w-sm mb-5">{description}</p>
+            <p className="flex items-center gap-2 text-xs font-semibold text-slate-700 mb-5">
+              <MapPin className="h-4 w-4 text-amber-700" />
+              Celebrating across Sri Lanka
             </p>
-            <div className="flex gap-4">
-              <a href={socials.website} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <Globe className="h-5 w-5" />
-              </a>
-              <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <Camera className="h-5 w-5" />
-              </a>
-              <a href={socials.facebook} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <MessageCircle className="h-5 w-5" />
-              </a>
-              <a href={socials.linkedin} target="_blank" rel="noopener noreferrer" className="h-10 w-10 rounded-full bg-slate-900 flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
-                <Briefcase className="h-5 w-5" />
-              </a>
+            <div
+              className="flex flex-wrap gap-2.5"
+              aria-label="Social media links"
+            >
+              {socialLinks.map(({ label, href, icon: Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="h-10 w-10 rounded-xl border border-[#e5decf] bg-white flex items-center justify-center text-slate-600 hover:border-primary hover:bg-primary/10 hover:text-amber-800 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
+                >
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </a>
+              ))}
             </div>
           </div>
 
-          <div>
-            <h4 className="text-white font-bold mb-6">Explore</h4>
-            <ul className="space-y-4">
-              <li><Link href="/#categories" className="hover:text-primary transition-colors">Categories</Link></li>
-              <li><Link href="/search" className="hover:text-primary transition-colors">Vendors</Link></li>
-              <li><Link href="/#packages" className="hover:text-primary transition-colors">Packages</Link></li>
-              <li><Link href="/locations" className="hover:text-primary transition-colors">Locations</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-bold mb-6">Company</h4>
-            <ul className="space-y-4">
-              <li><Link href="/about" className="hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link href="/vendor/register" className="hover:text-primary transition-colors">Become a Vendor</Link></li>
-              <li><Link href="/careers" className="hover:text-primary transition-colors">Careers</Link></li>
-              <li><Link href="/blog" className="hover:text-primary transition-colors">Blog</Link></li>
-              <li><Link href="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-white font-bold mb-6">Support</h4>
-            <ul className="space-y-4">
-              <li><Link href="/faq" className="hover:text-primary transition-colors">FAQ</Link></li>
-              <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/trust" className="hover:text-primary transition-colors">Trust & Safety</Link></li>
-            </ul>
-          </div>
+          {linkGroups.map((group) => (
+            <nav key={group.title} aria-label={`Footer ${group.title}`}>
+              <h3 className="text-xs font-bold uppercase tracking-[0.14em] text-slate-900 mb-5">
+                {group.title}
+              </h3>
+              <ul className="space-y-1">
+                {group.links.map(([label, href]) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="group inline-flex items-center gap-1 py-2 text-sm hover:text-amber-800 transition-colors focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2 rounded-sm"
+                    >
+                      {label}
+                      {label === "Become a Vendor" && (
+                        <ArrowUpRight
+                          className="h-3.5 w-3.5 text-amber-700"
+                          aria-hidden="true"
+                        />
+                      )}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
         </div>
 
-        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500">
+        <div className="border-t border-[#e5decf] pt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 text-xs leading-6 text-slate-500">
           <p>{copyright}</p>
-          <div className="flex gap-6 mt-4 md:mt-0">
-            <span>{subtext}</span>
-          </div>
+          <p className="font-medium text-slate-600">{subtext}</p>
         </div>
-
       </div>
     </footer>
   );
