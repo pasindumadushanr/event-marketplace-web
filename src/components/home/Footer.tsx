@@ -8,11 +8,8 @@ import {
   Camera,
   MessageCircle,
   Briefcase,
-  MapPin,
-  Sparkles,
   ArrowUpRight,
 } from "lucide-react";
-import { NewsletterForm } from "./NewsletterForm";
 
 type FooterContent = {
   description?: string;
@@ -114,59 +111,22 @@ export function Footer() {
   ].filter((link) => link.href && /^https?:\/\//i.test(link.href));
 
   return (
-    <footer className="relative bg-[#faf8f3] text-slate-600 border-t border-[#e9e2d3] pt-12 sm:pt-16 pb-6 sm:pb-8">
+    <footer className="relative bg-[#faf8f3] text-slate-600 border-t border-[#e9e2d3] pt-8 sm:pt-12 pb-6">
       <div
         aria-hidden="true"
         className="absolute top-0 inset-x-0 h-0.5 bg-gradient-to-r from-transparent via-primary/60 to-transparent"
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <section
-          aria-labelledby="footer-newsletter-title"
-          className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 p-6 sm:p-8 lg:p-10 mb-12 sm:mb-16 shadow-xl shadow-slate-900/10"
-        >
-          <div
-            aria-hidden="true"
-            className="absolute -right-16 -top-32 w-80 h-80 rounded-full border border-primary/20 pointer-events-none"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute -right-2 -top-16 w-48 h-48 rounded-full border border-primary/10 pointer-events-none"
-          />
-          <div className="relative grid lg:grid-cols-[1fr_0.9fr] items-center gap-6 lg:gap-12">
-            <div>
-              <p className="flex items-center gap-2 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-amber-300 mb-3">
-                <Sparkles className="h-4 w-4 shrink-0" />A little inspiration
-                for your big day
-              </p>
-              <h2
-                id="footer-newsletter-title"
-                className="text-2xl sm:text-3xl font-semibold tracking-tight text-white mb-3"
-              >
-                Make every celebration special.
-              </h2>
-              <p className="text-sm leading-relaxed text-slate-300 max-w-md">
-                Wedding ideas, planning tips, and fresh inspiration—delivered to
-                your inbox.
-              </p>
-            </div>
-            <NewsletterForm />
-          </div>
-        </section>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.7fr_1fr_1fr_1fr] gap-x-6 gap-y-10 lg:gap-12 pb-10 sm:pb-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-[1.7fr_1fr_1fr_1fr] gap-x-6 gap-y-8 lg:gap-10 pb-8">
           <div className="col-span-2 md:col-span-3 lg:col-span-1">
             <Link
               href="/"
               aria-label="Nakathata.lk home"
-              className="inline-flex bg-white rounded-2xl border border-[#ece5d7] p-3 shadow-sm mb-5 focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4"
+              className="inline-flex mb-4 rounded-lg focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4"
             >
-              <BrandLogo className="w-36 sm:w-40 rounded-none" />
+              <BrandLogo className="w-32 sm:w-36" />
             </Link>
-            <p className="text-sm leading-7 max-w-sm mb-5">{description}</p>
-            <p className="flex items-center gap-2 text-xs font-semibold text-slate-700 mb-5">
-              <MapPin className="h-4 w-4 text-amber-700" />
-              Celebrating across Sri Lanka
-            </p>
+            <p className="text-sm leading-6 max-w-sm mb-4">{description}</p>
             <div
               className="flex flex-wrap gap-2.5"
               aria-label="Social media links"

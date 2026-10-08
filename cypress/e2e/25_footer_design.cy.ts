@@ -40,18 +40,21 @@ describe("Branded footer", () => {
         "noopener noreferrer",
       );
       cy.get('a[href="#"]').should("not.exist");
-      cy.contains("Make every celebration special.").should("be.visible");
+      cy.contains("Make every celebration special.").should("not.exist");
+      cy.get('input[aria-label="Newsletter email address"]').should(
+        "not.exist",
+      );
     });
   });
-  it("fits mobile and keeps the newsletter form usable", () => {
+  it("fits mobile and keeps the simple navigation usable", () => {
     cy.viewport(390, 844);
     cy.visit("/");
     cy.get("footer").scrollIntoView();
-    cy.get('input[aria-label="Newsletter email address"]').should("be.visible");
     cy.get("footer").then(($footer) =>
       expect($footer[0].scrollWidth).to.be.at.most(390),
     );
-    cy.get("footer input[type=checkbox]").check();
-    cy.contains("button", "Subscribe").should("be.enabled");
+    cy.get('nav[aria-label="Footer Company"]')
+      .contains("Contact")
+      .should("have.attr", "href", "/contact");
   });
 });
