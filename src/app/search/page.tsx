@@ -72,8 +72,8 @@ function SearchContent() {
     setSearchError("");
     try {
       const params = new URLSearchParams();
-      if (searchQ) params.append("q", searchQ);
-      if (searchCity) params.append("city", searchCity);
+      if (searchQ.trim()) params.append("q", searchQ.trim());
+      if (searchCity.trim()) params.append("city", searchCity.trim());
       if (sort) params.append("sortBy", sort);
       if (selectedCategory) params.append("categoryId", selectedCategory);
       else if (selectedSlug) params.append("categorySlug", selectedSlug);
@@ -233,10 +233,17 @@ function SearchContent() {
                 </label>
                 <Input
                   placeholder="e.g. Colombo"
+                  aria-label="Town or city"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   disabled={!!nearby}
                 />
+                {!nearby && (
+                  <p className="text-xs text-slate-500">
+                    Type any town or city, for example Walasmulla. Matches
+                    vendors by their saved city name.
+                  </p>
+                )}
                 {nearby && (
                   <p className="text-xs text-slate-500">
                     Turn off nearby search to choose a city instead.
