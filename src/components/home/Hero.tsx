@@ -8,11 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Search, MapPin, Grid } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { homeCategories } from "@/lib/home-categories";
+import { useSiteMedia, fallbackImage } from "@/lib/site-media";
+
+const defaultHeroImage =
+  "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop";
 
 import { SRI_LANKA_PROVINCES_DISTRICTS } from "@/lib/districts";
 export { SRI_LANKA_PROVINCES_DISTRICTS } from "@/lib/districts";
 
 export function Hero() {
+  const { media } = useSiteMedia();
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
@@ -37,7 +42,9 @@ export function Hero() {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-slate-900/60 z-10" />
         <img
-          src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069&auto=format&fit=crop"
+          key={media.heroImage || defaultHeroImage}
+          src={media.heroImage || defaultHeroImage}
+          onError={(event) => fallbackImage(event, defaultHeroImage)}
           alt="Luxury Wedding Event"
           className="w-full h-full object-cover scale-105 transform origin-center animate-out zoom-in duration-[20000ms]"
         />

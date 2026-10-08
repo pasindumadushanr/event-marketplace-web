@@ -97,6 +97,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
           { href: "/admin/cms/pages", label: "Pages" },
           { href: "/admin/cms/blog", label: "Blog" },
           { href: "/admin/cms/banners", label: "Banners" },
+          { href: "/admin/cms/images", label: "Website Images" },
           { href: "/admin/cms/faq", label: "FAQ" },
           { href: "/admin/cms/terms", label: "Terms & Conditions" },
           { href: "/admin/cms/privacy", label: "Privacy Policy" },

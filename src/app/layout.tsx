@@ -28,10 +28,20 @@ export const metadata: Metadata = {
         type: "image/png",
         sizes: "96x96",
       },
-      { url: "/favicon.ico", type: "image/x-icon", sizes: "32x32 48x48 64x64 256x256" },
+      {
+        url: "/favicon.ico",
+        type: "image/x-icon",
+        sizes: "32x32 48x48 64x64 256x256",
+      },
     ],
     shortcut: "/favicon.ico",
-    apple: [{ url: "/images/brand/favicon-180.png", type: "image/png", sizes: "180x180" }],
+    apple: [
+      {
+        url: "/images/brand/favicon-180.png",
+        type: "image/png",
+        sizes: "180x180",
+      },
+    ],
   },
   openGraph: {
     siteName: "Nakathata.lk",
@@ -62,6 +72,7 @@ import { AuthProvider } from "@/lib/auth-context";
 import { LanguageProvider } from "@/lib/language";
 import { ShortlistProvider } from "@/lib/shortlist-context";
 import { Toaster } from "@/components/ui/sonner";
+import { SiteMediaProvider } from "@/lib/site-media";
 
 export default function RootLayout({
   children,
@@ -99,7 +110,9 @@ export default function RootLayout({
             }}
           />
           <LanguageProvider>
-            <ShortlistProvider>{children}</ShortlistProvider>
+            <SiteMediaProvider>
+              <ShortlistProvider>{children}</ShortlistProvider>
+            </SiteMediaProvider>
           </LanguageProvider>
           <Toaster />
         </AuthProvider>
