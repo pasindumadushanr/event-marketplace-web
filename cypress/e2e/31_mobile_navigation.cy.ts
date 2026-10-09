@@ -14,6 +14,23 @@ describe("Clear public page navigation", () => {
     cy.get('[aria-label="Breadcrumb"] [aria-current="page"]')
       .should("be.visible")
       .and("have.text", "About Us");
+    cy.get('[aria-label="Breadcrumb"] ol').should(
+      "have.css",
+      "flex-direction",
+      "row",
+    );
+    cy.get('[aria-label="Breadcrumb"] a').then(($home) => {
+      cy.get('[aria-label="Breadcrumb"] [aria-current="page"]').then(
+        ($page) => {
+          expect(
+            Math.abs(
+              $home[0].getBoundingClientRect().top -
+                $page[0].getBoundingClientRect().top,
+            ),
+          ).to.be.lessThan(18);
+        },
+      );
+    });
     cy.scrollTo(0, 500);
     cy.get('[aria-label="Breadcrumb"] [aria-current="page"]').should(
       "be.visible",

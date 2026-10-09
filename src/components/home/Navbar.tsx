@@ -211,31 +211,6 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
             <BrandLogo priority className="w-24 sm:w-28" />
           </Link>
 
-          {currentPageName && !isMobileMenuOpen && (
-            <div
-              role="navigation"
-              aria-label="Breadcrumb"
-              className={`lg:hidden min-w-0 flex-1 px-3 ${isScrolled ? "text-[#355346]" : "text-white"}`}
-            >
-              <ol className="flex min-w-0 flex-col items-center gap-1">
-                <li>
-                  <Link
-                    href="/"
-                    className="inline-flex min-h-8 items-center gap-1 rounded-md px-2 text-xs underline underline-offset-4 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-                  >
-                    Home <ChevronRight aria-hidden="true" className="h-3 w-3" />
-                  </Link>
-                </li>
-                <li
-                  aria-current="page"
-                  className="max-w-full truncate text-sm font-semibold"
-                >
-                  {currentPageName}
-                </li>
-              </ol>
-            </div>
-          )}
-
           {/* Desktop Navigation Links */}
           <div className="hidden lg:flex flex-1 justify-center gap-8 font-medium">
             {links.map((link) => (
@@ -334,6 +309,31 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
           </div>
         </div>
       </div>
+
+      {currentPageName && !isMobileMenuOpen && (
+        <div
+          role="navigation"
+          aria-label="Breadcrumb"
+          className="lg:hidden mt-1 -mb-1 border-y border-[#e8e1d4] bg-[#faf8f3] text-[#355346]"
+        >
+          <ol className="mx-auto flex min-h-11 max-w-7xl items-center gap-2 px-4 sm:px-6 text-[13px]">
+            <li className="shrink-0">
+              <Link
+                href="/"
+                className="inline-flex min-h-11 items-center rounded-md pr-1 font-medium text-[#687369] hover:text-[#355346] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#bd995c]"
+              >
+                Home
+              </Link>
+            </li>
+            <li aria-hidden="true" className="shrink-0 text-[#b5a88d]">
+              <ChevronRight className="h-3.5 w-3.5" />
+            </li>
+            <li aria-current="page" className="min-w-0 truncate font-semibold">
+              {currentPageName}
+            </li>
+          </ol>
+        </div>
+      )}
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
