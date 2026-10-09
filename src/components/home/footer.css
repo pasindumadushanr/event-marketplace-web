@@ -32,8 +32,8 @@
   width: 210px;
   height: 280px;
   pointer-events: none;
-  color: #a3ad91;
-  opacity: 0.19;
+  color: #81956f;
+  opacity: 0.5;
 }
 
 .wedding-footer-sprig-left {
@@ -45,7 +45,7 @@
 .wedding-footer-sprig-right {
   top: -40px;
   right: -40px;
-  color: #bb9692;
+  color: #ad7975;
   transform: rotate(190deg);
 }
 
@@ -103,6 +103,6 @@
   .wedding-footer-sprig {
     width: 150px;
     height: 200px;
-    opacity: 0.13;
+    opacity: 0.38;
   }
 }

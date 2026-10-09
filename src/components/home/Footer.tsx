@@ -25,9 +25,14 @@ function WeddingSprig({ className }: { className: string }) {
       <path
         d="M24 308C68 250 82 184 138 126S193 55 202 16"
         stroke="currentColor"
-        strokeWidth="1.5"
+        strokeWidth="2.2"
       />
-      <g stroke="currentColor" strokeWidth="1.2">
+      <g
+        stroke="currentColor"
+        strokeWidth="1.8"
+        fill="currentColor"
+        fillOpacity="0.06"
+      >
         <path d="M63 244C21 243 15 211 25 184C57 190 74 216 63 244Z" />
         <path d="M77 215C121 220 144 197 146 170C108 167 79 184 77 215Z" />
         <path d="M97 178C59 170 55 141 67 118C97 130 107 153 97 178Z" />
