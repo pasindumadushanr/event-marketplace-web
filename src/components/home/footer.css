@@ -1,0 +1,108 @@
+.wedding-footer {
+  background:
+    radial-gradient(ellipse at 0% 100%, #dce4d955 0%, transparent 48%),
+    radial-gradient(ellipse at 100% 0%, #ecd6d77a 0%, transparent 48%),
+    linear-gradient(115deg, #faf7f0 0%, #fffaf6 48%, #f7ece8 100%);
+  border-top: 1px solid #d7bc85;
+}
+
+.wedding-footer-ornament {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #b79859;
+  transform: translateX(-50%);
+}
+
+.wedding-footer-ornament span {
+  width: 56px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #c9ac74);
+}
+
+.wedding-footer-ornament span:last-child {
+  transform: rotate(180deg);
+}
+
+.wedding-footer-sprig {
+  position: absolute;
+  width: 210px;
+  height: 280px;
+  pointer-events: none;
+  color: #a3ad91;
+  opacity: 0.19;
+}
+
+.wedding-footer-sprig-left {
+  bottom: -32px;
+  left: -50px;
+  transform: rotate(14deg);
+}
+
+.wedding-footer-sprig-right {
+  top: -40px;
+  right: -40px;
+  color: #bb9692;
+  transform: rotate(190deg);
+}
+
+.wedding-footer-brand {
+  padding: 22px 24px;
+  border: 1px solid #ffffffd9;
+  border-radius: 24px 24px 24px 4px;
+  background: #ffffff66;
+  box-shadow: 0 8px 30px #977b6105;
+}
+
+.wedding-footer-heading {
+  color: #59463f;
+  padding-top: 8px;
+}
+
+.wedding-footer-heading::after {
+  content: "";
+  display: block;
+  width: 28px;
+  height: 2px;
+  margin-top: 12px;
+  background: #c4a269;
+  border-radius: 2px;
+}
+
+.wedding-footer-link:hover {
+  color: #875041;
+  text-decoration: underline;
+  text-decoration-color: #c4a269;
+  text-underline-offset: 5px;
+}
+
+.wedding-footer-social {
+  border: 1px solid #d9c8b7;
+  background: #fffcf5;
+  color: #7c6857;
+}
+
+.wedding-footer-social:hover {
+  border-color: #b58d59;
+  color: #754c32;
+  background: #f3e5d5;
+}
+
+.wedding-footer-bottom {
+  border-top: 1px solid #d9c9b7;
+}
+
+@media (max-width: 639px) {
+  .wedding-footer-brand {
+    padding: 20px;
+  }
+
+  .wedding-footer-sprig {
+    width: 150px;
+    height: 200px;
+    opacity: 0.13;
+  }
+}

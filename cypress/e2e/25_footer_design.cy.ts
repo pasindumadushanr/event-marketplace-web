@@ -21,9 +21,17 @@ describe("Branded footer", () => {
     });
   });
   it("preserves CMS copy and useful navigation with labelled social links", () => {
+    cy.viewport(1440, 1000);
     cy.visit("/");
     cy.get("footer").scrollIntoView();
     cy.get("footer").within(() => {
+      cy.get(".wedding-footer-sprig")
+        .should("have.length", 2)
+        .each(($sprig) => {
+          cy.wrap($sprig)
+            .should("have.attr", "aria-hidden", "true")
+            .and("have.css", "pointer-events", "none");
+        });
       cy.contains("Celebrations made simple with Nakathata.").should(
         "be.visible",
       );
