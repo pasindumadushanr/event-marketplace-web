@@ -11,7 +11,7 @@ import { sellData } from '@/data/sell';
 
 export function SellContent() {
   return (
-    <main className="flex-1">
+    <main className="wedding-typography flex-1">
       <SellHero data={sellData.hero} />
       
       <div id="benefits" className="pt-12">

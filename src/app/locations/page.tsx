@@ -422,7 +422,7 @@ export default function LocationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf8f4] font-sans text-slate-900">
+    <div className="wedding-typography min-h-screen bg-[#faf8f4] font-sans text-slate-900">
       <div className="h-20 bg-slate-900"><Navbar /></div>
       <header className="relative overflow-hidden bg-slate-900 pb-24 pt-14 sm:pb-32 sm:pt-20">
         <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(212,175,55,0.18),transparent_65%)]" />

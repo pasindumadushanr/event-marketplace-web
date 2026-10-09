@@ -41,7 +41,7 @@ export default function HomePage() {
         }}
       />
       <Navbar />
-      <main>
+      <main className="wedding-typography">
         <Hero />
         <Statistics />
         <CategoryCarousel />

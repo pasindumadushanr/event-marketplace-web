@@ -27,7 +27,7 @@ export default async function BlogListingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      <main className="pt-24 pb-16">
+      <main className="wedding-typography pt-24 pb-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 sm:text-5xl">Our Blog</h1>

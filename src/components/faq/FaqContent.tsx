@@ -29,7 +29,7 @@ export function FaqContent() {
     : faqData.categories.filter(c => c.id === activeCategory);
 
   return (
-    <main className="flex-1">
+    <main className="wedding-typography flex-1">
       <FaqHero 
         data={faqData.hero} 
         searchQuery={searchQuery}

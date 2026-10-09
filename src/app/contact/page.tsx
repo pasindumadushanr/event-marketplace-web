@@ -90,7 +90,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#faf8f4] font-sans text-slate-900">
+    <div className="wedding-typography min-h-screen flex flex-col bg-[#faf8f4] font-sans text-slate-900">
       <div className="bg-slate-900">
         <Navbar />
       </div>

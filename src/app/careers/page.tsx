@@ -67,7 +67,7 @@ export default function CareersPage() {
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col justify-between">
       <Navbar />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-20">
+      <main className="wedding-typography flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-12 sm:py-20">
         {/* Hero */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3 py-1 rounded-full">

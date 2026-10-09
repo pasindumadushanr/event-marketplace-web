@@ -12,7 +12,7 @@ import { aboutData } from '@/data/about';
 
 export function AboutContent() {
   return (
-    <main className="flex-1">
+    <main className="wedding-typography flex-1">
       <AboutHero data={aboutData.hero} />
       <AboutStory data={aboutData.story} />
       <AboutMissionVision data={aboutData.missionVision} />

@@ -100,7 +100,7 @@ export default async function BlogPostPage({
       />
       <Navbar />
 
-      <main className="pt-24 pb-16">
+      <main className="wedding-typography pt-24 pb-16">
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/blog"

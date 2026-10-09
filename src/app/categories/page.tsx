@@ -26,7 +26,7 @@ export default function CategoriesPage() {
   return (
     <div className="min-h-screen bg-[#f7f8f4]">
       <Navbar solid />
-      <main className="mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-6">
+      <main className="wedding-typography mx-auto max-w-7xl px-4 pb-20 pt-36 sm:px-6">
         <div className="mb-10 max-w-2xl">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">
             Every detail, together
