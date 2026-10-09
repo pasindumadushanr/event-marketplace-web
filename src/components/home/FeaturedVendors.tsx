@@ -30,6 +30,7 @@ export function FeaturedVendors() {
   return (
     <WeddingSection
       label="Featured vendors"
+      motif="rings"
       tone="blush"
       className="py-14 sm:py-20"
     >

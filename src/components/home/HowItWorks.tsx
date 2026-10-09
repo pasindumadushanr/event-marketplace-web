@@ -40,6 +40,7 @@ export function HowItWorks() {
   return (
     <WeddingSection
       label="How it works"
+      motif="hearts"
       tone="ivory"
       className="py-14 sm:py-20"
     >

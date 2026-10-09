@@ -16,6 +16,7 @@ export function Statistics() {
     <WeddingSection
       tone="sage"
       label="Discover and plan"
+      motif="sparkles"
       className="py-10 sm:py-12"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">

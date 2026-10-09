@@ -33,14 +33,32 @@
 }
 .home-section-flourish-left {
   bottom: -20px;
-  left: -38px;
+  left: -20px;
   transform: rotate(12deg);
 }
 .home-section-flourish-right {
   top: -20px;
-  right: -30px;
+  right: -15px;
   color: #b3897e;
-  transform: rotate(185deg);
+  transform: rotate(-12deg);
+}
+.home-motif-rings .home-section-flourish,
+.home-motif-ribbon .home-section-flourish,
+.home-motif-sparkles .home-section-flourish {
+  color: #b2965d;
+  opacity: 0.48;
+}
+.home-motif-flowers .home-section-flourish,
+.home-motif-hearts .home-section-flourish {
+  color: #b18383;
+  opacity: 0.42;
+}
+.home-motif-rosette .home-section-flourish {
+  color: #a28c72;
+}
+.home-motif-arch .home-section-flourish {
+  color: #849975;
+  opacity: 0.46;
 }
 .home-section-title {
   color: #304239;

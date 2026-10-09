@@ -82,6 +82,7 @@ export function CategoryCarousel() {
     <WeddingSection
       id="categories"
       label="Explore categories"
+      motif="flowers"
       tone="white"
       className="py-14 sm:py-20"
     >

@@ -54,6 +54,7 @@ export function WhyChooseUs() {
   return (
     <WeddingSection
       label="Why choose Nakathata"
+      motif="rosette"
       tone="ivory"
       className="py-14 sm:py-20"
     >

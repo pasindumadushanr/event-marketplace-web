@@ -63,6 +63,19 @@ describe("Wedding-themed homepage sections", () => {
   it("keeps category, vendor, package and location navigation intact", () => {
     cy.visit("/");
     cy.get(".home-wedding-section").should("have.length", 7);
+    cy.get(".home-section-decoration").then(($decorations) => {
+      const motifs = [...$decorations].map((element) =>
+        element.getAttribute("data-motif"),
+      );
+      expect(new Set(motifs).size).to.equal(7);
+      expect(motifs).to.include.members([
+        "flowers",
+        "rings",
+        "ribbon",
+        "arch",
+        "hearts",
+      ]);
+    });
     labels.forEach((label) => {
       cy.get(`section[aria-label="${label}"]`).within(() => {
         cy.get(".home-section-decoration")

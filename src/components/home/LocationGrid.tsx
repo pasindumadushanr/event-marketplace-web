@@ -49,6 +49,7 @@ export function LocationGrid() {
   return (
     <WeddingSection
       label="Browse by location"
+      motif="arch"
       tone="sage"
       className="py-14 sm:py-20"
     >

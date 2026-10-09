@@ -34,6 +34,7 @@ export function FeaturedPackages() {
     <WeddingSection
       id="packages"
       label="Featured packages"
+      motif="ribbon"
       tone="white"
       className="py-14 sm:py-20"
     >
