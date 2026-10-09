@@ -1,0 +1,98 @@
+.vendor-invitation {
+  background: linear-gradient(180deg, #ffffff, #faf7f0);
+}
+.vendor-invitation-panel {
+  background:
+    radial-gradient(ellipse at 90% 15%, #65725355, transparent 60%),
+    linear-gradient(120deg, #203e36, #314b3e);
+  border: 1px solid #466153;
+  box-shadow: 0 18px 45px #273e3612;
+}
+.vendor-invitation-decoration {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.vendor-invitation-decoration::before,
+.vendor-invitation-decoration::after {
+  content: "";
+  position: absolute;
+  width: 460px;
+  height: 600px;
+  top: -120px;
+  right: -90px;
+  border: 1px solid #e8c78d26;
+  border-radius: 50%;
+  transform: rotate(-30deg);
+}
+.vendor-invitation-decoration::after {
+  right: -55px;
+  top: -100px;
+}
+.vendor-invitation-decoration span {
+  position: absolute;
+  width: 70px;
+  height: 130px;
+  bottom: -20px;
+  left: -18px;
+  border: 1px solid #e8c78d40;
+  border-radius: 100% 0 100% 0;
+  transform: rotate(28deg);
+}
+.vendor-invitation-decoration span:nth-child(2) {
+  left: 42px;
+  bottom: -54px;
+  transform: rotate(68deg);
+}
+.vendor-invitation-decoration span:nth-child(3) {
+  left: 105px;
+  bottom: -78px;
+  transform: rotate(90deg);
+}
+.vendor-invitation-benefits {
+  background: linear-gradient(135deg, #fffcf6, #f5eee1);
+  border: 1px solid #ecd9b5;
+  box-shadow: 0 12px 32px #102c2b20;
+}
+.vendor-invitation-icon {
+  background: #e8eddf;
+  border: 1px solid #d4decd;
+  color: #476049;
+}
+.vendor-invitation-primary {
+  color: #273b30;
+  background: #ebce96;
+  border: 1px solid #ebce96;
+  box-shadow: 0 4px 12px #132c2820;
+}
+.vendor-invitation-primary:hover {
+  background: #f4dbac;
+  border-color: #f4dbac;
+}
+.vendor-invitation-secondary {
+  color: #fffcf6;
+  border: 1px solid #97ac9b;
+  background: #ffffff05;
+}
+.vendor-invitation-secondary:hover {
+  background: #ffffff12;
+  border-color: #d4e0d4;
+}
+.vendor-invitation-primary,
+.vendor-invitation-secondary {
+  transition:
+    background-color 150ms,
+    border-color 150ms;
+}
+.vendor-invitation-primary:focus-visible,
+.vendor-invitation-secondary:focus-visible {
+  outline: 2px solid #fff4d5;
+  outline-offset: 4px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vendor-invitation-primary,
+  .vendor-invitation-secondary {
+    transition: none;
+  }
+}
