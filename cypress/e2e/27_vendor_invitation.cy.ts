@@ -7,7 +7,7 @@ describe("Vendor invitation design", () => {
       body: { data: [], meta: { total: 0 } },
     });
   });
-  it("shows vendor benefits with separate registration and information links", () => {
+  it("keeps the invitation simple with separate registration and information links", () => {
     cy.viewport(1200, 800);
     cy.visit("/");
     cy.get('section[aria-labelledby="vendor-invitation-title"]')
@@ -16,9 +16,10 @@ describe("Vendor invitation design", () => {
         cy.get("h2")
           .should("be.visible")
           .and("contain.text", "Grow Your Event");
-        cy.contains("Showcase your work").should("be.visible");
-        cy.contains("Share your services").should("be.visible");
-        cy.contains("Keep inquiries organised").should("be.visible");
+        cy.get("p")
+          .should("have.length", 1)
+          .and("contain.text", "Showcase your work and connect with customers");
+        cy.get("h3, ul, .vendor-invitation-benefits").should("not.exist");
         cy.contains("a", "Register Your Business").should(
           "have.attr",
           "href",

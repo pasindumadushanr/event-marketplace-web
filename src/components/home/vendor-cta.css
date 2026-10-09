@@ -50,16 +50,6 @@
   bottom: -78px;
   transform: rotate(90deg);
 }
-.vendor-invitation-benefits {
-  background: linear-gradient(135deg, #fffcf6, #f5eee1);
-  border: 1px solid #ecd9b5;
-  box-shadow: 0 12px 32px #102c2b20;
-}
-.vendor-invitation-icon {
-  background: #e8eddf;
-  border: 1px solid #d4decd;
-  color: #476049;
-}
 .vendor-invitation-primary {
   color: #273b30;
   background: #ebce96;
