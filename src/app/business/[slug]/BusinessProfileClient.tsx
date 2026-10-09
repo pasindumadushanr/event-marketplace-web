@@ -119,7 +119,10 @@ export default function BusinessProfileClient({
       <div className="h-20 bg-slate-900" />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <nav className="flex items-center gap-2 text-sm text-slate-500 font-medium mb-8">
+        <nav
+          aria-label="Vendor breadcrumb"
+          className="flex flex-wrap items-center gap-2 text-sm text-slate-500 font-medium mb-8"
+        >
           <Link
             href="/"
             className="hover:text-primary transition-colors flex items-center gap-1"
@@ -127,10 +130,7 @@ export default function BusinessProfileClient({
             <Home className="h-4 w-4" /> Home
           </Link>
           <ChevronRight className="h-4 w-4 text-slate-300" />
-          <Link
-            href="/vendors"
-            className="hover:text-primary transition-colors"
-          >
+          <Link href="/search" className="hover:text-primary transition-colors">
             Vendors
           </Link>
           <ChevronRight className="h-4 w-4 text-slate-300" />
@@ -141,7 +141,9 @@ export default function BusinessProfileClient({
             {business.categoryName}
           </Link>
           <ChevronRight className="h-4 w-4 text-slate-300" />
-          <span className="text-slate-900">{business.name}</span>
+          <span aria-current="page" className="text-slate-900 break-words">
+            {business.name}
+          </span>
         </nav>
 
         <BusinessHero business={business} />

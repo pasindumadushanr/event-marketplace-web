@@ -188,7 +188,10 @@ export default function CareersPage() {
           <div className="pt-2">
             <a href="mailto:careers@nakathata.lk?subject=Spontaneous%20Application%20-%20Nakathata.lk">
               <Button className="bg-primary hover:bg-primary/90 text-white font-bold h-12 px-8 rounded-xl shadow-lg shadow-primary/20 flex items-center gap-2 mx-auto">
-                <Mail className="h-4 w-4" /> Email Us at careers@nakathata.lk
+                <Mail className="h-4 w-4" /> Email Us{" "}
+                <span className="hidden sm:inline">
+                  at careers@nakathata.lk
+                </span>
               </Button>
             </a>
           </div>
