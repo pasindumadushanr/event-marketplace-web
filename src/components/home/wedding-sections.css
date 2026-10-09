@@ -1,0 +1,128 @@
+.home-wedding-section {
+  position: relative;
+  overflow: hidden;
+}
+.home-wedding-ivory {
+  background: linear-gradient(120deg, #faf7ef, #fffcf8);
+}
+.home-wedding-blush {
+  background: linear-gradient(120deg, #fcf5f1, #faf5f3);
+}
+.home-wedding-sage {
+  background: linear-gradient(120deg, #f1f5ed, #faf9f2);
+}
+.home-wedding-white {
+  background: #fffdfa;
+}
+.home-section-content {
+  position: relative;
+  z-index: 1;
+}
+.home-section-decoration {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.home-section-flourish {
+  position: absolute;
+  width: 150px;
+  height: 210px;
+  color: #91a07e;
+  opacity: 0.38;
+}
+.home-section-flourish-left {
+  bottom: -20px;
+  left: -38px;
+  transform: rotate(12deg);
+}
+.home-section-flourish-right {
+  top: -20px;
+  right: -30px;
+  color: #b3897e;
+  transform: rotate(185deg);
+}
+.home-section-title {
+  color: #304239;
+  letter-spacing: -0.025em;
+}
+.home-section-title::after {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 2px;
+  margin-top: 14px;
+  background: #c4a269;
+  border-radius: 2px;
+}
+.home-section-centered .home-section-title::after {
+  margin-left: auto;
+  margin-right: auto;
+}
+.home-discovery-icon {
+  color: #54704d;
+  background: #ffffffb3;
+  border: 1px solid #d9dfce;
+}
+.home-feature-card {
+  background: #ffffffc9;
+  border: 1px solid #e8ddce;
+  box-shadow: 0 4px 20px #60482a05;
+}
+.home-feature-card:hover {
+  border-color: #ccb793;
+  box-shadow: 0 8px 24px #60482a0a;
+}
+.home-feature-icon {
+  color: #667b59;
+  background: #edf1e6;
+  border: 1px solid #dce3d2;
+}
+.home-feature-card:nth-child(3n + 2) .home-feature-icon {
+  color: #9d6e67;
+  background: #f7eae5;
+  border-color: #efdad3;
+}
+.home-feature-card:nth-child(3n) .home-feature-icon {
+  color: #947239;
+  background: #f5eddc;
+  border-color: #e9ddc0;
+}
+.home-step-card {
+  background: #ffffffb3;
+  border: 1px solid #e6ddcb;
+}
+.home-step-number {
+  color: #9b7c46;
+  background: #f6efdf;
+  border: 1px solid #eadcbd;
+}
+.home-section-action {
+  background: #fffdf7;
+  border: 1px solid #d9c7a6;
+  color: #57614f;
+}
+.home-section-action:hover {
+  background: #f5edde;
+  border-color: #bca478;
+  color: #3e533d;
+}
+.home-section-action:focus-visible {
+  outline: 2px solid #947239;
+  outline-offset: 3px;
+}
+.home-package-card {
+  border: 1px solid #e7dfd1;
+  background: #ffffffdb;
+  box-shadow: 0 4px 20px #60482a05;
+}
+@media (max-width: 639px) {
+  .home-section-flourish {
+    width: 105px;
+    height: 145px;
+    opacity: 0.3;
+  }
+  .home-section-flourish-left {
+    display: none;
+  }
+}

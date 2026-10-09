@@ -6,6 +6,7 @@ import Link from "next/link";
 import api from "@/lib/api";
 import { useSiteMedia, fallbackImage } from "@/lib/site-media";
 import { Tag, Building2, ArrowRight } from "lucide-react";
+import { WeddingSection } from "./WeddingSection";
 
 const defaultPackageImage =
   "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop";
@@ -30,17 +31,22 @@ export function FeaturedPackages() {
   }, []);
 
   return (
-    <section id="packages" className="py-24 bg-white">
+    <WeddingSection
+      id="packages"
+      label="Featured packages"
+      tone="white"
+      className="py-14 sm:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
             className="max-w-2xl"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="home-section-title text-3xl md:text-4xl font-bold mb-4">
               Exclusive Packages
             </h2>
             <p className="text-slate-600">
@@ -48,10 +54,11 @@ export function FeaturedPackages() {
               their inclusions.
             </p>
           </motion.div>
-          <Link href="/search">
-            <button className="shrink-0 px-6 py-3 bg-slate-50 text-slate-700 font-semibold rounded-xl hover:bg-slate-100 hover:text-primary transition-colors cursor-pointer flex items-center gap-1.5">
-              Browse All Vendors & Packages <ArrowRight className="h-4 w-4" />
-            </button>
+          <Link
+            href="/search"
+            className="home-section-action shrink-0 px-5 py-3 text-sm font-semibold rounded-xl transition-colors flex items-center gap-1.5"
+          >
+            Browse All Vendors & Packages <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
 
@@ -67,7 +74,7 @@ export function FeaturedPackages() {
             ))}
           </div>
         ) : packages.length === 0 ? (
-          <div className="text-center py-16 border-2 border-dashed border-slate-200 rounded-3xl p-8">
+          <div className="home-feature-card text-center py-12 rounded-3xl p-6">
             <Tag className="h-10 w-10 text-slate-300 mx-auto mb-3" />
             <h3 className="text-lg font-bold text-slate-900 mb-1">
               New Packages Coming Soon
@@ -98,11 +105,11 @@ export function FeaturedPackages() {
               return (
                 <motion.div
                   key={pkg.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={false}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group"
+                  className="home-package-card group rounded-2xl p-3"
                 >
                   <Link href={vendorUrl} className="block cursor-pointer">
                     <div className="relative h-64 rounded-2xl overflow-hidden mb-4 shadow-sm group-hover:shadow-md transition-shadow">
@@ -148,6 +155,6 @@ export function FeaturedPackages() {
           </div>
         )}
       </div>
-    </section>
+    </WeddingSection>
   );
 }

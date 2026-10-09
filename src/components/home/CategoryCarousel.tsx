@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import api from "@/lib/api";
 import { useSiteMedia, fallbackImage } from "@/lib/site-media";
+import { WeddingSection } from "./WeddingSection";
 
 const categoryImageMap: Record<string, string> = {
   "hotels-venues":
@@ -78,16 +79,21 @@ export function CategoryCarousel() {
   }, []);
 
   return (
-    <section id="categories" className="py-24 bg-white overflow-hidden">
+    <WeddingSection
+      id="categories"
+      label="Explore categories"
+      tone="white"
+      className="py-14 sm:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-end mb-10">
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={false}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+            <h2 className="home-section-title text-3xl md:text-4xl font-bold mb-3">
               Explore Categories
             </h2>
             <p className="text-slate-600">
@@ -97,14 +103,16 @@ export function CategoryCarousel() {
 
           <div className="hidden md:flex gap-3">
             <button
+              aria-label="Previous categories"
               onClick={scrollPrev}
-              className="h-12 w-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors focus:outline-none cursor-pointer"
+              className="home-section-action h-11 w-11 rounded-full flex items-center justify-center transition-colors cursor-pointer"
             >
               <ChevronLeft className="h-6 w-6" />
             </button>
             <button
+              aria-label="Next categories"
               onClick={scrollNext}
-              className="h-12 w-12 rounded-full border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50 hover:text-primary transition-colors focus:outline-none cursor-pointer"
+              className="home-section-action h-11 w-11 rounded-full flex items-center justify-center transition-colors cursor-pointer"
             >
               <ChevronRight className="h-6 w-6" />
             </button>
@@ -141,14 +149,14 @@ export function CategoryCarousel() {
                 return (
                   <motion.div
                     key={category.id}
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={false}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-50px" }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
                     className="flex-[0_0_80%] sm:flex-[0_0_40%] md:flex-[0_0_25%] min-w-0 pl-4"
                   >
                     <Link href={`/c/${category.slug}`}>
-                      <div className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-md transition-shadow">
+                      <div className="group relative h-80 rounded-2xl overflow-hidden cursor-pointer border border-[#e6ddcb] shadow-sm hover:shadow-md transition-shadow">
                         {/* Image */}
                         <img
                           key={imgUrl}
@@ -181,6 +189,6 @@ export function CategoryCarousel() {
           </div>
         )}
       </div>
-    </section>
+    </WeddingSection>
   );
 }

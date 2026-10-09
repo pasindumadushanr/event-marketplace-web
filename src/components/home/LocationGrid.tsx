@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { MapPin, ArrowRight, Compass } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { WeddingSection } from "./WeddingSection";
 import { useSiteMedia, fallbackImage, type SiteMedia } from "@/lib/site-media";
 
 const FALLBACK_IMAGE =
@@ -47,14 +47,18 @@ const locations = [
 export function LocationGrid() {
   const { media } = useSiteMedia();
   return (
-    <section className="py-24 bg-muted/60">
+    <WeddingSection
+      label="Browse by location"
+      tone="sage"
+      className="py-14 sm:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-widest mb-2">
               <Compass className="h-4 w-4" /> Nationwide Coverage
             </div>
-            <h2 className="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">
+            <h2 className="home-section-title text-3xl md:text-4xl font-bold">
               Browse by Location
             </h2>
             <p className="text-slate-600 text-sm md:text-base mt-1 max-w-2xl">
@@ -63,15 +67,13 @@ export function LocationGrid() {
             </p>
           </div>
 
-          <Link href="/locations" className="shrink-0">
-            <Button
-              variant="outline"
-              className="border-slate-300 hover:border-slate-400 bg-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs"
-            >
-              <MapPin className="h-3.5 w-3.5 text-primary" />
-              Explore All 25 Districts Map
-              <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
-            </Button>
+          <Link
+            href="/locations"
+            className="home-section-action shrink-0 self-start px-4 py-3 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
+          >
+            <MapPin className="h-3.5 w-3.5 text-primary" />
+            Explore All 25 Districts Map
+            <ArrowRight className="h-3.5 w-3.5 ml-0.5" />
           </Link>
         </div>
 
@@ -79,14 +81,14 @@ export function LocationGrid() {
           {locations.map((loc, index) => (
             <motion.div
               key={loc.name}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={false}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
               <Link
                 href={`/search?city=${encodeURIComponent(loc.name)}`}
-                className="group block relative h-80 rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-1.5"
+                className="group block relative h-80 rounded-2xl border border-[#d8dfce] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Background City Image with graceful fallback */}
                 <img
@@ -134,6 +136,6 @@ export function LocationGrid() {
           ))}
         </div>
       </div>
-    </section>
+    </WeddingSection>
   );
 }
