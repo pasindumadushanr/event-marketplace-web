@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { AboutHero } from '@/components/about/AboutHero';
-import { AboutStory } from '@/components/about/AboutStory';
-import { AboutMissionVision } from '@/components/about/AboutMissionVision';
-import { AboutWhyChooseUs } from '@/components/about/AboutWhyChooseUs';
-import { AboutHowItWorks } from '@/components/about/AboutHowItWorks';
-import { AboutStatistics } from '@/components/about/AboutStatistics';
-import { AboutValues } from '@/components/about/AboutValues';
-import { AboutCTA } from '@/components/about/AboutCTA';
-import { aboutData } from '@/data/about';
+import { AboutHero } from "@/components/about/AboutHero";
+import { AboutStory } from "@/components/about/AboutStory";
+import { AboutMissionVision } from "@/components/about/AboutMissionVision";
+import { AboutWhyChooseUs } from "@/components/about/AboutWhyChooseUs";
+import { AboutHowItWorks } from "@/components/about/AboutHowItWorks";
+import { AboutStatistics } from "@/components/about/AboutStatistics";
+import { AboutValues } from "@/components/about/AboutValues";
+import { AboutCTA } from "@/components/about/AboutCTA";
+import { aboutData } from "@/data/about";
 
 export function AboutContent() {
   return (
-    <main className="wedding-typography flex-1">
+    <main className="wedding-typography public-story-page flex-1">
       <AboutHero data={aboutData.hero} />
       <AboutStory data={aboutData.story} />
       <AboutMissionVision data={aboutData.missionVision} />

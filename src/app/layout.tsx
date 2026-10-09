@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+import "@/components/ui/public-page.css";
 import { SITE_URL } from "@/lib/site-url";
 import { BRAND_DESCRIPTION, jsonLd } from "@/lib/seo";
 

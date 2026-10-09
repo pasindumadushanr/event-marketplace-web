@@ -1,0 +1,142 @@
+/* Public editorial pages only; dashboard controls keep their existing theme. */
+.public-page-surface {
+  background: #faf8f3;
+}
+.public-page-intro {
+  position: relative;
+  border: 1px solid #e8dfd0;
+  border-radius: 28px;
+  padding: 40px 24px;
+  background:
+    radial-gradient(ellipse at top right, #f4e7e5, transparent 65%), #fffdf8;
+}
+.public-page-intro::before {
+  content: "";
+  display: block;
+  width: 36px;
+  height: 3px;
+  background: #bd995c;
+  border-radius: 8px;
+  margin: 0 auto 24px;
+}
+.public-page-intro h1 {
+  color: #25483e;
+}
+.public-story-page {
+  background: #faf8f3;
+}
+.public-story-page > section:not(.public-page-hero) {
+  padding-block: clamp(48px, 6vw, 80px);
+}
+.public-page-band {
+  background: #f1f4eb;
+  border-color: #e5e6d9;
+}
+.public-page-blush {
+  background: #faf0ed;
+}
+.public-page-hero {
+  background: #23483c;
+}
+.public-page-hero-overlay {
+  background: linear-gradient(110deg, #193b32eb, #344b38b8);
+}
+.public-page-hero p {
+  color: #eee9de;
+}
+.public-page-hero .public-hero-search {
+  background: #fffdf9;
+  border-color: #eadfc9;
+  color: #25483e;
+  box-shadow: 0 12px 40px #102c2526;
+}
+.public-hero-search::placeholder {
+  color: #737b73;
+}
+.public-page-card {
+  background: #fffefa;
+  border: 1px solid #e7dfd2;
+  box-shadow: 0 4px 18px #564b3510;
+}
+.public-page-card:hover {
+  border-color: #cdb98f;
+  box-shadow: 0 8px 24px #564b3514;
+}
+.public-page-card h2,
+.public-page-card h3 {
+  color: #2f483e;
+}
+.public-page-icon {
+  background: #edf1e7;
+  color: #50644b;
+  border-color: #dce3d4;
+}
+.public-page-icon svg {
+  color: inherit;
+}
+.public-page-card:nth-child(3n + 2) .public-page-icon {
+  background: #f6e9e4;
+  color: #95625a;
+}
+.public-page-card:nth-child(3n) .public-page-icon {
+  background: #f5efdf;
+  color: #937237;
+}
+.public-page-dark-card {
+  background: linear-gradient(120deg, #213f36, #415748);
+  border: 1px solid #566a53;
+  box-shadow: 0 10px 32px #213f3614;
+}
+.public-page-dark-card p {
+  color: #e4e9df;
+}
+.public-page-gold-button {
+  background: #e8ca8c;
+  color: #263d34;
+  box-shadow: none;
+}
+.public-page-gold-button:hover {
+  background: #f1d59d;
+  color: #263d34;
+}
+.public-page-outline-button {
+  background: transparent;
+  color: #fffdf6;
+  border-color: #ffffff55;
+}
+.public-page-outline-button:hover {
+  background: #ffffff12;
+  color: #fffdf6;
+}
+.public-page-hero a:focus-visible,
+.public-story-page a:focus-visible {
+  outline: 2px solid #bb9250;
+  outline-offset: 4px;
+  border-radius: 12px;
+}
+.public-page-hero a {
+  max-width: 100%;
+}
+.public-faq-category[aria-pressed="true"] {
+  background: #355346;
+  color: #fffdf7;
+  box-shadow: none;
+}
+.public-faq-category[aria-pressed="false"]:hover {
+  background: #e9eddf;
+}
+.public-blog-card:hover h3 {
+  color: #937237;
+}
+@media (max-width: 639px) {
+  .public-page-intro {
+    padding: 28px 20px;
+    border-radius: 22px;
+  }
+  .public-page-card {
+    overflow-wrap: anywhere;
+  }
+  .public-page-hero p {
+    font-size: 16px;
+  }
+}

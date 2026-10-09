@@ -1,24 +1,29 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import { WeddingSection } from "@/components/home/WeddingSection";
 
 export function AboutStory({ data }: { data: any }) {
   return (
-    <section className="py-24 bg-white relative">
+    <WeddingSection
+      label="Our story"
+      tone="ivory"
+      motif="rings"
+      className="py-16 sm:py-20"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col lg:flex-row items-center gap-16">
-          
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="w-full lg:w-1/2"
           >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
-              <img 
-                src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80" 
-                alt="Luxury Event Setup" 
+            <div className="relative rounded-[28px] overflow-hidden shadow-lg aspect-[4/3] border border-[#e5dac7]">
+              <img
+                src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80"
+                alt="Luxury Event Setup"
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
@@ -27,7 +32,7 @@ export function AboutStory({ data }: { data: any }) {
             <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-slate-100 rounded-full -z-10 blur-xl hidden lg:block"></div>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -46,9 +51,8 @@ export function AboutStory({ data }: { data: any }) {
               {data.content}
             </p>
           </motion.div>
-
         </div>
       </div>
-    </section>
+    </WeddingSection>
   );
 }

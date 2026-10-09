@@ -63,7 +63,7 @@ export default async function BlogPostPage({
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="public-page-surface min-h-screen">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -100,21 +100,21 @@ export default async function BlogPostPage({
       />
       <Navbar />
 
-      <main className="wedding-typography pt-24 pb-16">
+      <main className="wedding-typography pt-32 pb-16">
         <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Link
             href="/blog"
-            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 mb-8 transition-colors"
+            className="inline-flex items-center text-sm font-medium text-[#48644e] hover:text-[#937237] mb-8 transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" /> Back to all posts
           </Link>
 
-          <div className="text-center mb-10">
+          <div className="public-page-intro text-center mb-10">
             <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-zinc-900 mb-6">
               {post.title}
             </h1>
 
-            <div className="flex items-center justify-center text-sm text-zinc-500 gap-6">
+            <div className="flex flex-wrap items-center justify-center text-sm text-zinc-500 gap-4">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 <span>
@@ -148,7 +148,7 @@ export default async function BlogPostPage({
 
           {/* Render Rich HTML Content */}
           <div
-            className="prose prose-zinc lg:prose-lg mx-auto prose-a:text-blue-600 hover:prose-a:text-blue-500 prose-img:rounded-xl"
+            className="prose prose-zinc lg:prose-lg mx-auto prose-a:text-[#48644e] hover:prose-a:text-[#937237] prose-img:rounded-xl"
             dangerouslySetInnerHTML={{ __html: sanitizeHtml(post.content) }}
           />
         </article>

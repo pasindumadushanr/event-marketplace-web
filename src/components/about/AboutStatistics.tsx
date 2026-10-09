@@ -1,15 +1,14 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 export function AboutStatistics({ data }: { data: any[] }) {
   return (
-    <section className="py-20 bg-primary/5 border-y border-primary/10">
+    <section className="public-page-band py-16 border-y">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          
           {data.map((stat, index) => (
-            <motion.div 
+            <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -25,7 +24,6 @@ export function AboutStatistics({ data }: { data: any[] }) {
               </div>
             </motion.div>
           ))}
-
         </div>
       </div>
     </section>
