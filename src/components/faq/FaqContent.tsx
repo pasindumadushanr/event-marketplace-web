@@ -1,18 +1,62 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaqHero } from "@/components/faq/FaqHero";
 import { FaqAccordion } from "@/components/faq/FaqAccordion";
 import { FaqHelp } from "@/components/faq/FaqHelp";
 import { AboutCTA } from "@/components/about/AboutCTA";
 import { faqData } from "@/data/faq";
+import api from "@/lib/api";
+import { faqCategories, validFaqs } from "@/lib/public-faqs";
 
 export function FaqContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("general");
+  const [categories, setCategories] = useState(faqData.categories);
+  const [loading, setLoading] = useState(true);
+  const [offline, setOffline] = useState(false);
+  useEffect(() => {
+    let mounted = true;
+    const key = "nakathata:public-faqs";
+    try {
+      const cached = JSON.parse(localStorage.getItem(key) || "null");
+      if (validFaqs(cached))
+        queueMicrotask(() => {
+          if (mounted) setCategories(faqCategories(cached));
+        });
+    } catch {
+      /* Optional cache. */
+    }
+    api
+      .get("/admin/cms/public/faqs")
+      .then(({ data }) => {
+        if (!validFaqs(data)) throw new Error("Invalid FAQ response");
+        if (!mounted) return;
+        setCategories(faqCategories(data));
+        try {
+          localStorage.setItem(key, JSON.stringify(data));
+        } catch {
+          /* Optional cache. */
+        }
+      })
+      .catch(() => {
+        if (mounted) setOffline(true);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+  const selectedCategory = categories.some(
+    (category) => category.id === activeCategory,
+  )
+    ? activeCategory
+    : categories[0]?.id;
 
   // Filter FAQs based on search query
-  const filteredCategories = faqData.categories
+  const filteredCategories = categories
     .map((category) => {
       return {
         ...category,
@@ -29,7 +73,7 @@ export function FaqContent() {
   // otherwise we just show the active category
   const displayCategories = searchQuery
     ? filteredCategories
-    : faqData.categories.filter((c) => c.id === activeCategory);
+    : categories.filter((c) => c.id === selectedCategory);
 
   return (
     <main className="wedding-typography public-story-page flex-1">
@@ -41,63 +85,81 @@ export function FaqContent() {
 
       <section className="public-page-band py-16 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row gap-12">
-            {/* Sidebar Categories */}
-            <div className="w-full md:w-64 shrink-0">
-              <div className="sticky top-32 space-y-1">
-                {!searchQuery &&
-                  faqData.categories.map((category) => (
-                    <button
-                      key={category.id}
-                      onClick={() => setActiveCategory(category.id)}
-                      aria-pressed={activeCategory === category.id}
-                      className={`public-faq-category w-full text-left px-4 py-3 rounded-xl transition-all duration-200 font-medium ${
-                        activeCategory === category.id
-                          ? "bg-primary text-white shadow-md"
-                          : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
-                      }`}
-                    >
-                      {category.name}
-                    </button>
-                  ))}
-                {searchQuery && (
-                  <div className="px-4 py-3 text-slate-500 font-medium">
-                    Search Results (
-                    {filteredCategories.reduce(
-                      (acc, cat) => acc + cat.faqs.length,
-                      0,
+          {offline && (
+            <p role="status" className="mb-6 text-sm text-slate-600">
+              Showing saved help information while updates are unavailable.
+              Contact us if you need assistance.
+            </p>
+          )}
+          {loading ? (
+            <p role="status" className="py-12 text-center text-slate-500">
+              Loading questions...
+            </p>
+          ) : (
+            <>
+              <div className="flex flex-col md:flex-row gap-12">
+                {/* Sidebar Categories */}
+                <div className="w-full md:w-64 shrink-0">
+                  <div className="sticky top-32 space-y-1">
+                    {!searchQuery &&
+                      categories.map((category) => (
+                        <button
+                          key={category.id}
+                          onClick={() => setActiveCategory(category.id)}
+                          aria-pressed={selectedCategory === category.id}
+                          className={`public-faq-category w-full text-left px-4 py-3 rounded-xl transition-all duration-200 font-medium ${
+                            selectedCategory === category.id
+                              ? "bg-primary text-white shadow-md"
+                              : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                          }`}
+                        >
+                          {category.name}
+                        </button>
+                      ))}
+                    {searchQuery && (
+                      <div className="px-4 py-3 text-slate-500 font-medium">
+                        Search Results (
+                        {filteredCategories.reduce(
+                          (acc, cat) => acc + cat.faqs.length,
+                          0,
+                        )}
+                        )
+                      </div>
                     )}
-                    )
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Main FAQ Accordion */}
-            <div className="flex-1">
-              {displayCategories.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-3xl border border-slate-200">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">
-                    No results found
-                  </h3>
-                  <p className="text-slate-500">
-                    We couldn't find any FAQs matching "{searchQuery}"
-                  </p>
-                  <button
-                    onClick={() => setSearchQuery("")}
-                    className="mt-6 text-primary font-medium hover:underline"
-                  >
-                    Clear Search
-                  </button>
                 </div>
-              ) : (
-                <FaqAccordion
-                  categories={displayCategories}
-                  showCategoryTitles={!!searchQuery}
-                />
-              )}
-            </div>
-          </div>
+
+                {/* Main FAQ Accordion */}
+                <div className="flex-1">
+                  {displayCategories.length === 0 ? (
+                    <div className="text-center py-20 bg-white rounded-3xl border border-slate-200">
+                      <h3 className="text-xl font-bold text-slate-900 mb-2">
+                        {categories.length
+                          ? "No results found"
+                          : "Questions are being updated"}
+                      </h3>
+                      <p className="text-slate-500">
+                        {categories.length
+                          ? `We couldn't find any FAQs matching "${searchQuery}"`
+                          : "Please use our Contact page if you need help."}
+                      </p>
+                      <button
+                        onClick={() => setSearchQuery("")}
+                        className="mt-6 text-primary font-medium hover:underline"
+                      >
+                        Clear Search
+                      </button>
+                    </div>
+                  ) : (
+                    <FaqAccordion
+                      categories={displayCategories}
+                      showCategoryTitles={!!searchQuery}
+                    />
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       </section>
 

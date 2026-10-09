@@ -26,7 +26,56 @@ const business = {
 createServer((request, response) => {
   response.setHeader("Content-Type", "application/json");
   response.setHeader("Access-Control-Allow-Origin", "*");
-  if (request.url?.startsWith("/discovery/vendors/vendor-test"))
+  response.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization",
+  );
+  response.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+  if (request.method === "OPTIONS") {
+    response.statusCode = 204;
+    response.end();
+    return;
+  }
+  if (request.url?.startsWith("/admin/cms/public/pages/")) {
+    const slug = request.url.split("/").pop();
+    response.end(
+      JSON.stringify({
+        slug,
+        title:
+          slug === "privacy-policy" ? "Privacy Policy" : "Terms of Service",
+        content:
+          "<h2>Published policy</h2><p>Fixture policy content for isolated tests.</p>",
+        updatedAt: "2026-10-01T00:00:00Z",
+      }),
+    );
+  } else if (request.url === "/admin/cms/public/faqs")
+    response.end(
+      JSON.stringify([
+        {
+          id: "faq-general",
+          category: "GENERAL",
+          question: "What is Nakathata.lk?",
+          answer:
+            "Nakathata.lk is a premium marketplace connecting customers with wedding and event vendors.",
+          sortOrder: 0,
+        },
+        {
+          id: "faq-customers",
+          category: "CUSTOMERS",
+          question: "Do I need an account to browse vendors?",
+          answer: "No. Browse public vendor profiles without an account.",
+          sortOrder: 1,
+        },
+        {
+          id: "faq-account",
+          category: "ACCOUNT",
+          question: "How do I change my password?",
+          answer: "Use Account Settings > Security.",
+          sortOrder: 2,
+        },
+      ]),
+    );
+  else if (request.url?.startsWith("/discovery/vendors/vendor-test"))
     response.end(JSON.stringify(business));
   else if (request.url === "/discovery/sitemap")
     response.end(

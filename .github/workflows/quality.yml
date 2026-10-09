@@ -16,6 +16,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: node --test scripts/recaptcha.test.mjs
+      - run: node --experimental-strip-types --test scripts/cms-content.test.mjs
+      - name: Start isolated content API
+        run: |
+          node cypress/fixture-api.mjs > /tmp/fixture-api.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:3021/business-categories >/dev/null && break; sleep 1; done
       - run: npm run build
         env:
           NEXT_PUBLIC_API_URL: http://127.0.0.1:3021
@@ -24,7 +29,6 @@ jobs:
       - run: npx tsc --noEmit
       - name: Browser regression tests (isolated fixture API)
         run: |
-          node cypress/fixture-api.mjs &
           NEXT_PUBLIC_API_URL=http://127.0.0.1:3021 npm run start > /tmp/frontend-test.log 2>&1 &
           for i in $(seq 1 30); do curl -fsS http://localhost:3000 >/dev/null && break; sleep 2; done
           npx cypress run --browser chrome --spec "cypress/e2e/27_vendor_invitation.cy.ts"
@@ -32,4 +36,5 @@ jobs:
           npx cypress run --browser chrome --spec "cypress/e2e/29_wedding_typography.cy.ts"
           npx cypress run --browser chrome --spec "cypress/e2e/30_public_page_design.cy.ts"
           npx cypress run --browser chrome --spec "cypress/e2e/31_mobile_navigation.cy.ts"
+          npx cypress run --browser chrome --spec "cypress/e2e/32_cms_publication.cy.ts"
           npx cypress run --browser chrome --spec "cypress/e2e/10_vendor_profile_recovery.cy.ts,cypress/e2e/11_nonpayment_readiness.cy.ts,cypress/e2e/12_guided_setup.cy.ts,cypress/e2e/13_business_service_cards.cy.ts,cypress/e2e/14_customer_inquiries.cy.ts,cypress/e2e/15_vendor_shortlist.cy.ts,cypress/e2e/16_trust_and_mobile.cy.ts,cypress/e2e/17_language_and_launch.cy.ts,cypress/e2e/18_account_security.cy.ts,cypress/e2e/19_approval_workspace.cy.ts,cypress/e2e/20_admin_design.cy.ts,cypress/e2e/21_domain_seo.cy.ts,cypress/e2e/22_recaptcha.cy.ts,cypress/e2e/23_nearby_search.cy.ts,cypress/e2e/24_website_images.cy.ts,cypress/e2e/25_footer_design.cy.ts,cypress/e2e/26_vendor_actions.cy.ts"
