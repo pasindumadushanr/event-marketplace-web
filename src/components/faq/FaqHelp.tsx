@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MessageCircleQuestion, Mail } from "lucide-react";
+import { usePlatformSettings } from "@/lib/platform-settings-context";
 
 export function FaqHelp() {
+  const { general } = usePlatformSettings();
   return (
     <section className="public-page-blush py-20 border-y border-[#e8dfd0]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -24,8 +26,8 @@ export function FaqHelp() {
             Still Need Help?
           </h2>
           <p className="text-lg text-slate-600 mb-8 max-w-xl mx-auto">
-            Can't find the answer you're looking for? Our dedicated support team
-            is ready to assist you with any inquiries.
+            Can&apos;t find the answer you&apos;re looking for? Our dedicated
+            support team is ready to assist you with any inquiries.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -37,7 +39,7 @@ export function FaqHelp() {
                 Contact Support
               </Button>
             </Link>
-            <a href="mailto:support@nakathata.lk">
+            <a href={`mailto:${general.contactEmail}`}>
               <Button
                 variant="outline"
                 size="lg"

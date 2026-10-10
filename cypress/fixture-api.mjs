@@ -36,7 +36,35 @@ createServer((request, response) => {
     response.end();
     return;
   }
-  if (request.url?.startsWith("/admin/cms/public/pages/")) {
+  if (request.url === "/admin/cms/public/platform-settings") {
+    response.end(
+      JSON.stringify({
+        general: {
+          siteName: "Nakathata.lk",
+          contactEmail: "support@nakathata.lk",
+          supportPhone: "",
+          contactAddress: "Sri Lanka",
+          currency: "LKR",
+        },
+        seo: {
+          metaTitle: "Nakathata.lk | Owner-reviewed wedding marketplace",
+          metaDescription:
+            "Owner-edited search description for wedding vendors across Sri Lanka, provided by the settings API.",
+          keywords: "weddings, owner-edited",
+        },
+        social: {
+          website: "https://nakathata.lk",
+          facebook: "https://web.facebook.com/profile.php?id=61595001868271",
+          instagram: "https://www.instagram.com/nakathata.lk/",
+          linkedin: "",
+          twitter: "",
+          youtube: "https://www.youtube.com/channel/UCYSC4gU8KyQuhFn7p3RUjMw",
+          tiktok: "https://www.tiktok.com/@nakathata.lk",
+        },
+        analytics: { googleAnalyticsId: null },
+      }),
+    );
+  } else if (request.url?.startsWith("/admin/cms/public/pages/")) {
     const slug = request.url.split("/").pop();
     response.end(
       JSON.stringify({

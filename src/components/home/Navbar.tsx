@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
+import { usePlatformSettings } from "@/lib/platform-settings-context";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -131,6 +132,7 @@ function UserAccountNav() {
 }
 
 export function Navbar({ solid = false }: { solid?: boolean }) {
+  const { general } = usePlatformSettings();
   const { user, logout } = useAuth();
   const [scrollPastHeader, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -205,7 +207,7 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
           {/* Logo */}
           <Link
             href="/"
-            aria-label="Nakathata.lk home"
+            aria-label={`${general.siteName} home`}
             className="flex shrink-0 items-center gap-2 z-50"
           >
             <BrandLogo priority className="w-24 sm:w-28" />

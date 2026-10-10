@@ -10,7 +10,11 @@ import {
   Briefcase,
   ArrowUpRight,
   Heart,
+  Play,
+  Music2,
+  AtSign,
 } from "lucide-react";
+import { usePlatformSettings } from "@/lib/platform-settings-context";
 import "./footer.css";
 
 function WeddingSprig({ className }: { className: string }) {
@@ -93,6 +97,7 @@ const linkGroups = [
 ];
 
 export function Footer() {
+  const { general, social } = usePlatformSettings();
   const [cms, setCms] = useState<FooterContent | null>(null);
   useEffect(() => {
     let active = true;
@@ -120,15 +125,9 @@ export function Footer() {
     "Find the people and places that make your celebration special. Explore wedding venues and event professionals across Sri Lanka, all in one place.";
   const copyright =
     cms?.copyright ||
-    `© ${new Date().getFullYear()} Nakathata.lk. All rights reserved.`;
+    `© ${new Date().getFullYear()} ${general.siteName}. All rights reserved.`;
   const subtext = cms?.subtext || "Weddings. Events. Everything together.";
-  const socials = {
-    website: "https://nakathata.lk",
-    instagram: "https://www.instagram.com/nakathata.lk/",
-    facebook: "https://web.facebook.com/profile.php?id=61595001868271",
-    linkedin: "",
-    ...cms?.socials,
-  };
+  const socials = social;
   const socialLinks = [
     { label: "Visit our website", href: socials.website, icon: Globe },
     {
@@ -146,6 +145,9 @@ export function Footer() {
       href: socials.linkedin,
       icon: Briefcase,
     },
+    { label: "Follow us on YouTube", href: socials.youtube, icon: Play },
+    { label: "Follow us on TikTok", href: socials.tiktok, icon: Music2 },
+    { label: "Follow us on X", href: socials.twitter, icon: AtSign },
   ].filter((link) => link.href && /^https?:\/\//i.test(link.href));
 
   return (
@@ -167,7 +169,7 @@ export function Footer() {
           <div className="wedding-footer-brand col-span-2 md:col-span-3 lg:col-span-1">
             <Link
               href="/"
-              aria-label="Nakathata.lk home"
+              aria-label={`${general.siteName} home`}
               className="inline-flex mb-5 rounded-xl focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4"
             >
               <BrandLogo className="w-32 sm:w-36" />

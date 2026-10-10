@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useSiteMedia, fallbackImage } from "@/lib/site-media";
+import { usePlatformSettings } from "@/lib/platform-settings-context";
 
 /** Display the supplied artwork, framing out its large white margins in CSS. */
 export function BrandLogo({
@@ -12,6 +13,7 @@ export function BrandLogo({
   priority?: boolean;
 }) {
   const { media } = useSiteMedia();
+  const { general } = usePlatformSettings();
   return (
     <span
       className={cn(
@@ -23,7 +25,7 @@ export function BrandLogo({
         <img
           key={media.logoImage}
           src={media.logoImage}
-          alt="Nakathata.lk"
+          alt={general.siteName}
           className="w-full h-full object-contain p-1"
           onError={(event) =>
             fallbackImage(event, "/images/brand/nakathata-logo.jpg")
@@ -32,7 +34,7 @@ export function BrandLogo({
       ) : (
         <Image
           src="/images/brand/nakathata-logo.jpg"
-          alt="Nakathata.lk — Weddings, Events, Everything Together"
+          alt={`${general.siteName} — Weddings, Events, Everything Together`}
           width={2048}
           height={2048}
           priority={priority}

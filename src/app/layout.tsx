@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Geist, Geist_Mono } from "next/font/google";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { getPlatformSettings } from "@/lib/platform-settings-server";
+import {
+  PlatformSettingsProvider,
+  PlatformAnalytics,
+} from "@/lib/platform-settings-context";
 import "./globals.css";
 import "@/components/ui/public-page.css";
 import { SITE_URL } from "@/lib/site-url";
@@ -24,7 +28,7 @@ const weddingFont = Cormorant_Garamond({
   display: "swap",
 });
 
-export const metadata: Metadata = {
+const baseMetadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: "Nakathata.lk | Plan Your Next Celebration",
   description: BRAND_DESCRIPTION,
@@ -77,57 +81,82 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const { general, seo } = await getPlatformSettings();
+  return {
+    ...baseMetadata,
+    title: seo.metaTitle,
+    description: seo.metaDescription,
+    keywords: seo.keywords
+      .split(",")
+      .map((word) => word.trim())
+      .filter(Boolean),
+    applicationName: general.siteName,
+    openGraph: {
+      ...baseMetadata.openGraph,
+      title: seo.metaTitle,
+      description: seo.metaDescription,
+      siteName: general.siteName,
+    },
+    twitter: {
+      ...baseMetadata.twitter,
+      title: seo.metaTitle,
+      description: seo.metaDescription,
+    },
+  };
+}
+
 import { AuthProvider } from "@/lib/auth-context";
 import { LanguageProvider } from "@/lib/language";
 import { ShortlistProvider } from "@/lib/shortlist-context";
 import { Toaster } from "@/components/ui/sonner";
 import { SiteMediaProvider } from "@/lib/site-media";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getPlatformSettings();
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${weddingFont.variable} antialiased font-sans`}
       >
-        <AuthProvider>
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{
-              __html: jsonLd({
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                "@id": `${SITE_URL}/#organization`,
-                name: "Nakathata.lk",
-                url: SITE_URL,
-                logo: {
-                  "@type": "ImageObject",
-                  url: `${SITE_URL}/images/brand/nakathata-logo.jpg`,
-                  width: 2048,
-                  height: 2048,
-                },
-                sameAs: [
-                  "https://web.facebook.com/profile.php?id=61595001868271",
-                  "https://www.instagram.com/nakathata.lk/",
-                  "https://www.tiktok.com/@nakathata.lk",
-                  "https://www.youtube.com/channel/UCYSC4gU8KyQuhFn7p3RUjMw",
-                ],
-              }),
-            }}
-          />
-          <LanguageProvider>
-            <SiteMediaProvider>
-              <ShortlistProvider>{children}</ShortlistProvider>
-            </SiteMediaProvider>
-          </LanguageProvider>
-          <Toaster />
-        </AuthProvider>
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID} />
-        )}
+        <PlatformSettingsProvider initial={settings}>
+          <AuthProvider>
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{
+                __html: jsonLd({
+                  "@context": "https://schema.org",
+                  "@type": "Organization",
+                  "@id": `${SITE_URL}/#organization`,
+                  name: settings.general.siteName,
+                  url: SITE_URL,
+                  logo: {
+                    "@type": "ImageObject",
+                    url: `${SITE_URL}/images/brand/nakathata-logo.jpg`,
+                    width: 2048,
+                    height: 2048,
+                  },
+                  sameAs: Object.values(settings.social).filter((url) =>
+                    /^https:\/\//i.test(url),
+                  ),
+                  email: settings.general.contactEmail,
+                  telephone: settings.general.supportPhone || undefined,
+                }),
+              }}
+            />
+            <LanguageProvider>
+              <SiteMediaProvider>
+                <ShortlistProvider>{children}</ShortlistProvider>
+              </SiteMediaProvider>
+            </LanguageProvider>
+            <Toaster />
+          </AuthProvider>
+          <PlatformAnalytics />
+        </PlatformSettingsProvider>
       </body>
     </html>
   );

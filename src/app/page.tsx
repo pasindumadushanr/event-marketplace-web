@@ -10,12 +10,20 @@ import { HowItWorks } from "@/components/home/HowItWorks";
 import { VendorCTA } from "@/components/home/VendorCTA";
 import { Footer } from "@/components/home/Footer";
 import { pageMetadata, BRAND_DESCRIPTION } from "@/lib/seo";
+import { getPlatformSettings } from "@/lib/platform-settings-server";
 
-export const metadata = pageMetadata(
-  "Nakathata.lk | Wedding Venues & Event Services in Sri Lanka",
-  BRAND_DESCRIPTION,
-  "/",
-);
+export async function generateMetadata() {
+  const { seo, general } = await getPlatformSettings();
+  const result = pageMetadata(
+    seo.metaTitle,
+    seo.metaDescription || BRAND_DESCRIPTION,
+    "/",
+  );
+  return {
+    ...result,
+    openGraph: { ...result.openGraph, siteName: general.siteName },
+  };
+}
 
 const brandStructuredData = {
   "@context": "https://schema.org",
@@ -31,13 +39,20 @@ const brandStructuredData = {
   ],
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getPlatformSettings();
   return (
     <div className="min-h-screen bg-background font-sans">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(brandStructuredData).replace(/</g, "\\u003c"),
+          __html: JSON.stringify({
+            ...brandStructuredData,
+            "@graph": brandStructuredData["@graph"].map((item) => ({
+              ...item,
+              name: settings.general.siteName,
+            })),
+          }).replace(/</g, "\\u003c"),
         }}
       />
       <Navbar />
