@@ -9,7 +9,7 @@ describe("Vendor invitation design", () => {
   });
   it("keeps the invitation simple with separate registration and information links", () => {
     cy.viewport(1200, 800);
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('section[aria-labelledby="vendor-invitation-title"]')
       .scrollIntoView({ offset: { top: -90, left: 0 } })
       .within(() => {
@@ -34,7 +34,7 @@ describe("Vendor invitation design", () => {
   });
   it("stacks neatly on mobile without horizontal overflow", () => {
     cy.viewport(390, 844);
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('section[aria-labelledby="vendor-invitation-title"]')
       .scrollIntoView({ offset: { top: -80, left: 0 } })
       .then(($section) => {

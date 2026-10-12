@@ -61,7 +61,7 @@ describe("Wedding-themed homepage sections", () => {
     });
   });
   it("keeps category, vendor, package and location navigation intact", () => {
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get(".home-wedding-section").should("have.length", 7);
     cy.get(".home-section-decoration").then(($decorations) => {
       const motifs = [...$decorations].map((element) =>
@@ -104,7 +104,7 @@ describe("Wedding-themed homepage sections", () => {
     );
   });
   it("uses compact feature and planning cards with readable trust information", () => {
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('section[aria-label="Why choose Nakathata"]').scrollIntoView({
       offset: { top: -90, left: 0 },
     });
@@ -123,7 +123,7 @@ describe("Wedding-themed homepage sections", () => {
   });
   it("keeps every redesigned section within a small-screen width", () => {
     cy.viewport(390, 844);
-    cy.visit("/");
+    cy.visit("/home-classic");
     labels.forEach((label) => {
       cy.get(`section[aria-label="${label}"]`).then(($section) => {
         expect($section[0].scrollWidth, label).to.be.at.most(390);

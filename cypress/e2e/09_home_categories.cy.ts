@@ -25,7 +25,7 @@ describe("Homepage category search", () => {
   });
 
   it("shows all requested labels in order", () => {
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('select[aria-label="Category"] option').then(($options) => {
       expect([...$options].map((option) => option.textContent)).to.deep.equal([
         "All Categories",
@@ -49,7 +49,7 @@ describe("Homepage category search", () => {
 
   it("passes category, keyword, and location to search and retains the selection", () => {
     cy.viewport(390, 844);
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.wait("@categories");
     cy.get('select[aria-label="Category"]').select("Wedding Cars");
     cy.get('input[placeholder="What are you looking for?"]').type("classic");
@@ -123,7 +123,7 @@ describe("Homepage category search", () => {
       });
     }).as("townSearch");
     const geolocation = cy.stub().as("unrequestedLocation");
-    cy.visit("/", {
+    cy.visit("/home-classic", {
       onBeforeLoad(win) {
         Object.defineProperty(win.navigator, "geolocation", {
           configurable: true,
@@ -174,13 +174,13 @@ describe("Homepage category search", () => {
   });
 
   it("requires a custom town and can switch back to a district or all locations", () => {
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('select[aria-label="Location"]').select("__custom_town__");
     cy.get("#home-custom-town")
       .closest("form")
       .contains("button", "Search")
       .click();
-    cy.location("pathname").should("eq", "/");
+    cy.location("pathname").should("eq", "/home-classic");
     cy.get("#home-custom-town")
       .should("have.prop", "validity")
       .its("valid")

@@ -131,7 +131,13 @@ function UserAccountNav() {
   );
 }
 
-export function Navbar({ solid = false }: { solid?: boolean }) {
+export function Navbar({
+  solid = false,
+  simple = false,
+}: {
+  solid?: boolean;
+  simple?: boolean;
+}) {
   const { general } = usePlatformSettings();
   const { user, logout } = useAuth();
   const [scrollPastHeader, setIsScrolled] = useState(false);
@@ -147,6 +153,8 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
     "/contact": "Contact Us",
     "/categories": "Categories",
     "/search": "Vendors",
+    "/packages": "Packages",
+    "/home-classic": "Previous Homepage",
     "/locations": "Locations",
     "/faq": "FAQ",
     "/blog": "Blog",
@@ -178,17 +186,29 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const links = [
-    { name: "Home", href: "/" },
-    { name: "Categories", href: "/categories" },
-    { name: "Vendors", href: "/search" },
-    { name: "Locations", href: "/locations" },
-    { name: "Packages", href: "/#packages" },
-    { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
-  ];
+  const links = simple
+    ? [
+        { name: "Home", href: "/" },
+        { name: "Find Vendors", href: "/search" },
+        { name: "Services", href: "/categories" },
+      ]
+    : [
+        { name: "Home", href: "/" },
+        { name: "Categories", href: "/categories" },
+        { name: "Vendors", href: "/search" },
+        { name: "Locations", href: "/locations" },
+        { name: "Packages", href: "/packages" },
+        { name: "About", href: "/about" },
+        { name: "Contact", href: "/contact" },
+      ];
   const mobileLinks = [
     ...links,
+    ...(simple
+      ? [
+          { name: "About", href: "/about" },
+          { name: "Contact", href: "/contact" },
+        ]
+      : []),
     { name: "Blog", href: "/blog" },
     { name: "FAQ", href: "/faq" },
   ];
@@ -283,11 +303,13 @@ export function Navbar({ solid = false }: { solid?: boolean }) {
                       Login
                     </Button>
                   </Link>
-                  <Link href="/register">
-                    <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg">
-                      Join Now
-                    </Button>
-                  </Link>
+                  {!simple && (
+                    <Link href="/register">
+                      <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium shadow-lg">
+                        Join Now
+                      </Button>
+                    </Link>
+                  )}
                 </>
               )}
             </div>

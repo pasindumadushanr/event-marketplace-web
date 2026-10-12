@@ -71,7 +71,7 @@ const linkGroups = [
     links: [
       ["Categories", "/#categories"],
       ["Vendors", "/search"],
-      ["Packages", "/#packages"],
+      ["Packages", "/packages"],
       ["Locations", "/locations"],
     ],
   },

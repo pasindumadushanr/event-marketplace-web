@@ -19,7 +19,7 @@ describe("Wedding heading typography", () => {
     cy.intercept("GET", "**/discovery/packages*", { body: [] });
   });
   it("loads the display font for headlines while preserving readable interface text", () => {
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get("main h1")
       .should("have.css", "font-weight", "600")
       .invoke("css", "font-family")
@@ -84,7 +84,7 @@ describe("Wedding heading typography", () => {
   });
   it("fits mobile headlines and keeps the two calls to action visible", () => {
     cy.viewport(390, 844);
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get("main").then(($main) =>
       expect($main[0].scrollWidth).to.be.at.most(390),
     );

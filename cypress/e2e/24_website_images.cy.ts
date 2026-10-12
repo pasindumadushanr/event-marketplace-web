@@ -67,7 +67,7 @@ describe("Website image controls", () => {
     cy.wait("@saveImages")
       .its("request.body.value")
       .should("include", { heroImage: hero, logoImage: logo });
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('img[alt="Luxury Wedding Event"]').should("have.attr", "src", hero);
     cy.get('img[alt="Nakathata.lk"]').first().should("have.attr", "src", logo);
     cy.get('img[alt="Colombo"]').should(
@@ -86,7 +86,7 @@ describe("Website image controls", () => {
       .click();
     cy.contains("button", "Save Images").click();
     cy.wait("@saveImages");
-    cy.visit("/");
+    cy.visit("/home-classic");
     cy.get('img[alt="Luxury Wedding Event"]')
       .should("have.attr", "src")
       .and("include", "images.unsplash.com");

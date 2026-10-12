@@ -1,13 +1,6 @@
 import { Navbar } from "@/components/home/Navbar";
-import { Hero } from "@/components/home/Hero";
-import { Statistics } from "@/components/home/Statistics";
-import { WhyChooseUs } from "@/components/home/WhyChooseUs";
-import { CategoryCarousel } from "@/components/home/CategoryCarousel";
-import { FeaturedVendors } from "@/components/home/FeaturedVendors";
-import { FeaturedPackages } from "@/components/home/FeaturedPackages";
-import { LocationGrid } from "@/components/home/LocationGrid";
-import { HowItWorks } from "@/components/home/HowItWorks";
-import { VendorCTA } from "@/components/home/VendorCTA";
+import { SimpleHomepage } from "@/components/home/SimpleHomepage";
+import { ClassicHomepage } from "@/components/home/ClassicHomepage";
 import { Footer } from "@/components/home/Footer";
 import { pageMetadata, BRAND_DESCRIPTION } from "@/lib/seo";
 import { getPlatformSettings } from "@/lib/platform-settings-server";
@@ -41,6 +34,7 @@ const brandStructuredData = {
 
 export default async function HomePage() {
   const settings = await getPlatformSettings();
+  const classic = process.env.HOMEPAGE_DESIGN === "classic";
   return (
     <div className="min-h-screen bg-background font-sans">
       <script
@@ -55,17 +49,9 @@ export default async function HomePage() {
           }).replace(/</g, "\\u003c"),
         }}
       />
-      <Navbar />
+      <Navbar solid={!classic} simple={!classic} />
       <main className="wedding-typography">
-        <Hero />
-        <Statistics />
-        <CategoryCarousel />
-        <FeaturedVendors />
-        <WhyChooseUs />
-        <FeaturedPackages />
-        <LocationGrid />
-        <HowItWorks />
-        <VendorCTA />
+        {classic ? <ClassicHomepage /> : <SimpleHomepage />}
       </main>
       <Footer />
     </div>
