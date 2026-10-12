@@ -14,7 +14,11 @@ there instead of the removed homepage anchor.
 
 The previous section components were not rewritten or deleted. Their exact
 composition is preserved in `ClassicHomepage.tsx` and can be compared at
-`/home-classic`. This comparison page is noindex and excluded from the sitemap.
+`/home-v1` (also available at `/home-classic`). The simpler layout can be reviewed
+at `/home-v2`. Both Home V1 and Home V2 are linked in the desktop and mobile main
+navigation for collecting feedback. They are noindex and excluded from the
+sitemap; the normal `/` homepage keeps its existing SEO settings. No final
+design choice is made by adding these comparison links.
 
 To restore the previous homepage without reverting unrelated work, set
 `HOMEPAGE_DESIGN=classic` in Vercel and redeploy. Remove that environment variable

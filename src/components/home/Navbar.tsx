@@ -154,7 +154,9 @@ export function Navbar({
     "/categories": "Categories",
     "/search": "Vendors",
     "/packages": "Packages",
-    "/home-classic": "Previous Homepage",
+    "/home-classic": "Home V1",
+    "/home-v1": "Home V1",
+    "/home-v2": "Home V2",
     "/locations": "Locations",
     "/faq": "FAQ",
     "/blog": "Blog",
@@ -170,6 +172,7 @@ export function Navbar({
     (pathname.startsWith("/business/") ? "Vendor Profile" : null) ||
     (pathname.startsWith("/c/") ? "Category Vendors" : null);
   const isActiveLink = (href: string) => {
+    if (href === "/home-v1" && pathname === "/home-classic") return true;
     if (href.includes("#")) return false;
     if (href === "/categories" && pathname.startsWith("/c/")) return true;
     if (href === "/search" && pathname.startsWith("/business/")) return true;
@@ -189,11 +192,15 @@ export function Navbar({
   const links = simple
     ? [
         { name: "Home", href: "/" },
+        { name: "Home V1", href: "/home-v1" },
+        { name: "Home V2", href: "/home-v2" },
         { name: "Find Vendors", href: "/search" },
         { name: "Services", href: "/categories" },
       ]
     : [
         { name: "Home", href: "/" },
+        { name: "Home V1", href: "/home-v1" },
+        { name: "Home V2", href: "/home-v2" },
         { name: "Categories", href: "/categories" },
         { name: "Vendors", href: "/search" },
         { name: "Locations", href: "/locations" },
@@ -234,7 +241,7 @@ export function Navbar({
           </Link>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden lg:flex flex-1 justify-center gap-8 font-medium">
+          <div className="hidden xl:flex flex-1 justify-center gap-4 2xl:gap-5 font-medium">
             {links.map((link) => (
               <Link
                 key={link.name}
@@ -254,7 +261,7 @@ export function Navbar({
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-6">
+          <div className="hidden xl:flex items-center space-x-6">
             <div className="flex items-center gap-4 pl-6 border-l border-slate-300/30">
               {user ? (
                 <>
@@ -316,7 +323,7 @@ export function Navbar({
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="lg:hidden z-50">
+          <div className="xl:hidden z-50">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label={
@@ -338,7 +345,7 @@ export function Navbar({
         <div
           role="navigation"
           aria-label="Breadcrumb"
-          className="lg:hidden mt-1 -mb-1 border-y border-[#e8e1d4] bg-[#faf8f3] text-[#355346]"
+          className="xl:hidden mt-1 -mb-1 border-y border-[#e8e1d4] bg-[#faf8f3] text-[#355346]"
         >
           <ol className="mx-auto flex min-h-11 max-w-7xl items-center gap-2 px-4 sm:px-6 text-[13px]">
             <li className="shrink-0">
@@ -363,7 +370,7 @@ export function Navbar({
       {isMobileMenuOpen && (
         <div
           id="mobile-navigation"
-          className="lg:hidden absolute top-0 left-0 w-full h-[100dvh] overflow-y-auto bg-[#fffdf8] pt-24 pb-8 px-6 flex flex-col gap-2 animate-in slide-in-from-top-5"
+          className="xl:hidden absolute top-0 left-0 w-full h-[100dvh] overflow-y-auto bg-[#fffdf8] pt-24 pb-8 px-6 flex flex-col gap-2 animate-in slide-in-from-top-5"
         >
           {currentPageName && (
             <p className="px-3 pb-2 text-sm text-[#50644b]">
