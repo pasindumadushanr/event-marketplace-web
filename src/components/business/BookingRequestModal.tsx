@@ -66,24 +66,17 @@ export function BookingRequestModal({ pkg, isOpen, onClose, businessName, blocke
     setIsSubmitting(true);
     try {
       // 1. Create the booking
-      const bookingRes = await api.post('/bookings', {
+      await api.post('/bookings', {
         packageId: pkg.id,
         date: data.date,
         notes: data.notes
       });
 
       
-      // 2. Create the mock payment session
-      const sessionRes = await api.post('/payments/create-session', {
-        bookingId: bookingRes.data.id
-      });
-      
-      toast.success('Redirecting to secure checkout...');
+      toast.success('Booking request sent. Discuss booking terms directly with the vendor.');
       reset();
       onClose();
-      
-      // 3. Redirect to checkout
-      router.push(sessionRes.data.url);
+      router.push('/account/bookings');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to submit booking request.');
     } finally {

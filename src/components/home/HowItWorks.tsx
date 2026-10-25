@@ -24,9 +24,9 @@ const steps = [
   },
   {
     icon: CalendarCheck,
-    title: "3. Book Securely",
+    title: "3. Contact Your Vendor",
     description:
-      "Lock in your dates and pay securely through our trusted payment gateway.",
+      "Discuss availability, pricing, and booking terms directly with your chosen vendor.",
   },
   {
     icon: Sparkles,

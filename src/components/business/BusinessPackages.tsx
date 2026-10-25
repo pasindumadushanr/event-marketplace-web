@@ -4,7 +4,6 @@ import { Package } from "@/types/business-profile";
 import { Button } from "@/components/ui/button";
 import { Check, Clock, Package as PackageIcon, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { BookingRequestModal } from "./BookingRequestModal";
 import { Badge } from "@/components/ui/badge";
 import { serviceCardCopy, servicePriceLabel } from "@/lib/service-card-copy";
 import { useAuth } from "@/lib/auth-context";
@@ -25,10 +24,8 @@ export function BusinessPackages({
   businessName,
   businessId,
   categoryName = "",
-  blockedDates = [],
   previewOnly = false,
 }: BusinessPackagesProps) {
-  const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [inquiryListing, setInquiryListing] = useState<Package | undefined>();
   const copy = serviceCardCopy(categoryName);
@@ -66,7 +63,7 @@ export function BusinessPackages({
         </h3>
         <p className="text-slate-500 max-w-md mx-auto mb-6">
           This vendor creates custom packages tailored specifically to your
-          event's unique needs rather than set pricing tiers.
+          event&apos;s unique needs rather than set pricing tiers.
         </p>
         <Button
           disabled={previewOnly || !businessId}
@@ -181,14 +178,8 @@ export function BusinessPackages({
               {/* Action Button */}
               <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end">
                 <Button
-                  disabled={
-                    previewOnly || (Number(pkg.price) <= 0 && !businessId)
-                  }
-                  onClick={() =>
-                    Number(pkg.price) > 0
-                      ? setSelectedPackage(pkg)
-                      : enquire(pkg)
-                  }
+                  disabled={previewOnly || !businessId}
+                  onClick={() => enquire(pkg)}
                   className="w-full sm:w-auto bg-slate-900 text-white hover:bg-primary font-bold text-sm rounded-xl px-6 min-h-12 shadow-sm transition-all"
                 >
                   {Number(pkg.price) > 0
@@ -202,13 +193,6 @@ export function BusinessPackages({
       </div>
 
       {inquiryDialog}
-      <BookingRequestModal
-        pkg={selectedPackage}
-        isOpen={!!selectedPackage}
-        onClose={() => setSelectedPackage(null)}
-        businessName={businessName}
-        blockedDates={blockedDates}
-      />
     </div>
   );
 }

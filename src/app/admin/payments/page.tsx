@@ -52,13 +52,14 @@ export default function AdminPaymentsPage() {
       <div className="flex justify-between items-end flex-col sm:flex-row gap-4">
         <div>
           <h2 className="text-3xl font-bold tracking-tight text-slate-900">Payments Ledger</h2>
-          <p className="text-muted-foreground mt-1">Track all platform transactions and commission revenue.</p>
+          <p className="text-muted-foreground mt-1">Historical payment-status records, not verified settlements.</p>
         </div>
         <Button variant="outline" className="w-full sm:w-auto">
           <Download className="mr-2 h-4 w-4" /> Export CSV
         </Button>
       </div>
 
+      <p role="note" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Online payments are disabled. Existing records may include test data. A Paid label is not proof that money was received; verify any historical payment independently.</p>
       <div className="grid gap-4 md:grid-cols-3">
         <div className="bg-white p-6 rounded-xl border shadow-sm">
           <div className="flex items-center gap-4">
@@ -66,7 +67,7 @@ export default function AdminPaymentsPage() {
               <DollarSign className="h-6 w-6 text-blue-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Gross Processing Volume</p>
+              <p className="text-sm font-medium text-slate-500">Recorded Amount (Unverified)</p>
               <h3 className="text-2xl font-bold text-slate-900">LKR {totalVolume.toLocaleString()}</h3>
             </div>
           </div>
@@ -78,17 +79,16 @@ export default function AdminPaymentsPage() {
               <ArrowUpRight className="h-6 w-6 text-emerald-700" />
             </div>
             <div>
-              <p className="text-sm font-medium text-slate-500">Net Platform Revenue (10%)</p>
+              <p className="text-sm font-medium text-slate-500">Illustrative 10% (Not Revenue)</p>
               <h3 className="text-2xl font-bold text-slate-900">LKR {totalPlatformRevenue.toLocaleString()}</h3>
             </div>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-xl border shadow-sm flex flex-col justify-center">
-          <p className="text-sm font-medium text-slate-500 mb-2">Total Successful Transactions</p>
+          <p className="text-sm font-medium text-slate-500 mb-2">Historical Paid-Status Records</p>
           <div className="flex items-end gap-2">
             <h3 className="text-3xl font-bold text-slate-900">{payments.length}</h3>
-            <span className="text-emerald-500 text-sm font-medium mb-1">+12% this week</span>
           </div>
         </div>
       </div>

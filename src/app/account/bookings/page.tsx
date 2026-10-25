@@ -169,15 +169,15 @@ export default function CustomerBookingsPage() {
                     <div className="text-center mt-6">
                       <p className="text-sm text-slate-500 font-medium mb-4">
                         {step === 1 && "The vendor is reviewing your request. They will confirm availability soon."}
-                        {step === 2 && booking.paymentStatus === 'PENDING' && "The vendor has approved your request! Please pay the advance to lock your date."}
-                        {step === 2 && booking.paymentStatus === 'PAID' && "Your date is locked! You're all set for the big day."}
+                        {step === 2 && booking.paymentStatus === 'PENDING' && "The vendor has approved your request. Discuss booking terms directly with them; online payments are not available."}
+                        {step === 2 && booking.paymentStatus === 'PAID' && "A payment is recorded for this booking. Confirm arrangements directly with your vendor."}
                         {step === 3 && "This event has been successfully completed. Thank you for using Nakathata.lk!"}
                       </p>
                       
                       {step === 2 && booking.paymentStatus === 'PENDING' && (
-                        <Link href={`/checkout/${booking.id}`}>
+                        <Link href={`/business/${booking.business.id}`}>
                           <Button className="bg-primary hover:bg-primary/90 text-white font-bold px-8 shadow-lg shadow-primary/20">
-                            Pay Advance to Lock Date
+                            Contact Vendor
                           </Button>
                         </Link>
                       )}
