@@ -55,6 +55,19 @@ export function mapBusinessData(data: any) {
       "https://images.unsplash.com/photo-1519741497674-611481863552?w=1200",
     categoryId: data.categoryId || "",
     categoryName: data.category?.name || "Vendor",
+    categoryIds: data.categoryIds || [data.categoryId].filter(Boolean),
+    categoryNames: [
+      ...new Set<string>(
+        [
+          data.category?.name,
+          ...(Array.isArray(data.categories)
+            ? data.categories.map(
+                (category: { name?: unknown }) => category.name,
+              )
+            : []),
+        ].filter((name): name is string => typeof name === "string" && !!name),
+      ),
+    ],
     isVerified: false, // No identity/registration evidence is recorded yet.
     rating: Number(data.rating) || 0,
     reviewCount: Number(data.reviewCount) || 0,
@@ -115,7 +128,9 @@ export function mapBusinessData(data: any) {
       : [],
 
     bookingMethod: data.profileSettings?.bookingMethod || "DIRECT_BOOKING",
-    blockedDates: parseArrayOrDelimited(data.unavailableDates ?? data.profileSettings?.blockedDates),
+    blockedDates: parseArrayOrDelimited(
+      data.unavailableDates ?? data.profileSettings?.blockedDates,
+    ),
 
     businessHours: (() => {
       const defaultHours: Record<string, string> = {

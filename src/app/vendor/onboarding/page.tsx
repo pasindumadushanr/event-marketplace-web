@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 import { LanguageSwitch, useLanguage } from "@/lib/language";
 import { SRI_LANKA_DISTRICTS } from "@/lib/districts";
-import { CategorySelector } from "@/components/categories/CategorySelector";
+import { BusinessCategorySelector } from "@/components/categories/BusinessCategorySelector";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,6 +44,7 @@ export default function VendorOnboardingWizard() {
     phone: "",
     website: "",
     categoryId: "",
+    categoryIds: [] as string[],
     address: "",
     city: "",
     district: "",
@@ -58,7 +59,14 @@ export default function VendorOnboardingWizard() {
       setFormData(
         (previous) =>
           Object.fromEntries(
-            Object.keys(previous).map((key) => [key, business[key] || ""]),
+            Object.keys(previous).map((key) => [
+              key,
+              key === "categoryIds"
+                ? business.categoryIds ||
+                  business.profileSettings?.categoryIds ||
+                  []
+                : business[key] || "",
+            ]),
           ) as typeof previous,
       );
       setLoadedId(business.id);
@@ -106,10 +114,17 @@ export default function VendorOnboardingWizard() {
       const payload: any = {};
       Object.keys(formData).forEach((key) => {
         const val = (formData as any)[key];
-        if (val !== "") {
+        if (val !== "" && key !== "categoryIds") {
           payload[key] = val;
         }
       });
+      payload.profileSettings = {
+        categoryIds: [
+          ...new Set(
+            [formData.categoryId, ...formData.categoryIds].filter(Boolean),
+          ),
+        ],
+      };
 
       if (!payload.categoryId) {
         toast.error(t("Please select a Business Category in Step 2."));
@@ -281,11 +296,12 @@ export default function VendorOnboardingWizard() {
                 {t("Step 2: Business Category")}
               </h3>
               <div className="space-y-4">
-                <CategorySelector
+                <BusinessCategorySelector
                   required
-                  value={formData.categoryId}
-                  onChange={(categoryId) =>
-                    setFormData((previous) => ({ ...previous, categoryId }))
+                  categoryId={formData.categoryId}
+                  categoryIds={formData.categoryIds}
+                  onChange={(selection) =>
+                    setFormData((previous) => ({ ...previous, ...selection }))
                   }
                 />
               </div>

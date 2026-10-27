@@ -13,6 +13,7 @@ export interface VendorCardProps {
     isVerified: boolean;
     city?: string;
     category?: { name: string };
+    categories?: { id: string; name: string }[];
     startingPrice: number;
     rating: number;
     reviewCount: number;
@@ -90,9 +91,18 @@ export function VendorCard({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-sm text-slate-500 mb-4">
-              <span className="font-medium text-slate-700">
-                {business.category?.name || "Vendor"}
+            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500 mb-4">
+              <span
+                className="font-medium text-slate-700 line-clamp-2"
+                title={business.categories
+                  ?.map((category) => category.name)
+                  .join(" · ")}
+              >
+                {business.categories?.length
+                  ? business.categories
+                      .map((category) => category.name)
+                      .join(" · ")
+                  : business.category?.name || "Vendor"}
               </span>
               {business.city && (
                 <>

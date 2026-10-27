@@ -71,6 +71,8 @@ export interface FullBusinessProfile {
   coverImage: string;
   categoryId: string;
   categoryName: string;
+  categoryNames?: string[];
+  categoryIds?: string[];
 
   // Hero Stats
   isVerified: boolean;
