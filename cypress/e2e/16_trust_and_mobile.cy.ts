@@ -1,5 +1,5 @@
 import { mapBusinessData } from "../../src/lib/map-business-profile";
-import { whatsappUrl } from "../../src/lib/whatsapp";
+import { whatsappUrl, whatsappEnquiryUrl } from "../../src/lib/whatsapp";
 const profile = {
   id: "vendor-test",
   name: "Sunrise Photography",
@@ -67,7 +67,7 @@ describe("Honest trust labels and phone-first profiles", () => {
       phone: "0771234567",
       profileSettings: { verification: { isPhoneVerified: true } },
     });
-    if (!result) throw new Error('Expected a mapped profile');
+    if (!result) throw new Error("Expected a mapped profile");
     expect(result.verification.isEmailVerified).to.equal(false);
     expect(result.verification.isPhoneVerified).to.equal(false);
     expect(result.isVerified).to.equal(false);
@@ -95,15 +95,15 @@ describe("Honest trust labels and phone-first profiles", () => {
       cy.contains("a", "WhatsApp").should(
         "have.attr",
         "href",
-        "https://wa.me/94771234567",
+        whatsappEnquiryUrl("0771234567"),
       );
       cy.contains("button", "Message").should("be.visible").click();
     });
     cy.contains("label", "Event date").should("be.visible");
     cy.get('div[aria-label="Quick contact"]').should("not.exist");
     cy.contains("button", "Cancel").click();
-    cy.get('[role="dialog"]').should('not.exist');
-    cy.get('div[aria-label="Quick contact"]').should('be.visible');
+    cy.get('[role="dialog"]').should("not.exist");
+    cy.get('div[aria-label="Quick contact"]').should("be.visible");
     cy.contains("p", "Beautiful wedding photographs").should(
       "have.css",
       "font-size",

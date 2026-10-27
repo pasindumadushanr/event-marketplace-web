@@ -26,7 +26,7 @@ export const businessSections = [
     key: "contact",
     href: "/vendor/business/contact",
     title: "Contact & social links",
-    description: "Help customers call, email and follow you.",
+    description: "Add your WhatsApp number, phone, email and social media links.",
     group: "Essentials",
     icon: Phone,
   },

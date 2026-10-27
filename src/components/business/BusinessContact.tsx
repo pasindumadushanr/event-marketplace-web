@@ -1,7 +1,15 @@
 "use client";
-
-import { Phone, Mail, Globe, Camera, MessageCircle } from "lucide-react";
-import { whatsappUrl } from "@/lib/whatsapp";
+import {
+  Phone,
+  Mail,
+  Globe,
+  Camera,
+  Play,
+  Music2,
+  MessageCircle,
+} from "lucide-react";
+import { whatsappEnquiryUrl } from "@/lib/whatsapp";
+import { publicContactUrl } from "@/lib/vendor-contact";
 
 interface BusinessContactProps {
   contact: {
@@ -15,105 +23,86 @@ interface BusinessContactProps {
     tiktok?: string;
   };
 }
+const socials = [
+  { field: "facebook", label: "Facebook", Icon: Globe },
+  { field: "instagram", label: "Instagram", Icon: Camera },
+  { field: "youtube", label: "YouTube", Icon: Play },
+  { field: "tiktok", label: "TikTok", Icon: Music2 },
+] as const;
 
 export function BusinessContact({ contact }: BusinessContactProps) {
-  const whatsappHref = whatsappUrl(contact.whatsapp);
+  const whatsappHref = whatsappEnquiryUrl(contact.whatsapp);
+  const website = publicContactUrl(contact.website);
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
-      <h3 className="text-lg font-bold text-slate-900 mb-4">
-        Contact Information
+    <section
+      className="bg-white rounded-3xl p-6 shadow-sm border border-slate-100"
+      aria-label="Vendor contact and social media"
+    >
+      <h3 className="text-lg font-bold text-slate-900 mb-2">
+        Contact this vendor
       </h3>
-
-      <div className="space-y-4 mb-6">
+      <p className="text-sm text-slate-500 mb-5">
+        Connect directly to discuss your event.
+      </p>
+      {whatsappHref && (
         <a
-          href={`tel:${contact.phone}`}
-          className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium"
+          href={whatsappHref}
+          aria-label="Contact vendor on WhatsApp (opens outside Nakathata.lk)"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mb-5 flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 py-3 font-semibold text-white hover:bg-emerald-800"
         >
-          <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
-            <Phone className="h-4 w-4" />
-          </div>
-          {contact.phone}
+          <MessageCircle className="h-5 w-5" /> Chat on WhatsApp
         </a>
-
-        <a
-          href={`mailto:${contact.email}`}
-          className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium"
-        >
-          <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
-            <Mail className="h-4 w-4" />
-          </div>
-          {contact.email}
-        </a>
-
-        {contact.website && (
+      )}
+      <div className="space-y-4">
+        {contact.phone && (
           <a
-            href={contact.website}
+            href={`tel:${contact.phone}`}
+            className="flex items-center gap-3 text-slate-700 font-medium break-all"
+          >
+            <Phone className="h-4 w-4 shrink-0" />
+            {contact.phone}
+          </a>
+        )}
+        {contact.email && (
+          <a
+            href={`mailto:${contact.email}`}
+            className="flex items-center gap-3 text-slate-700 font-medium break-all"
+          >
+            <Mail className="h-4 w-4 shrink-0" />
+            {contact.email}
+          </a>
+        )}
+        {website && (
+          <a
+            href={website}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 text-slate-700 hover:text-primary transition-colors font-medium"
+            className="flex min-h-11 items-center gap-3 font-medium text-slate-700"
           >
-            <div className="h-8 w-8 rounded-full bg-slate-50 flex items-center justify-center shrink-0">
-              <Globe className="h-4 w-4" />
-            </div>
-            Website
+            <Globe className="h-4 w-4" /> Visit website
           </a>
         )}
       </div>
-
-      <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-100">
-        {contact.youtube && (
-          <a
-            href={contact.youtube}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-700"
-          >
-            YouTube
-          </a>
-        )}
-        {contact.tiktok && (
-          <a
-            href={contact.tiktok}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-700"
-          >
-            TikTok
-          </a>
-        )}
-        {whatsappHref && (
-          <a
-            href={whatsappHref}
-            aria-label="Contact vendor on WhatsApp (opens outside Nakathata.lk)"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="min-h-12 rounded-xl px-4 gap-2 bg-green-50 text-green-700 font-semibold flex items-center justify-center hover:bg-green-100 transition-colors"
-          >
-            <MessageCircle className="h-5 w-5" />
-            WhatsApp
-          </a>
-        )}
-        {contact.facebook && (
-          <a
-            href={contact.facebook}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="h-10 w-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition-colors"
-          >
-            <Globe className="h-5 w-5" />
-          </a>
-        )}
-        {contact.instagram && (
-          <a
-            href={contact.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="h-10 w-10 rounded-full bg-pink-50 text-pink-600 flex items-center justify-center hover:bg-pink-100 transition-colors"
-          >
-            <Camera className="h-5 w-5" />
-          </a>
-        )}
+      <div className="mt-5 grid grid-cols-2 gap-2 border-t border-slate-100 pt-5">
+        {socials.map(({ field, label, Icon }) => {
+          const href = publicContactUrl(contact[field], field);
+          return href ? (
+            <a
+              key={field}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`Visit vendor on ${label}`}
+              className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-stone-100"
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              {label}
+            </a>
+          ) : null;
+        })}
       </div>
-    </div>
+    </section>
   );
 }

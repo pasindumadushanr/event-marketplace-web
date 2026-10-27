@@ -1,170 +1,260 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Save, Phone, Mail, Globe, Camera, MessageCircle } from 'lucide-react';
-import { useBusinessProfile } from '@/contexts/BusinessProfileContext';
-import { toast } from 'sonner';
-import api from '@/lib/api';
+import { useState } from "react";
+import { isAxiosError } from "axios";
+import { Save, MessageCircle, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
+import { toast } from "sonner";
+import api from "@/lib/api";
+import { whatsappUrl, whatsappEnquiryUrl } from "@/lib/whatsapp";
+import {
+  publicContactUrl,
+  vendorWhatsappValue,
+  type SocialField,
+} from "@/lib/vendor-contact";
 
+interface ContactValues {
+  phone: string;
+  email: string;
+  whatsapp: string;
+  website: string;
+  facebook: string;
+  instagram: string;
+  tiktok: string;
+  youtube: string;
+}
+interface ContactBusiness {
+  id: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+  profileSettings?: {
+    whatsapp?: string;
+    tiktok?: string;
+    contact?: { whatsapp?: string };
+  };
+}
+const links: { field: SocialField; label: string; placeholder: string }[] = [
+  {
+    field: "website",
+    label: "Website",
+    placeholder: "https://yourbusiness.lk",
+  },
+  {
+    field: "facebook",
+    label: "Facebook",
+    placeholder: "https://facebook.com/yourpage",
+  },
+  {
+    field: "instagram",
+    label: "Instagram",
+    placeholder: "https://instagram.com/yourbusiness",
+  },
+  {
+    field: "tiktok",
+    label: "TikTok",
+    placeholder: "https://tiktok.com/@yourbusiness",
+  },
+  {
+    field: "youtube",
+    label: "YouTube",
+    placeholder: "https://youtube.com/@yourchannel",
+  },
+];
 export default function ContactSettingsPage() {
   const { business, updateBusinessLocally } = useBusinessProfile();
-  const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    phone: '',
-    email: '',
-    whatsapp: '',
-    website: '',
-    facebook: '',
-    instagram: '',
-    tiktok: '',
-    youtube: ''
-  });
-
-  useEffect(() => {
-    if (business) {
-      setFormData({
-        phone: business.phone || '',
-        email: business.email || '',
-        whatsapp: business.profileSettings?.whatsapp || '',
-        website: business.website || '',
-        facebook: business.facebook || '',
-        instagram: business.instagram || '',
-        tiktok: business.profileSettings?.tiktok || '',
-        youtube: business.youtube || ''
-      });
+  return business ? (
+    <ContactForm
+      key={business.id}
+      business={business}
+      onSaved={updateBusinessLocally}
+    />
+  ) : null;
+}
+function ContactForm({
+  business,
+  onSaved,
+}: {
+  business: ContactBusiness;
+  onSaved: (data: unknown) => void;
+}) {
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState<ContactValues>(() => ({
+    phone: business.phone || "",
+    email: business.email || "",
+    whatsapp: vendorWhatsappValue(business.profileSettings),
+    website: business.website || "",
+    facebook: business.facebook || "",
+    instagram: business.instagram || "",
+    youtube: business.youtube || "",
+    tiktok: business.profileSettings?.tiktok || "",
+  }));
+  const preview = whatsappEnquiryUrl(form.whatsapp);
+  function change(field: keyof ContactValues, value: string) {
+    setForm((previous) => ({ ...previous, [field]: value }));
+  }
+  async function save(event: React.FormEvent) {
+    event.preventDefault();
+    const normalised = { ...form };
+    const numberLink = whatsappUrl(form.whatsapp);
+    if (form.whatsapp.trim() && !numberLink) {
+      toast.error("Enter a valid WhatsApp number, e.g. +94771234567");
+      return;
     }
-  }, [business]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const validateUrl = (url: string) => {
-    if (!url) return true;
-    try {
-      new URL(url.startsWith('http') ? url : `https://${url}`);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Validation
-    const urlFields = ['website', 'facebook', 'instagram', 'tiktok', 'youtube'] as const;
-    for (const field of urlFields) {
-      if (!validateUrl(formData[field])) {
-        return toast.error(`Invalid URL provided for ${field}`);
+    normalised.whatsapp = numberLink
+      ? new URL(numberLink).pathname.slice(1)
+      : "";
+    for (const { field, label } of links) {
+      const href = publicContactUrl(form[field], field);
+      if (form[field].trim() && !href) {
+        toast.error(`Enter a valid ${label} link`);
+        return;
       }
+      normalised[field] = href || "";
     }
-
-    setIsLoading(true);
+    setSaving(true);
     try {
-      const payload = {
-        phone: formData.phone,
-        email: formData.email,
-        website: formData.website,
-        facebook: formData.facebook,
-        instagram: formData.instagram,
-        youtube: formData.youtube,
-        profileSettings: {
-          whatsapp: formData.whatsapp,
-          tiktok: formData.tiktok,
-        }
-      };
-
-      await api.patch('/vendor/business', payload);
-      updateBusinessLocally(payload);
-      toast.success('Contact settings saved!');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to save settings');
+      const { whatsapp, tiktok, ...primary } = normalised;
+      const payload = { ...primary, profileSettings: { whatsapp, tiktok } };
+      await api.patch("/vendor/business", payload);
+      onSaved(payload);
+      setForm(normalised);
+      toast.success("Contact and social links saved!");
+    } catch (error) {
+      toast.error(
+        isAxiosError(error)
+          ? error.response?.data?.message ||
+              "Could not save your contact details. Please try again."
+          : "Could not save your contact details. Please try again.",
+      );
     } finally {
-      setIsLoading(false);
+      setSaving(false);
     }
-  };
-
-  if (!business) return null;
-
+  }
   return (
-    <form onSubmit={handleSave} className="space-y-8 max-w-4xl">
+    <form onSubmit={save} className="space-y-6 max-w-4xl">
       <div>
-        <h2 className="text-2xl font-bold text-slate-900">Contact Information</h2>
-        <p className="text-slate-500 mt-1">How customers can reach you directly.</p>
+        <h2 className="text-2xl font-bold text-slate-900">
+          Contact & social links
+        </h2>
+        <p className="mt-2 text-sm text-slate-600">
+          Help customers reach you directly. These details are public. Clear a
+          field to hide its button.
+        </p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Primary Contact */}
-        <div className="space-y-6 md:col-span-2 bg-slate-50 p-6 rounded-2xl border border-slate-100">
-          <h3 className="font-semibold text-slate-900">Primary Contact</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <Phone className="h-4 w-4 text-slate-400" /> Phone Number
-              </label>
-              <Input name="phone" value={formData.phone} onChange={handleChange} className="h-12 bg-white" />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <Mail className="h-4 w-4 text-slate-400" /> Email Address
-              </label>
-              <Input type="email" name="email" value={formData.email} onChange={handleChange} className="h-12 bg-white" />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <MessageCircle className="h-4 w-4 text-slate-400" /> WhatsApp Number
-              </label>
-              <Input name="whatsapp" value={formData.whatsapp} onChange={handleChange} className="h-12 bg-white" />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <Globe className="h-4 w-4 text-slate-400" /> Website URL
-              </label>
-              <Input name="website" value={formData.website} onChange={handleChange} className="h-12 bg-white" placeholder="https://" />
-            </div>
+      <section className="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 sm:p-6 space-y-4">
+        <h3 className="flex items-center gap-2 font-semibold text-emerald-950">
+          <MessageCircle className="h-5 w-5" /> WhatsApp enquiries
+        </h3>
+        <label
+          htmlFor="vendor-whatsapp"
+          className="block text-sm font-medium text-slate-700"
+        >
+          WhatsApp number
+        </label>
+        <Input
+          id="vendor-whatsapp"
+          name="whatsapp"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          value={form.whatsapp}
+          onChange={(event) => change("whatsapp", event.target.value)}
+          placeholder="e.g. 0771234567 or +94771234567"
+          aria-describedby="whatsapp-help"
+          className="h-12 bg-white"
+        />
+        <p id="whatsapp-help" className="text-sm text-slate-600">
+          Use a number registered with WhatsApp. Sri Lankan numbers are
+          automatically formatted with +94. Customers can contact you without
+          signing in.
+        </p>
+        {preview && (
+          <a
+            href={preview}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2 text-sm font-semibold text-white"
+          >
+            <MessageCircle className="h-4 w-4" /> Test your WhatsApp link{" "}
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        )}
+      </section>
+      <section className="rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 space-y-5">
+        <h3 className="font-semibold text-slate-900">Phone & email</h3>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label
+              htmlFor="vendor-phone"
+              className="block mb-2 text-sm font-medium"
+            >
+              Phone number
+            </label>
+            <Input
+              id="vendor-phone"
+              name="phone"
+              type="tel"
+              value={form.phone}
+              onChange={(event) => change("phone", event.target.value)}
+              className="h-12"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="vendor-email"
+              className="block mb-2 text-sm font-medium"
+            >
+              Email address
+            </label>
+            <Input
+              id="vendor-email"
+              name="email"
+              type="email"
+              value={form.email}
+              onChange={(event) => change("email", event.target.value)}
+              className="h-12"
+            />
           </div>
         </div>
-
-        {/* Social Media */}
-        <div className="space-y-6 md:col-span-2">
-          <h3 className="font-semibold text-slate-900 border-b border-slate-100 pb-2">Social Media Profiles</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <Globe className="h-4 w-4 text-blue-600" /> Facebook
+      </section>
+      <section className="rounded-2xl border border-stone-200 bg-white p-5 sm:p-6 space-y-5">
+        <h3 className="font-semibold text-slate-900">Website & social media</h3>
+        <div className="grid gap-5 sm:grid-cols-2">
+          {links.map(({ field, label, placeholder }) => (
+            <div key={field}>
+              <label
+                htmlFor={`vendor-${field}`}
+                className="mb-2 block text-sm font-medium"
+              >
+                {label}
               </label>
-              <Input name="facebook" value={formData.facebook} onChange={handleChange} className="h-12 bg-slate-50" placeholder="https://facebook.com/..." />
+              <Input
+                id={`vendor-${field}`}
+                name={field}
+                value={form[field]}
+                onChange={(event) => change(field, event.target.value)}
+                placeholder={placeholder}
+                inputMode="url"
+                className="h-12"
+              />
             </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <Camera className="h-4 w-4 text-pink-600" /> Instagram
-              </label>
-              <Input name="instagram" value={formData.instagram} onChange={handleChange} className="h-12 bg-slate-50" placeholder="https://instagram.com/..." />
-            </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">TikTok</label>
-              <Input name="tiktok" value={formData.tiktok} onChange={handleChange} className="h-12 bg-slate-50" placeholder="https://tiktok.com/@..." />
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700">YouTube</label>
-              <Input name="youtube" value={formData.youtube} onChange={handleChange} className="h-12 bg-slate-50" placeholder="https://youtube.com/..." />
-            </div>
-          </div>
+          ))}
         </div>
-      </div>
-
-      <div className="pt-6 border-t border-slate-100 flex justify-end">
-        <Button type="submit" disabled={isLoading} className="bg-primary hover:bg-primary/90 text-white min-w-[150px]">
-          {isLoading ? 'Saving...' : <><Save className="mr-2 h-4 w-4" /> Save Changes</>}
+      </section>
+      <div className="flex justify-end border-t border-stone-200 pt-5">
+        <Button
+          type="submit"
+          disabled={saving}
+          className="min-h-12 bg-emerald-800 px-6 text-white hover:bg-emerald-900"
+        >
+          <Save className="mr-2 h-4 w-4" />
+          {saving ? "Saving..." : "Save contact & social links"}
         </Button>
       </div>
     </form>

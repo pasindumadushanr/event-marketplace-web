@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth-context";
 import { EventInquiryDialog } from "./EventInquiryDialog";
 import { ShortlistButton } from "@/components/discovery/ShortlistButton";
-import { whatsappUrl } from "@/lib/whatsapp";
+import { whatsappEnquiryUrl } from "@/lib/whatsapp";
 
 interface BusinessCTAProps {
   businessId: string;
@@ -26,7 +26,7 @@ export function BusinessCTA({
   const router = useRouter();
   const { isAuthenticated } = useAuth();
   const [inquiryOpen, setInquiryOpen] = useState(false);
-  const whatsappHref = whatsappUrl(whatsapp);
+  const whatsappHref = whatsappEnquiryUrl(whatsapp);
   function enquire() {
     if (!isAuthenticated) {
       router.push("/login");
@@ -48,6 +48,16 @@ export function BusinessCTA({
           </p>
         </div>
         <div className="space-y-4">
+          {whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full min-h-14 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-lg"
+            >
+              <MessageCircle className="h-5 w-5" /> Chat on WhatsApp
+            </a>
+          )}
           <Button
             onClick={enquire}
             className="w-full h-14 text-lg bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl"
@@ -61,16 +71,6 @@ export function BusinessCTA({
             Discuss availability and booking terms directly with the vendor.
             Online payments are not available.
           </p>
-          {whatsappHref && (
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full min-h-14 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-lg"
-            >
-              <MessageCircle className="h-5 w-5" /> WhatsApp vendor
-            </a>
-          )}
           <Button
             variant="outline"
             onClick={enquire}
@@ -86,6 +86,29 @@ export function BusinessCTA({
         onClose={() => setInquiryOpen(false)}
         businessId={businessId}
       />
+      {!inquiryOpen && (
+        <div
+          aria-label="Quick contact"
+          className="fixed inset-x-0 bottom-0 z-40 flex gap-3 border-t border-stone-200 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg backdrop-blur lg:hidden"
+        >
+          {whatsappHref && (
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex flex-1 min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 text-sm font-semibold text-white"
+            >
+              <MessageCircle className="h-5 w-5" /> WhatsApp
+            </a>
+          )}
+          <Button
+            onClick={enquire}
+            className="min-h-12 flex-1 rounded-xl bg-slate-900 text-white"
+          >
+            <MessageCircle className="mr-2 h-5 w-5" /> Message
+          </Button>
+        </div>
+      )}
     </>
   );
 }

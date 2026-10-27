@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Star, MapPin, Building2 } from "lucide-react";
+import { Star, MapPin, Building2, MessageCircle } from "lucide-react";
+import { whatsappEnquiryUrl } from "@/lib/whatsapp";
 import { ShortlistButton } from "./ShortlistButton";
 
 export interface VendorCardProps {
@@ -18,6 +19,7 @@ export interface VendorCardProps {
     rating: number;
     reviewCount: number;
     distanceKm?: number | null;
+    whatsapp?: string;
   };
   initialIsFavorite?: boolean;
   onFavoriteChange?: (isFavorite: boolean) => void;
@@ -28,8 +30,14 @@ export function VendorCard({
   initialIsFavorite = false,
   onFavoriteChange,
 }: VendorCardProps) {
+  const whatsappHref = whatsappEnquiryUrl(business.whatsapp);
   return (
-    <Link href={`/business/${business.id}`} className="group block">
+    <article className="group relative block h-full" data-testid="vendor-card">
+      <Link
+        href={`/business/${business.id}`}
+        aria-label={`View ${business.name}`}
+        className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700"
+      />
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-300 flex flex-col h-full min-h-[400px]">
         {/* Image Section */}
         <div className="relative h-[220px] w-full bg-slate-100 overflow-hidden shrink-0">
@@ -46,17 +54,19 @@ export function VendorCard({
           )}
 
           {/* Favorite Button */}
-          <ShortlistButton
-            businessId={business.id}
-            compact
-            onChange={onFavoriteChange}
-          />
+          <div className="absolute inset-0 z-20 pointer-events-none [&>button]:pointer-events-auto">
+            <ShortlistButton
+              businessId={business.id}
+              compact
+              onChange={onFavoriteChange}
+            />
+          </div>
         </div>
 
         {/* Details Section */}
         <div className="p-5 flex-1 flex flex-col relative">
           {/* Logo (Floating over edge) */}
-          <div className="absolute -top-10 left-5 h-16 w-16 bg-white rounded-xl shadow-md border border-slate-100 p-1 overflow-hidden z-10 flex items-center justify-center">
+          <div className="pointer-events-none absolute -top-10 left-5 h-16 w-16 bg-white rounded-xl shadow-md border border-slate-100 p-1 overflow-hidden z-10 flex items-center justify-center">
             {business.logo ? (
               <img
                 src={business.logo}
@@ -123,9 +133,24 @@ export function VendorCard({
                   : "Custom"}
               </span>
             </div>
+            {whatsappHref && (
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Chat with ${business.name} on WhatsApp`}
+                className="relative z-20 mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 py-3 text-sm font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-800"
+              >
+                <MessageCircle
+                  className="h-4 w-4 shrink-0"
+                  aria-hidden="true"
+                />{" "}
+                Chat on WhatsApp
+              </a>
+            )}
           </div>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

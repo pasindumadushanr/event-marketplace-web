@@ -1,3 +1,4 @@
+import { publicContactUrl, vendorWhatsappValue } from "./vendor-contact";
 // Helper to map backend data to frontend component expected props
 export function mapBusinessData(data: any) {
   if (!data) return null;
@@ -171,15 +172,12 @@ export function mapBusinessData(data: any) {
     contact: {
       phone: data.phone || "",
       email: data.email || "",
-      website: data.website || "",
-      facebook: data.facebook || "",
-      instagram: data.instagram || "",
-      youtube: data.youtube || "",
-      tiktok: data.profileSettings?.tiktok || "",
-      whatsapp:
-        data.profileSettings?.whatsapp ||
-        data.profileSettings?.contact?.whatsapp ||
-        "",
+      website: publicContactUrl(data.website) || "",
+      facebook: publicContactUrl(data.facebook, "facebook") || "",
+      instagram: publicContactUrl(data.instagram, "instagram") || "",
+      youtube: publicContactUrl(data.youtube, "youtube") || "",
+      tiktok: publicContactUrl(data.profileSettings?.tiktok, "tiktok") || "",
+      whatsapp: vendorWhatsappValue(data.profileSettings),
     },
 
     faq: Array.isArray(data.profileSettings?.faqs)
