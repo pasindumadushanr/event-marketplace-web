@@ -188,7 +188,7 @@ describe("Gradual languages and nationwide launch support", () => {
     cy.visit("/business/vendor-test", {
       onBeforeLoad: (win) => auth(win, "CUSTOMER"),
     });
-    cy.contains("button", "Message Vendor").first().click();
+    cy.contains("button", "Request a Custom Quote").click();
     language("si");
     cy.get('[role="dialog"] button[type="submit"]').click();
     cy.contains(

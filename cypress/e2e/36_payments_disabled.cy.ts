@@ -36,7 +36,8 @@ describe("Launch without online payments", () => {
       },
     });
     cy.contains("button", "Book Now").should("not.exist");
-    cy.contains("button", "Request a Quote").should("be.visible");
+    cy.get('section[aria-label="Contact this vendor"]').should("be.visible");
+    cy.contains("button", "Request a Quote").should("not.exist");
     cy.contains("button", "Request this package").click();
     cy.get('[role="dialog"]').should("contain.text", "Full day photography");
     cy.contains("button", "Send enquiry").should("be.visible");

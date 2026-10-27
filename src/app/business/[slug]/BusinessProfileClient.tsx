@@ -175,8 +175,6 @@ export default function BusinessProfileClient({
             <div className="sticky top-28 space-y-6">
               <BusinessCTA
                 businessId={business.id}
-                bookingMethod={business.bookingMethod}
-                startingPrice={business.startingPrice}
                 whatsapp={business.contact.whatsapp}
               />
               <BusinessAvailability blockedDates={business.blockedDates} />

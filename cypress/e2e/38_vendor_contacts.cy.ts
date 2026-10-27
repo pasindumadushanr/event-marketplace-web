@@ -112,6 +112,15 @@ describe("Direct vendor contact and social links", () => {
     cy.intercept("GET", "**/discovery/vendors/vendor-test", { body: original });
     cy.viewport(390, 844);
     cy.visit("/business/vendor-test");
+    cy.get('section[aria-label="Contact this vendor"]').within(() => {
+      cy.contains("+94771234567").should("exist");
+      cy.contains("a", "Chat on WhatsApp")
+        .should("have.attr", "href", whatsappEnquiryUrl("0771234567"));
+      cy.contains("Request a Quote").should("not.exist");
+      cy.contains("Custom Quote").should("not.exist");
+      cy.contains("Message Vendor").should("not.exist");
+      cy.get('button[aria-label="Save to shortlist"]').should("exist");
+    });
     cy.get('[aria-label="Quick contact"]').within(() => {
       cy.contains("a", "WhatsApp")
         .should("be.visible")

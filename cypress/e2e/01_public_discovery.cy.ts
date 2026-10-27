@@ -59,7 +59,7 @@ describe('01 - Public Discovery & Marketing Pages', () => {
         
         // Check core storefront elements
         cy.get('h1').should('be.visible');
-        cy.contains(/Book This Vendor|Contact Vendor|Request Quote/i).should('exist');
+        cy.get('section[aria-label="Contact this vendor"]').should('exist');
         
         // Check tab interaction
         cy.contains(/Packages|Services/i).should('exist');

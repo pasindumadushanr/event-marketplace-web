@@ -1,112 +1,72 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { MessageCircle, FileText } from "lucide-react";
-import { BookingMethod } from "@/types/business-profile";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/lib/auth-context";
-import { EventInquiryDialog } from "./EventInquiryDialog";
+import { MessageCircle } from "lucide-react";
 import { ShortlistButton } from "@/components/discovery/ShortlistButton";
 import { whatsappEnquiryUrl } from "@/lib/whatsapp";
 
 interface BusinessCTAProps {
   businessId: string;
-  bookingMethod: BookingMethod;
-  startingPrice: number;
   whatsapp?: string;
 }
 
-export function BusinessCTA({
-  businessId,
-  bookingMethod,
-  startingPrice,
-  whatsapp,
-}: BusinessCTAProps) {
-  const router = useRouter();
-  const { isAuthenticated } = useAuth();
-  const [inquiryOpen, setInquiryOpen] = useState(false);
+export function BusinessCTA({ businessId, whatsapp }: BusinessCTAProps) {
   const whatsappHref = whatsappEnquiryUrl(whatsapp);
-  function enquire() {
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    setInquiryOpen(true);
-  }
+  // Display the same normalized number used by the chat link.
+  const number = whatsappHref
+    ? `+${new URL(whatsappHref).pathname.slice(1)}`
+    : null;
+
   return (
     <>
-      <div className="bg-white rounded-3xl p-6 shadow-xl border border-primary/20">
-        <div className="text-center mb-6 pb-6 border-b border-slate-100">
-          <p className="text-sm font-bold uppercase tracking-wider text-slate-400 mb-1">
-            {startingPrice > 0 ? "Starting Price" : "Pricing"}
-          </p>
-          <p className="text-3xl font-extrabold text-slate-900">
-            {startingPrice > 0
-              ? `LKR ${startingPrice.toLocaleString()}`
-              : "Custom Quote"}
+      <section
+        aria-label="Contact this vendor"
+        className="rounded-3xl border border-emerald-100 bg-white p-6 shadow-xl"
+      >
+        <div className="mb-5 text-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
+            <MessageCircle className="h-6 w-6" aria-hidden="true" />
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">Contact this vendor</h2>
+          <p className="mt-2 text-sm text-slate-500">
+            Connect directly to discuss your event.
           </p>
         </div>
-        <div className="space-y-4">
-          {whatsappHref && (
+        {whatsappHref ? (
+          <div className="mb-5 space-y-3">
+            <p className="text-center text-sm text-slate-500">
+              WhatsApp <span className="ml-1 font-semibold text-slate-900">{number}</span>
+            </p>
             <a
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full min-h-14 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-lg"
+              className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 text-lg font-bold text-white transition-colors hover:bg-emerald-800"
             >
-              <MessageCircle className="h-5 w-5" /> Chat on WhatsApp
+              <MessageCircle className="h-5 w-5" aria-hidden="true" /> Chat on WhatsApp
             </a>
-          )}
-          <Button
-            onClick={enquire}
-            className="w-full h-14 text-lg bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl"
-          >
-            <FileText className="mr-2 h-5 w-5" />{" "}
-            {bookingMethod === "CONTACT_ONLY"
-              ? "Contact Vendor"
-              : "Request a Quote"}
-          </Button>
-          <p className="text-xs text-center text-slate-500">
-            Discuss availability and booking terms directly with the vendor.
-            Online payments are not available.
+          </div>
+        ) : (
+          <p className="mb-5 text-center text-sm text-slate-500">
+            WhatsApp contact is not available for this vendor yet.
           </p>
-          <Button
-            variant="outline"
-            onClick={enquire}
-            className="w-full min-h-12 rounded-xl"
-          >
-            <MessageCircle className="mr-2 h-5 w-5" /> Message Vendor
-          </Button>
+        )}
+        <div className="flex justify-center border-t border-slate-100 pt-5">
           <ShortlistButton businessId={businessId} />
         </div>
-      </div>
-      <EventInquiryDialog
-        open={inquiryOpen}
-        onClose={() => setInquiryOpen(false)}
-        businessId={businessId}
-      />
-      {!inquiryOpen && (
+      </section>
+      {whatsappHref && (
         <div
           aria-label="Quick contact"
-          className="fixed inset-x-0 bottom-0 z-40 flex gap-3 border-t border-stone-200 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg backdrop-blur lg:hidden"
+          className="fixed inset-x-0 bottom-0 z-40 flex border-t border-stone-200 bg-white/95 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-lg backdrop-blur lg:hidden"
         >
-          {whatsappHref && (
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-1 min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 text-sm font-semibold text-white"
-            >
-              <MessageCircle className="h-5 w-5" /> WhatsApp
-            </a>
-          )}
-          <Button
-            onClick={enquire}
-            className="min-h-12 flex-1 rounded-xl bg-slate-900 text-white"
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 text-sm font-semibold text-white hover:bg-emerald-800"
           >
-            <MessageCircle className="mr-2 h-5 w-5" /> Message
-          </Button>
+            <MessageCircle className="h-5 w-5" aria-hidden="true" /> Chat on WhatsApp
+          </a>
         </div>
       )}
     </>

@@ -97,13 +97,13 @@ describe("Honest trust labels and phone-first profiles", () => {
         "href",
         whatsappEnquiryUrl("0771234567"),
       );
-      cy.contains("button", "Message").should("be.visible").click();
+      cy.get("button").should("not.exist");
     });
-    cy.contains("label", "Event date").should("be.visible");
-    cy.get('div[aria-label="Quick contact"]').should("not.exist");
-    cy.contains("button", "Cancel").click();
-    cy.get('[role="dialog"]').should("not.exist");
-    cy.get('div[aria-label="Quick contact"]').should("be.visible");
+    cy.get('section[aria-label="Contact this vendor"]').within(() => {
+      cy.contains("+94771234567").should("exist");
+      cy.contains("Request a Quote").should("not.exist");
+      cy.contains("Custom Quote").should("not.exist");
+    });
     cy.contains("p", "Beautiful wedding photographs").should(
       "have.css",
       "font-size",
@@ -127,7 +127,8 @@ describe("Honest trust labels and phone-first profiles", () => {
     });
     cy.contains("Vendor account email confirmed").should("not.exist");
     cy.get('div[aria-label="Quick contact"] a').should("not.exist");
-    cy.get('div[aria-label="Quick contact"] button').should("be.visible");
+    cy.get('div[aria-label="Quick contact"]').should("not.exist");
+    cy.contains("WhatsApp contact is not available for this vendor yet.").should("exist");
   });
   it("supports camera uploads, reports mixed failures honestly, and shows touch-friendly photo controls", () => {
     cy.viewport(390, 844);

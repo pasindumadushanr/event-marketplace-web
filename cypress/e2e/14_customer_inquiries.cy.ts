@@ -102,7 +102,7 @@ describe("Customer event enquiries", () => {
       }
     }).as("send");
     cy.visit("/business/vendor-test", { onBeforeLoad: (win) => auth(win) });
-    cy.contains("button", "Request a Quote").click();
+    cy.contains("button", "Request a Custom Quote").click();
     cy.contains("button", "Send enquiry").click();
     cy.get('[role="dialog"]').should("be.visible");
     fill();
