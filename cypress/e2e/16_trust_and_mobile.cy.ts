@@ -84,10 +84,8 @@ describe("Honest trust labels and phone-first profiles", () => {
   it("explains genuine checks and review labels with easy phone contact and readable services", () => {
     cy.viewport(390, 844);
     customer();
-    cy.contains("Vendor account email confirmed").should("exist");
-    cy.contains(
-      "Identity, business registration, and phone ownership have not been verified",
-    ).should("exist");
+    cy.contains("Trust & Verification").should("not.exist");
+    cy.contains("Vendor account email confirmed").should("not.exist");
     cy.contains("Verified customer · completed booking").should("exist");
     cy.contains("Customer review · booking not verified").should("exist");
     cy.contains("Based on 2 customer reviews").should("exist");

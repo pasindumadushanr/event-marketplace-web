@@ -22,7 +22,6 @@ import {
 } from "@/components/vendor/visual-profile-model";
 import { FullBusinessProfile } from "@/types/business-profile";
 import { BusinessHero } from "@/components/business/BusinessHero";
-import { BusinessTrust } from "@/components/business/BusinessTrust";
 import { BusinessAbout } from "@/components/business/BusinessAbout";
 import { BusinessFeatures } from "@/components/business/BusinessFeatures";
 import { BusinessGallery } from "@/components/business/BusinessGallery";
@@ -588,7 +587,6 @@ export default function VendorPreviewPage() {
         {wrap("hero", <BusinessHero business={business} />)}
         <div className="visual-profile-columns grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div className="min-w-0 space-y-5">
-            <BusinessTrust verification={business.verification} />
             {wrap("about", <BusinessAbout business={business} />)}
             {wrap(
               "features",

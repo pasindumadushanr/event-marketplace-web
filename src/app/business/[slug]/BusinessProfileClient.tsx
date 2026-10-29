@@ -9,7 +9,6 @@ import { Navbar } from "@/components/home/Navbar";
 import { Footer } from "@/components/home/Footer";
 
 import { BusinessHero } from "@/components/business/BusinessHero";
-import { BusinessTrust } from "@/components/business/BusinessTrust";
 import { BusinessAbout } from "@/components/business/BusinessAbout";
 import { BusinessFeatures } from "@/components/business/BusinessFeatures";
 import { BusinessGallery } from "@/components/business/BusinessGallery";
@@ -150,7 +149,6 @@ export default function BusinessProfileClient({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           <div className="lg:col-span-8 space-y-8">
-            <BusinessTrust verification={business.verification} />
             <BusinessAbout business={business} />
             <BusinessFeatures featureGroups={business.featureGroups} />
             <BusinessGallery gallery={business.gallery} />
