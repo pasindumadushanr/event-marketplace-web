@@ -171,11 +171,6 @@ function SearchContent() {
                     ? "Finding your location…"
                     : "Use my location · 50 km"}
                 </Button>
-                <p className="text-xs text-slate-500">
-                  Only requested when you click. Used for this search, not saved
-                  to your account. Vendor distances are approximate
-                  straight-line distances.
-                </p>
                 {locationError && (
                   <p role="alert" className="text-sm text-red-700">
                     {locationError}
@@ -238,12 +233,6 @@ function SearchContent() {
                   onChange={(e) => setCity(e.target.value)}
                   disabled={!!nearby}
                 />
-                {!nearby && (
-                  <p className="text-xs text-slate-500">
-                    Type any town or city, for example Walasmulla. Matches
-                    vendors by their saved city name.
-                  </p>
-                )}
                 {nearby && (
                   <p className="text-xs text-slate-500">
                     Turn off nearby search to choose a city instead.
