@@ -192,15 +192,11 @@ export function Navbar({
   const links = simple
     ? [
         { name: "Home", href: "/" },
-        { name: "Home V1", href: "/home-v1" },
-        { name: "Home V2", href: "/home-v2" },
         { name: "Find Vendors", href: "/search" },
         { name: "Services", href: "/categories" },
       ]
     : [
         { name: "Home", href: "/" },
-        { name: "Home V1", href: "/home-v1" },
-        { name: "Home V2", href: "/home-v2" },
         { name: "Categories", href: "/categories" },
         { name: "Vendors", href: "/search" },
         { name: "Locations", href: "/locations" },

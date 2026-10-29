@@ -34,7 +34,7 @@ const brandStructuredData = {
 
 export default async function HomePage() {
   const settings = await getPlatformSettings();
-  const classic = process.env.HOMEPAGE_DESIGN === "classic";
+  const classic = settings.general.homepageVersion === "v1";
   return (
     <div className="min-h-screen bg-background font-sans">
       <script

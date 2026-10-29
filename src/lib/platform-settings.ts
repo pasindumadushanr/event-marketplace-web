@@ -4,6 +4,7 @@ export const DEFAULT_GENERAL = {
   supportPhone: "",
   contactAddress: "Sri Lanka",
   currency: "LKR",
+  homepageVersion: "v2",
 };
 export const DEFAULT_SEO = {
   metaTitle: "Nakathata.lk | Wedding Venues & Event Services in Sri Lanka",
@@ -44,7 +45,10 @@ export function isPlatformSettings(value: unknown): value is PlatformSettings {
     if (!record || typeof record !== "object") return false;
     if (
       !Object.keys(defaults).every(
-        (key) => typeof (record as Record<string, unknown>)[key] === "string",
+        (key) =>
+          (group === "general" && key === "homepageVersion" &&
+            (record as Record<string, unknown>)[key] === undefined) ||
+          typeof (record as Record<string, unknown>)[key] === "string",
       )
     )
       return false;

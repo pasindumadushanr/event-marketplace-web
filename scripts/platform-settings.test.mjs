@@ -16,6 +16,12 @@ test("accepts the public settings contract and rejects incomplete responses", ()
   ])
     assert.equal(isPlatformSettings(value), false);
 });
+
+test("accepts older backends without a homepage choice during rollout", () => {
+  const { homepageVersion, ...general } = DEFAULT_PLATFORM.general;
+  assert.equal(homepageVersion, "v2");
+  assert.equal(isPlatformSettings({ ...DEFAULT_PLATFORM, general }), true);
+});
 test("saved GA4 ID overrides the Vercel fallback", () => {
   assert.equal(
     analyticsId(

@@ -17,6 +17,7 @@ type Field = {
   type?: string;
   multiline?: boolean;
   readOnly?: boolean;
+  options?: { value: string; label: string }[];
 };
 type EmailStatus = {
   provider: string;
@@ -193,7 +194,18 @@ export function SettingsEditor({
             {fields.map((field) => (
               <div key={field.key} className="space-y-2">
                 <Label htmlFor={`setting-${field.key}`}>{field.label}</Label>
-                {field.multiline ? (
+                {field.options ? (
+                  <select
+                    id={`setting-${field.key}`}
+                    value={values[field.key]}
+                    onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
+                    className="min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm"
+                  >
+                    {field.options.map((option) => (
+                      <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                  </select>
+                ) : field.multiline ? (
                   <Textarea
                     id={`setting-${field.key}`}
                     value={values[field.key]}
