@@ -30,6 +30,12 @@ export default function StudioLogin() {
       if (!studioRoles.includes(value.user?.roleName))
         throw new Error("This account does not have Invitation Studio access.");
       sessionStorage.setItem("invitationStudioToken", value.accessToken);
+      try {
+        await studioRequest("/invitation-studio/session");
+      } catch (failure) {
+        sessionStorage.removeItem("invitationStudioToken");
+        throw failure;
+      }
       router.replace("/invitation-studio");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not sign in");
@@ -110,8 +116,8 @@ export default function StudioLogin() {
           </button>
         </form>
         <p className="mt-6 text-xs text-stone-500">
-          Invitation staff and super administrators only. Customer accounts
-          cannot sign in here.
+          Invitation staff and approved website administrators only. Customer
+          accounts cannot sign in here.
         </p>
       </section>
     </main>

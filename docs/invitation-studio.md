@@ -2,7 +2,7 @@
 
 ## Scope
 
-Standalone staff workspace at `/invitation-studio` with its own `/invitation-studio/login` screen and sessionStorage token (separate from marketplace localStorage/auth state). Authorized roles: `INVITATION_STAFF` and `SUPER_ADMIN`. Marketplace ADMIN, VENDOR and CUSTOMER roles cannot use the studio API. Password sign-in requires an emailed code; Google login cannot bypass that requirement.
+Standalone staff workspace at `/invitation-studio` with its own `/invitation-studio/login` screen and sessionStorage token (separate from marketplace localStorage/auth state). Authorized roles: `INVITATION_STAFF`, `SUPER_ADMIN`, and an `ADMIN` with an explicit `InvitationStudioMember` record. Marketplace administrators do not automatically get studio access. VENDOR and CUSTOMER roles cannot use the studio API even if a membership row were accidentally present. Password sign-in requires an emailed code; Google login cannot bypass that requirement. The owner requested using the existing website admin credentials; no password or marketplace role is changed to provide this access.
 
 Public catalogue: `/invitation-templates`. First template: W01 Olive & Ivory at LKR 2,500, adapted from the supplied calla-lily sample. Demo: `/invitation-templates/w01`. Only W01 is available; basic LKR 1,500 designs and further templates are future work, not advertised as ready.
 
@@ -33,10 +33,10 @@ Draft API reads require staff authorization. Customer review links are bearer li
 ## Deployment — not automatically applied
 
 1. Confirm the intended production database using the backend's actual `DATABASE_URL`, and review pending migration history/backups first. Do not assume a separately connected Neon project is the application database.
-2. Apply `20261030000000_invitation_studio` through the project's reviewed Prisma deployment process. It adds `WeddingInvitation` and the invitation-only role; no marketplace data is deleted or reassigned. No migration was applied during development.
+2. Apply `20261030000000_invitation_studio` through the project's reviewed deployment process. It adds `WeddingInvitation`, `InvitationStudioMember` and the invitation-only role; no marketplace data is deleted or reassigned. The existing production database has no `_prisma_migrations` table. Do not run the entire legacy migration history blindly. `scripts/setup-invitation-production.cjs --apply-invitation-studio` is the owner-approved, target-checked additive setup for this database; it also grants the single existing active ADMIN explicit studio membership without changing credentials or its role.
 3. Generate Prisma Client, build and deploy the backend. Build/install uses the schema; production still needs the table migration. Existing Cloudinary and SMTP/Resend settings are reused.
 4. Deploy frontend with its normal API URL. New routes are not added to marketplace navigation yet, so the service can be reviewed before promotion.
-5. Test using an existing SUPER_ADMIN first. To provision a *new* invitation-only employee account, explicitly run `node scripts/create-invitation-staff.cjs --create-invitation-staff` with `STUDIO_STAFF_EMAIL`, `STUDIO_STAFF_NAME`, and a unique `STUDIO_STAFF_PASSWORD` (14+ characters) set privately in the operator environment. The script refuses to overwrite/reassign existing users and never prints the password. Do not run it automatically on deploy. Remove those temporary environment variables afterward.
+5. Use the existing website ADMIN credentials after explicit studio membership is granted, with the normal email code. A SUPER_ADMIN can also sign in. To provision a *new* invitation-only employee account later, explicitly run `node scripts/create-invitation-staff.cjs --create-invitation-staff` with `STUDIO_STAFF_EMAIL`, `STUDIO_STAFF_NAME`, and a unique `STUDIO_STAFF_PASSWORD` (14+ characters) set privately in the operator environment. The script refuses to overwrite/reassign existing users and never prints the password. Do not run it automatically on deploy. Remove those temporary environment variables afterward.
 6. Set ordering WhatsApp, create an internal test invitation, approve/publish, verify its WhatsApp preview on a real device, download its card, and test unpublish before taking orders.
 
 ## Deliberate limits

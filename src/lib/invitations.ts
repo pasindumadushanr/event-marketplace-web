@@ -53,7 +53,8 @@ export const demoInvitation: InvitationContent = {
   gallery: [],
   music: true,
 };
-export const studioRoles = ["SUPER_ADMIN", "INVITATION_STAFF"];
+// ADMIN is a login candidate only; the server requires explicit membership.
+export const studioRoles = ["SUPER_ADMIN", "INVITATION_STAFF", "ADMIN"];
 export async function studioRequest(path: string, init: RequestInit = {}) {
   const token =
     typeof window !== "undefined"
