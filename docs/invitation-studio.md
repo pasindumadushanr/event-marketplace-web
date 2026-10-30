@@ -18,7 +18,7 @@ The public demo retains the original fictional details and browser-only sample R
 
 1. Sign in using an authorized staff account. An existing SUPER_ADMIN can use this separate login without a new account.
 2. Save the team's sales WhatsApp number in the studio. It powers the catalogue ordering button. This is distinct from each couple's RSVP number.
-3. Create an invitation, pick its permanent slug, enter names/details and upload photos. Dates use Sri Lanka time (UTC+05:30).
+3. Click Create invitation → choose a template → Use W01. The template picker shows only implemented designs, with price and a live-demo link. No draft is created until its editor is saved. Then pick the permanent slug, enter names/details and upload photos. Existing invitations open directly in their editor. Dates use Sri Lanka time (UTC+05:30).
 4. Save draft and preview. A draft save does **not** change a published invitation.
 5. Create a customer review link. The random token stays in the URL fragment, is sent in a POST body, stored hashed on the server and expires after seven days. Saving edits, republishing, archiving or unpublishing revokes it. A new review link also replaces the previous token.
 6. After customer approval, check the approval box and Publish. The saved content is copied to a separate published snapshot at `/wedding/<slug>`.

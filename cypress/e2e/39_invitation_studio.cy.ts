@@ -11,18 +11,97 @@ function invitationFrame() {
     .then((body) => cy.wrap(body));
 }
 describe("Invitation Studio first template", () => {
-  it('preserves the original three-scene animation and illustrated seal', () => {
-    cy.viewport(1280,900);
-    cy.visit('/invitation-templates/w01');
-    invitationFrame().find('#open-invitation .wax-ring svg').should('exist');
-    invitationFrame().find('link').should('not.exist');
-    invitationFrame().find('#open-invitation').click();
-    invitationFrame().find('#cover').should('have.attr','data-scene','photo');
-    invitationFrame().find('#cover',{timeout:9000}).should('have.attr','data-scene','date');
-    invitationFrame().find('#cover',{timeout:9000}).should('have.attr','data-scene','crest');
-    invitationFrame().find('#view-invitation').click();
-    invitationFrame().find('#cover').should('not.be.visible');
-    invitationFrame().find('.hero h1').should('contain','Amaya').and('be.visible');
+  it("asks for a template before opening a new invitation editor", () => {
+    let creates = 0;
+    cy.intercept("GET", `${api}/invitation-studio/session`, {
+      body: { role: "ADMIN" },
+    });
+    cy.intercept("GET", `${api}/invitation-studio/invitations`, { body: [] });
+    cy.intercept("GET", `${api}/invitation-studio/settings`, {
+      body: { orderPhone: "" },
+    });
+    cy.intercept("POST", `${api}/invitation-studio/invitations`, (req) => {
+      creates++;
+      expect(req.body).to.include({ templateId: "W01", slug: "test-couple" });
+      req.reply({
+        body: {
+          id,
+          slug: req.body.slug,
+          templateId: req.body.templateId,
+          status: "DRAFT",
+          revision: 1,
+          draft: req.body.draft,
+        },
+      });
+    }).as("createFromTemplate");
+    cy.visit("/invitation-studio", {
+      onBeforeLoad(win) {
+        win.sessionStorage.setItem("invitationStudioToken", "studio-test");
+      },
+    });
+    cy.contains("button", "Create invitation").click();
+    cy.contains("h2", "Choose a template").should("be.visible");
+    cy.contains("h3", "W01 · Olive & Ivory").should("be.visible");
+    cy.contains("LKR 2,500").should("be.visible");
+    cy.contains("a", "View demo")
+      .should("have.attr", "href", "/invitation-templates/w01")
+      .and("have.attr", "target", "_blank");
+    cy.contains("label", "First partner’s name").should("not.exist");
+    cy.then(() => expect(creates).to.equal(0));
+    cy.contains("button", "Use W01").click();
+    cy.contains("h2", "Choose a template").should("not.exist");
+    cy.contains("label", "First partner’s name").should("be.visible");
+    cy.contains("label", "Invitation link name")
+      .find("input")
+      .type("test-couple");
+    cy.contains("button", "Save draft").click();
+    cy.wait("@createFromTemplate");
+    cy.contains('[role="status"]', "Draft saved").should("be.visible");
+  });
+  it("lets mobile staff cancel template selection without creating a record", () => {
+    cy.viewport(390, 844);
+    cy.intercept("GET", `${api}/invitation-studio/session`, {
+      body: { role: "ADMIN" },
+    });
+    cy.intercept("GET", `${api}/invitation-studio/invitations`, { body: [] });
+    cy.intercept("GET", `${api}/invitation-studio/settings`, {
+      body: { orderPhone: "" },
+    });
+    cy.visit("/invitation-studio", {
+      onBeforeLoad(win) {
+        win.sessionStorage.setItem("invitationStudioToken", "studio-test");
+      },
+    });
+    cy.contains("button", "Create invitation").click();
+    cy.contains("h2", "Choose a template").should("be.visible");
+    cy.contains("button", "Use W01").should("be.visible");
+    cy.document().then((doc) =>
+      expect(doc.documentElement.scrollWidth).to.be.at.most(390),
+    );
+    cy.screenshot("studio-template-picker-phone", { capture: "viewport" });
+    cy.contains("button", "Back to invitations").click();
+    cy.contains("h2", "Beautiful beginnings").should("be.visible");
+    cy.contains("label", "First partner’s name").should("not.exist");
+  });
+  it("preserves the original three-scene animation and illustrated seal", () => {
+    cy.viewport(1280, 900);
+    cy.visit("/invitation-templates/w01");
+    invitationFrame().find("#open-invitation .wax-ring svg").should("exist");
+    invitationFrame().find("link").should("not.exist");
+    invitationFrame().find("#open-invitation").click();
+    invitationFrame().find("#cover").should("have.attr", "data-scene", "photo");
+    invitationFrame()
+      .find("#cover", { timeout: 9000 })
+      .should("have.attr", "data-scene", "date");
+    invitationFrame()
+      .find("#cover", { timeout: 9000 })
+      .should("have.attr", "data-scene", "crest");
+    invitationFrame().find("#view-invitation").click();
+    invitationFrame().find("#cover").should("not.be.visible");
+    invitationFrame()
+      .find(".hero h1")
+      .should("contain", "Amaya")
+      .and("be.visible");
   });
   it("renders published invitation metadata and does not expose missing drafts", () => {
     cy.request("/wedding/live-demo-wedding").then(({ body, headers }) => {
@@ -40,7 +119,7 @@ describe("Invitation Studio first template", () => {
       .should("eq", 404);
     cy.visit("/wedding/live-demo-wedding");
     invitationFrame().find("#skip-intro").click();
-    invitationFrame().find('#cover').should('have.attr','hidden');
+    invitationFrame().find("#cover").should("have.attr", "hidden");
     invitationFrame()
       .contains("a", "RSVP on WhatsApp")
       .should("have.attr", "href")
@@ -78,7 +157,7 @@ describe("Invitation Studio first template", () => {
     invitationFrame().find("#open-invitation").click();
     invitationFrame().find("#cover").should("have.attr", "data-scene", "photo");
     invitationFrame().find("#skip-intro").click();
-    invitationFrame().find('#cover').should('have.attr','hidden');
+    invitationFrame().find("#cover").should("have.attr", "hidden");
     invitationFrame()
       .find("#invitation h1")
       .should("contain", "Amaya")

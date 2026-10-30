@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { invitationTemplates } from "@/lib/invitation-templates";
 import { InvitationExperience } from "@/components/invitations/InvitationExperience";
 import {
   emptyInvitation,
@@ -35,6 +36,9 @@ export default function InvitationStudio() {
   const [records, setRecords] = useState<InvitationRecord[]>([]);
   const [selected, setSelected] = useState<InvitationRecord | null>(null);
   const [editing, setEditing] = useState(false);
+  const [choosingTemplate, setChoosingTemplate] = useState(false);
+  const [templateId, setTemplateId] = useState<string>("W01");
+  const template = invitationTemplates.find((item) => item.id === templateId);
   const [draft, setDraft] = useState<InvitationContent>({ ...emptyInvitation });
   const [slug, setSlug] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -85,7 +89,9 @@ export default function InvitationStudio() {
     setApproved(false);
     setReviewLink("");
   }
-  async function choose(id?: string) {
+  async function choose(id?: string, newTemplateId?: string) {
+    if (!id && !invitationTemplates.some((item) => item.id === newTemplateId))
+      return;
     if (dirty && !window.confirm("Discard unsaved invitation changes?")) return;
     setBusy(true);
     setError("");
@@ -95,9 +101,11 @@ export default function InvitationStudio() {
         ? await studioRequest(`/invitation-studio/invitations/${id}`)
         : null;
       setSelected(row);
+      setTemplateId(row?.templateId || newTemplateId!);
       setDraft(row?.draft || { ...emptyInvitation });
       setSlug(row?.slug || "");
       setEditing(true);
+      setChoosingTemplate(false);
       setDirty(false);
       setApproved(false);
       setReviewLink("");
@@ -123,7 +131,7 @@ export default function InvitationStudio() {
           body: JSON.stringify({
             ...(selected
               ? { revision: selected.revision }
-              : { slug, templateId: "W01" }),
+              : { slug, templateId }),
             draft,
           }),
         },
@@ -293,6 +301,91 @@ export default function InvitationStudio() {
               Reload studio
             </button>
           </div>
+        ) : choosingTemplate ? (
+          <section aria-labelledby="template-selection-title">
+            <div className="mb-7 flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-widest text-amber-800">
+                  New invitation · Step 1
+                </p>
+                <h2
+                  id="template-selection-title"
+                  className="mt-2 text-3xl font-serif"
+                >
+                  Choose a template
+                </h2>
+                <p className="mt-2 text-sm text-stone-600">
+                  Preview a design, then select it to enter the couple’s
+                  details.
+                </p>
+              </div>
+              <button
+                className={buttonClass}
+                disabled={busy}
+                onClick={() => setChoosingTemplate(false)}
+              >
+                Back to invitations
+              </button>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {invitationTemplates.map((item) => (
+                <article
+                  key={item.id}
+                  className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
+                >
+                  <div className="relative h-64 bg-[#414334]">
+                    <img
+                      src={item.image}
+                      alt={`${item.id} ${item.name} floral invitation design`}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-5 text-center text-[#fff5da]">
+                      <span className="text-xs uppercase tracking-widest">
+                        {item.id}
+                      </span>
+                      <span className="mt-4 text-4xl font-serif italic">
+                        {item.name}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="space-y-4 p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="text-xl font-serif">
+                        {item.id} · {item.name}
+                      </h3>
+                      <span className="text-sm font-semibold">
+                        LKR {item.price.toLocaleString()}
+                      </span>
+                    </div>
+                    <p className="text-sm leading-6 text-stone-600">
+                      {item.description}
+                    </p>
+                    <div className="flex flex-wrap gap-3">
+                      <Link
+                        href={item.demo}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={buttonClass}
+                      >
+                        View demo ↗
+                      </Link>
+                      <button
+                        disabled={busy}
+                        className={`${buttonClass} bg-[#344b39] text-white`}
+                        onClick={() => void choose(undefined, item.id)}
+                      >
+                        Use {item.id}
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="mt-6 text-sm text-stone-500">
+              W01 is currently available. New designs will appear here as they
+              are added.
+            </p>
+          </section>
         ) : editing ? (
           <>
             <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -303,7 +396,9 @@ export default function InvitationStudio() {
                     : "Create an invitation"}
                 </h2>
                 <p className="mt-2 text-sm text-stone-500">
-                  W01 · Olive & Ivory · LKR 2,500 ·{" "}
+                  {template?.id || templateId} ·{" "}
+                  {template?.name || "Invitation"} · LKR{" "}
+                  {template?.price.toLocaleString() || "—"} ·{" "}
                   {selected?.status || "New draft"}
                 </p>
               </div>
@@ -578,7 +673,11 @@ export default function InvitationStudio() {
               <button
                 className={`${buttonClass} bg-[#344b39] text-white`}
                 disabled={busy}
-                onClick={() => void choose()}
+                onClick={() => {
+                  setError("");
+                  setNotice("");
+                  setChoosingTemplate(true);
+                }}
               >
                 + Create invitation
               </button>
