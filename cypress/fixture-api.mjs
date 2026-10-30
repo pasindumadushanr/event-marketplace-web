@@ -103,6 +103,8 @@ createServer((request, response) => {
         },
       ]),
     );
+  else if (request.url === "/public/invitations/live-demo-wedding")
+    response.end(JSON.stringify({slug:'live-demo-wedding',templateId:'W01',content:{partnerOne:'Amaya',partnerTwo:'Kasun',welcome:'Celebrate with us',weddingAt:'2027-09-18T16:00:00+05:30',venue:'The Kingsbury',address:'Colombo',mapUrl:'https://maps.app.goo.gl/example',rsvpPhone:'94771234567',couplePhoto:'/images/invitations/w01-demo-couple.jpg',story:'Our story',gallery:[],music:true}}));
   else if (request.url?.startsWith("/discovery/vendors/vendor-test"))
     response.end(JSON.stringify(business));
   else if (request.url === "/discovery/sitemap")

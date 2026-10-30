@@ -1,6 +1,7 @@
 "use client";
 import { createContext, useContext, useEffect, useState } from "react";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import { usePathname } from "next/navigation";
 import {
   DEFAULT_PLATFORM,
   isPlatformSettings,
@@ -48,8 +49,10 @@ export function PlatformSettingsProvider({
 }
 export const usePlatformSettings = () => useContext(Context);
 export function PlatformAnalytics() {
+  const pathname = usePathname();
   const settings = usePlatformSettings();
   const ready = useContext(AnalyticsReady);
   const id = analyticsId(settings, process.env.NEXT_PUBLIC_GA_ID);
-  return ready && id ? <GoogleAnalytics key={id} gaId={id} /> : null;
+  const privateInvitation = ['/invitation-studio', '/invitation-review', '/wedding/'].some(prefix => pathname.startsWith(prefix));
+  return ready && id && !privateInvitation ? <GoogleAnalytics key={id} gaId={id} /> : null;
 }

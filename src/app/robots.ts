@@ -16,6 +16,8 @@ export default function robots(): MetadataRoute.Robots {
         "/register",
         "/forgot-password",
         "/dashboard",
+        "/invitation-studio",
+        "/invitation-review",
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,

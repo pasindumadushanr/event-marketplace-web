@@ -36,6 +36,9 @@ const nextConfig: NextConfig = {
       "register",
       "forgot-password",
       "dashboard",
+      "invitation-studio",
+      "invitation-review",
+      "wedding",
     ].map((route) => ({
       source: `/${route}/:path*`,
       headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
