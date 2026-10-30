@@ -1,0 +1,76 @@
+/* A consistent reading scale for the wider invitation layout. */
+@media (min-width: 800px) {
+  body { font-size: 16px; }
+  nav { font-size: 14px; gap: 32px; }
+  .eyebrow, .timeline .eyebrow { font-size: 11px; letter-spacing: 1.8px; }
+  .hero { gap: 8%; }
+  .hero-copy, .hero-visual, .details-heading, .timeline, .rsvp-intro, form { min-width: 0; }
+  .handwritten { font-size: 25px; margin: 26px 0 18px; }
+  .hero h1 { font-size: clamp(76px, 7.8vw, 112px); line-height: 1.02; }
+  .hero h1 .ampersand { font-size: .62em; }
+  .hero h1 .second-name { padding-left: 40px; }
+  .name-branch { width: 62px; height: 120px; right: 1%; }
+  .hero-description { font-size: 16px; line-height: 1.75; margin: 24px 0; }
+  .date-line > span { font-size: 52px; }
+  .date-line > div { font-size: 14px; letter-spacing: 1.2px; }
+  .date-line small { font-size: 12px; letter-spacing: 1px; color: #c2c1ad; }
+  .button { font-size: 14px; padding: 17px 25px; }
+  .hero-footnote { font-size: 10px; line-height: 1.8; letter-spacing: 1px; }
+  .photo-side { font-size: 10px; letter-spacing: 1.5px; }
+  .photo-caption { font-size: 38px; }
+  .photo-badge { font-size: 11px; letter-spacing: 1px; }
+  .photo-badge span { font-size: 19px; }
+  .ribbon { font-size: 11px; letter-spacing: 1.5px; gap: 28px; line-height: 1.7; }
+  h2 { font-size: clamp(46px, 4.1vw, 60px); line-height: 1.12; }
+  h3 { font-size: 30px; line-height: 1.2; }
+  .intro { max-width: 980px; }
+  .intro > p { max-width: 580px; font-size: 16px; line-height: 1.8; }
+  .countdown strong { font-size: 56px; }
+  .countdown span { font-size: 11px; }
+  .details-heading > p, .rsvp-intro > p, .venue-copy > p { font-size: 16px; line-height: 1.8; }
+  .timeline p { max-width: 380px; font-size: 15px; line-height: 1.75; }
+  .timeline article { padding-bottom: 36px; }
+  .venue-copy h2 { font-size: clamp(42px, 3.7vw, 54px); }
+  .venue-copy { padding-left: 12%; padding-right: 12%; }
+  .dress-code p { font-size: 15px; line-height: 1.75; }
+  .text-link, .share-actions button { font-size: 14px; }
+  .small-note { font-size: 12px !important; }
+  .demo-label { font-size: 10px; }
+  form > label, #party-field > label, legend { display: block; font-size: 11px; line-height: 1.6; letter-spacing: 1.2px; margin-bottom: 9px; }
+  form > label span { font-size: 10px; }
+  input:not([type=radio]), select, textarea { font-size: 16px; }
+  .radio-choice { font-size: 14px; line-height: 1.7; }
+  #rsvp-status { font-size: 14px; }
+  .closing h2 { font-size: clamp(44px, 3.8vw, 56px); }
+  .closing > p { font-size: 11px; line-height: 1.8; }
+  footer { font-size: 11px; line-height: 1.7; gap: 24px; }
+}
+
+/* Intro typography follows the portrait's height, rather than the desktop width. */
+@media (min-width: 800px) and (min-height: 640px) {
+  .micro, .portrait-title .micro { font-size: 11px; letter-spacing: 2px; }
+  .cover-greeting { font-size: 23px; }
+  .cover-greeting span { font-size: 28px; }
+  .sealed-names { font-size: clamp(54px, 8vh, 72px); }
+  .sealed-date { font-size: 11px; letter-spacing: 1.8px; }
+  .tap-note { font-size: 21px; }
+  .cinema-controls button { font-size: 12px; letter-spacing: 1px; }
+  .portrait-title h1 { font-size: clamp(60px, 9vh, 80px); }
+  .script-subtitle { font-size: 22px; }
+  .portrait-bottom { font-size: 20px; }
+  .date-stack span { font-size: clamp(78px, 12vh, 118px); }
+  .date-place { font-size: 25px; }
+  .date-scene > .micro:last-child { font-size: 10px; letter-spacing: 1.5px; }
+  .crest-message { font-size: 26px; max-width: 370px; }
+  .cinema-button { font-size: 13px; }
+}
+
+@media (min-width: 800px) and (max-width: 1050px) {
+  .hero { padding-left: 6%; padding-right: 6%; gap: 6%; }
+  .hero h1 .second-name { padding-left: 20px; }
+  .name-branch { display: none; }
+  .hero-footnote { font-size: 9px; }
+  .ribbon { gap: 18px; font-size: 10px; letter-spacing: 1px; }
+  .details, .rsvp { gap: 7%; }
+  .radio-choice { display: flex; }
+}

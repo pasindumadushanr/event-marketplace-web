@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
     ];
   },
   async headers() {
-    return [
+    const noindex = [
       "admin",
       "vendor",
       "account",
@@ -39,10 +39,25 @@ const nextConfig: NextConfig = {
       "invitation-studio",
       "invitation-review",
       "wedding",
+      "invitation-assets",
     ].map((route) => ({
       source: `/${route}/:path*`,
       headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
     }));
+    return [
+      ...noindex,
+      {
+        source: "/invitation-assets/:path*",
+        headers: [
+          { key: "Referrer-Policy", value: "no-referrer" },
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'",
+          },
+        ],
+      },
+    ];
   },
 };
 

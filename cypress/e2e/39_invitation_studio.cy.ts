@@ -1,22 +1,58 @@
 import { demoInvitation } from "../../src/lib/invitations";
 const id = "10000000-0000-4000-8000-000000000001";
 const api = "http://127.0.0.1:3021";
+function invitationFrame() {
+  return cy
+    .get('iframe[title="Wedding invitation — W01"]')
+    .its("0.contentDocument.body")
+    .should((body: HTMLBodyElement) =>
+      expect(body.dataset.invitationReady).to.equal("true"),
+    )
+    .then((body) => cy.wrap(body));
+}
 describe("Invitation Studio first template", () => {
-  it('renders published invitation metadata and does not expose missing drafts', () => {
-    cy.request('/wedding/live-demo-wedding').then(({body,headers}) => {
-      expect(headers['x-robots-tag']).to.contain('noindex');
-      const doc = new DOMParser().parseFromString(body,'text/html');
-      expect(doc.querySelector('meta[property="og:title"]')?.getAttribute('content')).to.contain('Amaya & Kasun');
-      expect(doc.querySelector('meta[name="robots"]')?.getAttribute('content')).to.contain('noindex');
+  it('preserves the original three-scene animation and illustrated seal', () => {
+    cy.viewport(1280,900);
+    cy.visit('/invitation-templates/w01');
+    invitationFrame().find('#open-invitation .wax-ring svg').should('exist');
+    invitationFrame().find('link').should('not.exist');
+    invitationFrame().find('#open-invitation').click();
+    invitationFrame().find('#cover').should('have.attr','data-scene','photo');
+    invitationFrame().find('#cover',{timeout:9000}).should('have.attr','data-scene','date');
+    invitationFrame().find('#cover',{timeout:9000}).should('have.attr','data-scene','crest');
+    invitationFrame().find('#view-invitation').click();
+    invitationFrame().find('#cover').should('not.be.visible');
+    invitationFrame().find('.hero h1').should('contain','Amaya').and('be.visible');
+  });
+  it("renders published invitation metadata and does not expose missing drafts", () => {
+    cy.request("/wedding/live-demo-wedding").then(({ body, headers }) => {
+      expect(headers["x-robots-tag"]).to.contain("noindex");
+      const doc = new DOMParser().parseFromString(body, "text/html");
+      expect(
+        doc.querySelector('meta[property="og:title"]')?.getAttribute("content"),
+      ).to.contain("Amaya & Kasun");
+      expect(
+        doc.querySelector('meta[name="robots"]')?.getAttribute("content"),
+      ).to.contain("noindex");
     });
-    cy.request({url:'/wedding/unpublished-draft',failOnStatusCode:false}).its('status').should('eq',404);
-    cy.visit('/wedding/live-demo-wedding');
-    cy.get('button[aria-label="Open wedding invitation"]').click();
-    cy.contains('a','RSVP on WhatsApp').should('have.attr','href').and('contain','94771234567');
-    cy.contains('button','Download invitation card').click();
-    cy.contains('[role="status"]','Card downloaded').should('be.visible');
-    cy.readFile('cypress/downloads/wedding-invitation.png',null).should(buffer => expect(buffer.slice(1,4).toString()).to.equal('PNG'));
-    cy.screenshot('w01-desktop-open',{capture:'viewport'});
+    cy.request({ url: "/wedding/unpublished-draft", failOnStatusCode: false })
+      .its("status")
+      .should("eq", 404);
+    cy.visit("/wedding/live-demo-wedding");
+    invitationFrame().find("#skip-intro").click();
+    invitationFrame().find('#cover').should('have.attr','hidden');
+    invitationFrame()
+      .contains("a", "RSVP on WhatsApp")
+      .should("have.attr", "href")
+      .and("contain", "94771234567");
+    invitationFrame().find("#download-card").click();
+    invitationFrame()
+      .contains('[role="status"]', "Your card is ready")
+      .should("be.visible");
+    cy.readFile("cypress/downloads/wedding-invitation.png", null).should(
+      (buffer) => expect(buffer.slice(1, 4).toString()).to.equal("PNG"),
+    );
+    cy.screenshot("w01-desktop-open", { capture: "viewport" });
   });
   beforeEach(() => {
     cy.intercept("GET", `${api}/public/invitations/catalogue`, {
@@ -37,13 +73,25 @@ describe("Invitation Studio first template", () => {
         );
       });
     cy.contains("a", "View demo").click();
-    cy.get('button[aria-label="Open wedding invitation"]')
-      .should("be.visible")
-      .click();
-    cy.contains("h1", "Amaya").should("be.visible");
-    cy.contains("a", "Get directions").should("have.attr", "target", "_blank");
-    cy.contains("RSVP is disabled in this demo").should("exist");
-    cy.get('button[aria-pressed="false"]').should("contain", "Sound off");
+    invitationFrame().find("#open-invitation").should("be.visible");
+    cy.screenshot("w01-original-envelope-phone", { capture: "viewport" });
+    invitationFrame().find("#open-invitation").click();
+    invitationFrame().find("#cover").should("have.attr", "data-scene", "photo");
+    invitationFrame().find("#skip-intro").click();
+    invitationFrame().find('#cover').should('have.attr','hidden');
+    invitationFrame()
+      .find("#invitation h1")
+      .should("contain", "Amaya")
+      .and("be.visible");
+    invitationFrame()
+      .contains("a", "Get directions")
+      .should("have.attr", "target", "_blank");
+    invitationFrame()
+      .contains("No message is sent to the couple.")
+      .should("exist");
+    invitationFrame()
+      .find("#sound-toggle")
+      .should("have.attr", "aria-pressed", "false");
     cy.document().then((doc) =>
       expect(doc.documentElement.scrollWidth).to.be.at.most(390),
     );
@@ -161,9 +209,13 @@ describe("Invitation Studio first template", () => {
     cy.contains("button", "Save draft").click();
     cy.wait("@save");
     cy.contains("button", "Preview invitation").click();
-    cy.get('button[aria-label="Open wedding invitation"]').click();
-    cy.contains("h1", "Amaya Updated").should("be.visible");
-    cy.contains("a", "RSVP on WhatsApp")
+    invitationFrame().find("#skip-intro").click();
+    invitationFrame()
+      .find("#invitation h1")
+      .should("contain", "Amaya Updated")
+      .and("be.visible");
+    invitationFrame()
+      .contains("a", "RSVP on WhatsApp")
       .should("have.attr", "href")
       .and("contain", "94771234567");
     cy.contains("button", "Back to editor").click();

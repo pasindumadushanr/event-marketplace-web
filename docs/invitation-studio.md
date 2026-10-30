@@ -6,6 +6,14 @@ Standalone staff workspace at `/invitation-studio` with its own `/invitation-stu
 
 Public catalogue: `/invitation-templates`. First template: W01 Olive & Ivory at LKR 2,500, adapted from the supplied calla-lily sample. Demo: `/invitation-templates/w01`. Only W01 is available; basic LKR 1,500 designs and further templates are future work, not advertised as ready.
 
+### Original design fidelity
+
+W01 now reuses the supplied `sample-invitation/dist/index.html`, `app.js`, `style.css`, `cinematic.css`, `desktop.css` and artwork under `public/invitation-assets/w01`. All three original stylesheets and both source images are byte-identical copies. The original floral seal, photo → date → crest sequence, desktop typography and full invitation layout are preserved. The earlier recreated React design/stylesheet was removed.
+
+An isolated same-origin frame prevents marketplace CSS from restyling the source document. The frame accepts content only from its parent origin/window. Its restrictive CSP permits the original font/image resources but no external scripts or network API calls. The source HTML only adds noindex/initial-loading safeguards and a content adapter; animation logic is retained with limited changes for dynamic names/date, parent-page sharing, personalised card export, and WhatsApp replies.
+
+The public demo retains the original fictional details and browser-only sample RSVP form (no messages sent). Real invitations receive studio data through text nodes, not HTML injection. Their RSVP form prepares a WhatsApp reply; guests still must send it in WhatsApp. Published invitations do not reuse the sample's invented event times, dress code or RSVP deadline. Sample venue imagery is replaced with the couple's uploaded photo until a dedicated venue-photo field is implemented. Optional galleries are added only for real invitations that have uploaded images.
+
 ## Workflow
 
 1. Sign in using an authorized staff account. An existing SUPER_ADMIN can use this separate login without a new account.

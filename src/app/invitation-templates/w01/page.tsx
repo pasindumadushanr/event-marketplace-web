@@ -5,5 +5,5 @@ export const metadata = {
   robots: { index: false, follow: true },
 };
 export default function W01Demo() {
-  return <InvitationExperience content={demoInvitation} preview />;
+  return <InvitationExperience content={demoInvitation} preview demo />;
 }
