@@ -4,6 +4,7 @@ import { InvitationContent } from "@/lib/invitations";
 import { InvitationExperience } from "./InvitationExperience";
 export function ReviewInvitation({ id }: { id: string }) {
   const [content, setContent] = useState<InvitationContent | null>(null);
+  const [templateId, setTemplateId] = useState("W01");
   const [error, setError] = useState("");
   useEffect(() => {
     const token = location.hash.slice(1);
@@ -25,14 +26,17 @@ export function ReviewInvitation({ id }: { id: string }) {
           );
         return r.json();
       })
-      .then((v) => setContent(v.content))
+      .then((v) => {
+        setTemplateId(v.templateId);
+        setContent(v.content);
+      })
       .catch((e) => {
         if (e.name !== "AbortError") setError(e.message);
       });
     return () => abort.abort();
   }, [id]);
   return content ? (
-    <InvitationExperience content={content} preview />
+    <InvitationExperience content={content} templateId={templateId} preview />
   ) : (
     <main className="min-h-screen flex items-center justify-center bg-stone-50 p-6 text-center">
       <p role={error ? "alert" : "status"}>

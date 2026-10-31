@@ -7,6 +7,7 @@ import { invitationTemplates } from "@/lib/invitation-templates";
 import { InvitationExperience } from "@/components/invitations/InvitationExperience";
 import {
   emptyInvitation,
+  sinhalaWelcome,
   InvitationContent,
   InvitationRecord,
   studioRequest,
@@ -102,7 +103,12 @@ export default function InvitationStudio() {
         : null;
       setSelected(row);
       setTemplateId(row?.templateId || newTemplateId!);
-      setDraft(row?.draft || { ...emptyInvitation });
+      setDraft(
+        row?.draft || {
+          ...emptyInvitation,
+          welcome: newTemplateId === "W02" ? sinhalaWelcome : "",
+        },
+      );
       setSlug(row?.slug || "");
       setEditing(true);
       setChoosingTemplate(false);
@@ -237,7 +243,7 @@ export default function InvitationStudio() {
             Back to editor
           </button>
         </div>
-        <InvitationExperience content={draft} preview />
+        <InvitationExperience content={draft} templateId={templateId} preview />
       </div>
     );
   return (
@@ -543,14 +549,16 @@ export default function InvitationStudio() {
                     ))}
                   </div>
                 </div>
-                <label className="flex min-h-11 items-center gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={draft.music}
-                    onChange={(e) => update("music", e.target.checked)}
-                  />
-                  Offer gentle background music (guest taps to play)
-                </label>
+                {template?.music && (
+                  <label className="flex min-h-11 items-center gap-3 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={draft.music}
+                      onChange={(e) => update("music", e.target.checked)}
+                    />
+                    Offer gentle background music (guest taps to play)
+                  </label>
+                )}
                 <div className="flex flex-wrap gap-3">
                   <button
                     disabled={busy}
@@ -748,7 +756,8 @@ export default function InvitationStudio() {
             </div>
             {!records.length && (
               <p className="rounded-2xl border bg-white p-8 text-center text-stone-500">
-                No invitations yet. Create your first one with Template W01.
+                No invitations yet. Choose a design to create your first
+                invitation.
               </p>
             )}
             <p className="mt-6 text-xs text-stone-500">

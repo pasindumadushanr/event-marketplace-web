@@ -54,6 +54,19 @@ export const demoInvitation: InvitationContent = {
   music: true,
 };
 // ADMIN is a login candidate only; the server requires explicit membership.
+export const sinhalaWelcome =
+  "දෙමාපිය ආශිර්වාදයෙන් යුග දිවියට පියනඟන අපගේ මංගල දිනයේ සතුට බෙදා ගැනීමට ඔබටත් ආදරයෙන් ඇරයුම් කරමු.";
+export const sinhalaDemoInvitation: InvitationContent = {
+  ...demoInvitation,
+  partnerOne: "අමායා",
+  partnerTwo: "කසුන්",
+  welcome: sinhalaWelcome,
+  venue: "ද කිංස්බරි හෝටලය",
+  address: "කොළඹ, ශ්‍රී ලංකාව",
+  story:
+    "හමුවූ දා සිට එක්ව ගෙවූ සොඳුරු මතක අතරට අලුත්ම පිටුවක් එක් කරන මේ දිනය, ඔබේ පැමිණීමෙන් තවත් සුන්දර වනු ඇත.",
+  music: false,
+};
 export const studioRoles = ["SUPER_ADMIN", "INVITATION_STAFF", "ADMIN"];
 export async function studioRequest(path: string, init: RequestInit = {}) {
   const token =

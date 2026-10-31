@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="si">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    <meta name="theme-color" content="#651f2d" />
+    <title>මංගල ඇරයුම</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+Sinhala:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="content.js" defer></script>
+  </head>
+  <body>
+    <svg class="symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <symbol id="lotus" viewBox="0 0 200 130">
+          <g fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M100 110C64 85 74 43 100 10C126 43 136 85 100 110Z" />
+            <path
+              d="M100 110C63 111 35 78 34 37C76 45 99 71 100 110ZM100 110C137 111 165 78 166 37C124 45 101 71 100 110Z"
+            />
+            <path
+              d="M100 110C57 128 15 102 8 70C48 66 80 83 100 110ZM100 110C143 128 185 102 192 70C152 66 120 83 100 110Z"
+            />
+            <path d="M35 121H165M65 127H135M100 31V96" />
+          </g>
+        </symbol>
+      </defs>
+    </svg>
+    <div id="loading" role="status">ආරාධනාව විවෘත වෙමින් පවතී…</div>
+    <div id="experience" hidden>
+      <section id="cover" class="cover" aria-label="මංගල ඇරයුම">
+        <div class="cover-frame">
+          <p class="overline">සුබ මංගලම්</p>
+          <svg class="lotus large" aria-hidden="true">
+            <use href="#lotus" />
+          </svg>
+          <p class="cover-kicker">ආදරයෙන් පිදෙන</p>
+          <h1>මංගල ඇරයුම</h1>
+          <div class="rule"><span>✦</span></div>
+          <p class="cover-names" data-names></p>
+          <p id="guest" class="guest">ඔබටත් ඔබේ ආදරණීයයන්ටත්</p>
+          <button id="open" class="seal" aria-label="ආරාධනාව විවෘත කරන්න">
+            <svg class="lotus" aria-hidden="true"><use href="#lotus" /></svg>
+          </button>
+          <p class="tap">ආරාධනාව විවෘත කරන්න</p>
+          <p class="cover-date" data-date></p>
+        </div>
+        <p class="cover-footer">NAKATHATA.LK <span>·</span> W02</p>
+      </section>
+      <div id="invitation" hidden>
+        <nav class="navigation" aria-label="ආරාධනා විස්තර">
+          <a href="#details">මංගල දිනය</a><span>✦</span
+          ><a href="#rsvp">පැමිණීම දන්වන්න</a>
+        </nav>
+        <main>
+          <section class="hero">
+            <div class="hero-copy">
+              <p class="overline">දෙහදක් එක්වන සුබ මොහොත</p>
+              <svg class="lotus" aria-hidden="true"><use href="#lotus" /></svg>
+              <h1 id="names">
+                <span id="one"></span><small>සහ</small><span id="two"></span>
+              </h1>
+              <div class="rule"><span>✦</span></div>
+              <p id="welcome" class="welcome"></p>
+              <p data-date class="hero-date"></p>
+              <a class="button" href="#details">මංගල දිනයේ විස්තර ↓</a>
+            </div>
+            <div class="portrait">
+              <div class="portrait-border">
+                <img id="photo" alt="" fetchpriority="high" />
+              </div>
+              <p>අපේ දිවියේ සොඳුරු ඇරඹුම</p>
+            </div>
+          </section>
+          <div class="ribbon">
+            සෙනෙහසින් බැඳී <span>✦</span> ආශිර්වාදයෙන් පිරී <span>✦</span> එක්ව
+            යන ගමනක්
+          </div>
+          <section id="story-section" class="story section">
+            <p class="overline">අපේ කතාව</p>
+            <h2>සොඳුරු මතක අතරින්<br />නව දිවියකට…</h2>
+            <p id="story" class="prose"></p>
+          </section>
+          <section id="details" class="details section">
+            <svg class="lotus" aria-hidden="true"><use href="#lotus" /></svg>
+            <p class="overline">ඔබ වෙනුවෙන් කරන ආදරණීය ඇරයුමයි</p>
+            <h2>අපේ මංගල දිනය</h2>
+            <div class="details-grid">
+              <div>
+                <p class="label">දිනය සහ වේලාව</p>
+                <p data-date></p>
+                <p id="time"></p>
+                <small>ශ්‍රී ලංකා වේලාවෙන්</small>
+              </div>
+              <div>
+                <p class="label">ස්ථානය</p>
+                <h3 id="venue"></h3>
+                <p id="address"></p>
+                <a
+                  id="map"
+                  class="text-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >මාර්ගය බලන්න ↗</a
+                >
+              </div>
+            </div>
+            <div
+              id="countdown"
+              class="countdown"
+              aria-label="මංගල දිනයට ඉතිරි කාලය"
+            >
+              <div><strong id="days">—</strong><span>දින</span></div>
+              <div><strong id="hours">—</strong><span>පැය</span></div>
+              <div><strong id="minutes">—</strong><span>මිනිත්තු</span></div>
+              <div><strong id="seconds">—</strong><span>තත්පර</span></div>
+            </div>
+            <p id="countdown-note" class="note"></p>
+          </section>
+          <section
+            id="gallery"
+            class="gallery section"
+            aria-label="අපේ සොඳුරු මතක"
+            hidden
+          ></section>
+          <section id="rsvp" class="rsvp section">
+            <p class="overline">ඔබේ පැමිණීම අපට සතුටකි</p>
+            <h2>එදාට අප හා එක්වන්න</h2>
+            <p class="prose">
+              අපගේ සතුට බෙදා ගැනීමට ඔබ පැමිණෙන බව<br />කරුණාවෙන් දන්වන්න.
+            </p>
+            <a
+              id="reply"
+              class="button"
+              target="_blank"
+              rel="noopener noreferrer"
+              >WhatsApp ඔස්සේ දන්වන්න ↗</a
+            >
+            <p id="reply-note" class="note"></p>
+          </section>
+          <section class="closing">
+            <svg class="lotus" aria-hidden="true"><use href="#lotus" /></svg>
+            <p>ආදරයෙන්,</p>
+            <h2 data-names></h2>
+            <p data-date></p>
+            <button id="print" class="text-link">ආරාධනාව මුද්‍රණය කරන්න</button>
+          </section>
+        </main>
+        <footer>ආදරයෙන් නිමවූ ඇරයුමක් <span>·</span> NAKATHATA.LK</footer>
+      </div>
+      <p id="mode" class="mode" hidden></p>
+    </div>
+  </body>
+</html>

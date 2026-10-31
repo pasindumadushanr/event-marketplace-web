@@ -20,9 +20,15 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const { content: c } = await invitation(slug);
-  const title = `${c.partnerOne} & ${c.partnerTwo} — You’re invited`;
-  const description = `Join us to celebrate our wedding at ${c.venue}.`;
+  const { content: c, templateId } = await invitation(slug);
+  const title =
+    templateId === "W02"
+      ? `${c.partnerOne} සහ ${c.partnerTwo} — මංගල ඇරයුම`
+      : `${c.partnerOne} & ${c.partnerTwo} — You’re invited`;
+  const description =
+    templateId === "W02"
+      ? c.welcome
+      : `Join us to celebrate our wedding at ${c.venue}.`;
   return {
     title,
     description,
@@ -53,5 +59,10 @@ export default async function WeddingPage({
 }) {
   const { slug } = await params;
   const value = await invitation(slug);
-  return <InvitationExperience content={value.content} />;
+  return (
+    <InvitationExperience
+      content={value.content}
+      templateId={value.templateId}
+    />
+  );
 }
