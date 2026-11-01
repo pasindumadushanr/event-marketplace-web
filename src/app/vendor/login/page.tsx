@@ -23,6 +23,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 export default function VendorLoginPage() {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
@@ -106,8 +107,19 @@ export default function VendorLoginPage() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-slate-700 font-semibold">Password</Label>
               </div>
-              <Input id="password" type="password" className="h-12 bg-white border-slate-200 focus-visible:ring-primary" {...register('password')} />
+              <Input id="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" className="h-12 bg-white border-slate-200 focus-visible:ring-primary" {...register('password')} />
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+              <label htmlFor="show-password" className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-600">
+                <input
+                  id="show-password"
+                  type="checkbox"
+                  checked={showPassword}
+                  onChange={(event) => setShowPassword(event.target.checked)}
+                  aria-controls="password"
+                  className="h-4 w-4 accent-primary"
+                />
+                Show password
+              </label>
             </div>
 
             <Button type="button" onClick={handleSubmit(onSubmit)} className="w-full h-12 text-lg bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 transition-all" disabled={isLoading}>
