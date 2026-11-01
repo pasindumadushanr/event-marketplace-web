@@ -148,7 +148,20 @@ export default function BusinessProfileClient({
         <BusinessHero business={business} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          <div className="lg:col-span-8 space-y-8">
+          <div className="lg:order-2 lg:col-span-4">
+            <div className="space-y-6 lg:sticky lg:top-28">
+              <BusinessCTA
+                businessId={business.id}
+                whatsapp={business.contact.whatsapp}
+              />
+              <BusinessAvailability blockedDates={business.blockedDates} />
+              <BusinessHours hours={business.businessHours} />
+              <BusinessContact contact={business.contact} />
+              <BusinessLocation location={business.location} />
+            </div>
+          </div>
+
+          <div className="lg:order-1 lg:col-span-8 space-y-8">
             <BusinessAbout business={business} />
             <BusinessFeatures featureGroups={business.featureGroups} />
             <BusinessGallery gallery={business.gallery} />
@@ -169,18 +182,6 @@ export default function BusinessProfileClient({
             <BusinessPolicies policies={business.policies} />
           </div>
 
-          <div className="lg:col-span-4">
-            <div className="sticky top-28 space-y-6">
-              <BusinessCTA
-                businessId={business.id}
-                whatsapp={business.contact.whatsapp}
-              />
-              <BusinessAvailability blockedDates={business.blockedDates} />
-              <BusinessHours hours={business.businessHours} />
-              <BusinessContact contact={business.contact} />
-              <BusinessLocation location={business.location} />
-            </div>
-          </div>
         </div>
 
         <SimilarBusinesses currentCategoryId={business.categoryId} />
