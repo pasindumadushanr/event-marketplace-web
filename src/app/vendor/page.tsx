@@ -124,7 +124,7 @@ export default function VendorDashboardPage() {
             className="inline-flex items-center rounded-lg border px-4 py-2 text-sm"
             href="/vendor/documents"
           >
-            Upload requested documents
+              Verification document guidance
           </Link>
         </div>
       </div>

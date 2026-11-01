@@ -80,13 +80,13 @@ function visitVendor(
 }
 
 describe("Simplified vendor workspace", () => {
-  it("keeps the starting price card above the calendar while scrolling", () => {
+  it("keeps the contact card above the calendar while scrolling", () => {
     cy.viewport(1440, 900);
     cy.intercept("GET", "**/discovery/vendors/vendor-test", {
       body: { ...business, startingPrice: 5222, packages: [] },
     });
     cy.visit("/business/vendor-test");
-    cy.contains("p", "Starting Price").parent().parent().as("priceCard");
+    cy.get('section[aria-label="Contact this vendor"]').as("priceCard");
     cy.get("@priceCard").should("have.css", "position", "static");
     for (const offset of [500, 1000, 1500]) {
       cy.scrollTo(0, offset);

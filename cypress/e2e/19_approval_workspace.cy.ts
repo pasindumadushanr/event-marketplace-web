@@ -327,7 +327,7 @@ describe("Vendor approval workspace", () => {
     cy.contains("h3", "Application rejected").should("be.visible");
     cy.contains("Email accepted by provider").should("be.visible");
   });
-  it("lets vendors see requests, upload documents and resubmit their existing application", () => {
+  it("lets vendors see requests, view private-document guidance and resubmit their existing application", () => {
     const data = details("NEEDS_INFO");
     let status = "NEEDS_INFO";
     cy.intercept("GET", "**/vendor/business/onboarding/status", (req) =>
@@ -359,7 +359,7 @@ describe("Vendor approval workspace", () => {
     }).as("resubmit");
     cy.visit("/vendor", { onBeforeLoad: (win) => auth(win, "VENDOR") });
     cy.contains("A few more details are needed").should("be.visible");
-    cy.contains("a", "Upload requested documents").click();
+    cy.contains("a", "Verification document guidance").click();
     cy.location("pathname").should("eq", "/vendor/documents");
     cy.visit("/vendor/onboarding");
     cy.get('[name="name"]')

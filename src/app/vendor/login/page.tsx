@@ -106,6 +106,7 @@ export default function VendorLoginPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password" className="text-slate-700 font-semibold">Password</Label>
+                <Link href="/forgot-password?from=vendor" className="text-sm font-medium text-primary hover:underline">Forgot password?</Link>
               </div>
               <Input id="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" className="h-12 bg-white border-slate-200 focus-visible:ring-primary" {...register('password')} />
               {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}

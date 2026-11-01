@@ -9,7 +9,6 @@ import {
   Building2,
   CalendarDays,
   CalendarRange,
-  LineChart,
   Bell,
   Settings,
   LogOut,
@@ -28,7 +27,6 @@ const navConfig = [
   { href: "/vendor/messages", label: "Messages", icon: MessageCircle },
   { href: "/vendor/business", label: "My Business Page", icon: Building2 },
   { href: "/vendor/calendar", label: "Availability", icon: CalendarRange },
-  { href: "/vendor/revenue", label: "Earnings", icon: LineChart },
   { href: "/vendor/account", label: "Account & Help", icon: Settings },
 ];
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,8 @@ import api from '@/lib/api';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const [loginPath, setLoginPath] = useState('/login');
+  useEffect(() => { if (new URLSearchParams(window.location.search).get('from') === 'vendor') setLoginPath('/vendor/login'); }, []);
   const [step, setStep] = useState<'REQUEST' | 'RESET' | 'SUCCESS'>('REQUEST');
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -28,7 +30,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
     try {
       await api.post('/auth/forgot-password', { email });
-      toast.success('Reset code sent! Please check your email.');
+      toast.success('If an account exists, a reset email will be sent. Check your inbox and spam folder.');
       setStep('RESET');
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to request password reset code');
@@ -59,7 +61,7 @@ export default function ForgotPasswordPage() {
       setStep('SUCCESS');
       toast.success('Password updated successfully!');
       setTimeout(() => {
-        router.push('/login');
+        router.push(loginPath);
       }, 2500);
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Failed to reset password. Check your code.');
@@ -113,7 +115,7 @@ export default function ForgotPasswordPage() {
 
             <div className="text-center pt-2">
               <Link
-                href="/login"
+                href={loginPath}
                 className="inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors gap-2"
               >
                 <ArrowLeft className="w-4 h-4" /> Back to Sign In
@@ -216,7 +218,7 @@ export default function ForgotPasswordPage() {
               Your password has been successfully updated. Redirecting you to sign in...
             </p>
             <div className="pt-4">
-              <Link href="/login">
+              <Link href={loginPath}>
                 <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-semibold rounded-xl">
                   Sign In Now
                 </Button>

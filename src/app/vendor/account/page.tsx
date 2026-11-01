@@ -18,7 +18,7 @@ const sections = [
     href: "/vendor/documents",
     title: "Verification documents",
     description:
-      "Upload and manage your business documents. Available after approval.",
+      "Document uploads are paused while private verification is prepared.",
     icon: ShieldCheck,
   },
   {

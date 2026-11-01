@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,17 +15,32 @@ export default function VerifyEmailPage() {
   const [otp, setOtp] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [resendWait, setResendWait] = useState(0);
+  const initialRequest = useRef(false);
 
   // Send OTP automatically when page loads
   useEffect(() => {
+    if (initialRequest.current) return;
+    initialRequest.current = true;
     sendOtp();
   }, []);
+  useEffect(() => {
+    if (!resendWait) return;
+    const timer = window.setTimeout(
+      () => setResendWait((value) => Math.max(0, value - 1)),
+      1000,
+    );
+    return () => window.clearTimeout(timer);
+  }, [resendWait]);
 
   const sendOtp = async () => {
     setIsSending(true);
     try {
       await api.post("/auth/send-verification-otp");
-      toast.success(t("Verification code sent to your email."));
+      setResendWait(60);
+      toast.success(
+        t("Check your inbox and spam folder for the verification code."),
+      );
     } catch (error: any) {
       if (error.response?.data?.message === "Email already verified") {
         router.push("/vendor/onboarding");
@@ -118,10 +133,11 @@ export default function VerifyEmailPage() {
             {t("Didn't receive the code?")}{" "}
             <button
               onClick={sendOtp}
-              disabled={isSending}
+              disabled={isSending || resendWait > 0}
               className="text-blue-600 font-semibold hover:underline disabled:opacity-50"
             >
               {isSending ? t("Sending...") : t("Resend Code")}
+              {resendWait > 0 ? ` (${resendWait}s)` : ""}
             </button>
           </p>
         </div>

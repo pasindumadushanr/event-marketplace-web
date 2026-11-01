@@ -29,10 +29,10 @@ export function BusinessPackages({
   const [inquiryOpen, setInquiryOpen] = useState(false);
   const [inquiryListing, setInquiryListing] = useState<Package | undefined>();
   const copy = serviceCardCopy(categoryName);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const router = useRouter();
   function enquire(listing?: Package) {
-    if (previewOnly || !businessId) return;
+    if (previewOnly || !businessId || authLoading) return;
     if (!isAuthenticated) {
       router.push("/login");
       return;
@@ -66,7 +66,7 @@ export function BusinessPackages({
           event&apos;s unique needs rather than set pricing tiers.
         </p>
         <Button
-          disabled={previewOnly || !businessId}
+          disabled={previewOnly || !businessId || authLoading}
           onClick={() => enquire()}
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
         >
@@ -178,7 +178,7 @@ export function BusinessPackages({
               {/* Action Button */}
               <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end">
                 <Button
-                  disabled={previewOnly || !businessId}
+                  disabled={previewOnly || !businessId || authLoading}
                   onClick={() => enquire(pkg)}
                   className="w-full sm:w-auto bg-slate-900 text-white hover:bg-primary font-bold text-sm rounded-xl px-6 min-h-12 shadow-sm transition-all"
                 >

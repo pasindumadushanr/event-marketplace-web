@@ -8,6 +8,7 @@ import api from "@/lib/api";
 import { LanguageSwitch, useLanguage } from "@/lib/language";
 import { SRI_LANKA_DISTRICTS } from "@/lib/districts";
 import { BusinessCategorySelector } from "@/components/categories/BusinessCategorySelector";
+import { useAuth } from "@/lib/auth-context";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,6 +25,10 @@ import {
 
 export default function VendorOnboardingWizard() {
   const router = useRouter();
+  const { user } = useAuth();
+  const [draftReady, setDraftReady] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const draftKey = user ? `vendor-application-draft:${user.id}` : null;
   const { language, t } = useLanguage();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,6 +58,69 @@ export default function VendorOnboardingWizard() {
     logo: "",
     coverImage: "",
   });
+
+  useEffect(() => {
+    if (!draftKey || profileLoading || draftReady) return;
+    if (!business) {
+      try {
+        const saved = JSON.parse(sessionStorage.getItem(draftKey) || "null");
+        if (
+          saved &&
+          Date.now() - saved.savedAt < 86400000 &&
+          saved.fields &&
+          typeof saved.fields === "object"
+        ) {
+          setFormData(
+            (previous) =>
+              Object.fromEntries(
+                Object.keys(previous).map((key) => [
+                  key,
+                  key === "categoryIds"
+                    ? Array.isArray(saved.fields[key])
+                      ? saved.fields[key].filter(
+                          (v: unknown) => typeof v === "string",
+                        )
+                      : []
+                    : typeof saved.fields[key] === "string"
+                      ? saved.fields[key]
+                      : previous[key as keyof typeof previous],
+                ]),
+              ) as typeof previous,
+          );
+        }
+      } catch {
+        /* Storage can be unavailable; the form still works. */
+      }
+    }
+    setDraftReady(true);
+  }, [draftKey, profileLoading, business, draftReady]);
+
+  useEffect(() => {
+    if (!draftKey || !draftReady || business || submitted) return;
+    try {
+      sessionStorage.setItem(
+        draftKey,
+        JSON.stringify({ savedAt: Date.now(), fields: formData }),
+      );
+    } catch {}
+  }, [draftKey, draftReady, business, submitted, formData]);
+
+  useEffect(() => {
+    if (
+      submitted ||
+      business ||
+      !Object.values(formData).some(
+        (value) => typeof value === "string" && value.trim(),
+      )
+    )
+      return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [formData, submitted, business]);
 
   useEffect(() => {
     if (isRevision && business && loadedId !== business.id) {
@@ -145,6 +213,12 @@ export default function VendorOnboardingWizard() {
           : "/vendor/business/onboarding/wizard",
         payload,
       );
+      setSubmitted(true);
+      if (draftKey) {
+        try {
+          sessionStorage.removeItem(draftKey);
+        } catch {}
+      }
       await refreshBusiness();
       toast.success(t("Application submitted successfully!"));
       router.push("/vendor");
@@ -191,7 +265,7 @@ export default function VendorOnboardingWizard() {
               requested, then submit again on the last step.
             </p>
             <Link href="/vendor/documents" className="underline">
-              Upload requested documents
+              Verification document guidance
             </Link>
           </div>
         )}

@@ -585,8 +585,8 @@ export default function VendorPreviewPage() {
       </div>
       <div className="visual-canvas">
         {wrap("hero", <BusinessHero business={business} />)}
-        <div className="visual-profile-columns grid gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <div className="min-w-0 space-y-5">
+        <div className="visual-profile-columns grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="min-w-0 space-y-5 lg:order-1">
             {wrap("about", <BusinessAbout business={business} />)}
             {wrap(
               "features",
@@ -635,7 +635,7 @@ export default function VendorPreviewPage() {
               <BusinessPolicies policies={business.policies} />,
             )}
           </div>
-          <div className="min-w-0 space-y-5">
+          <div className="order-first min-w-0 space-y-5 lg:order-2">
             <p className="rounded-xl bg-slate-100 p-4 text-xs text-slate-500">
               Customer booking actions are disabled in this preview.
             </p>
