@@ -1,6 +1,21 @@
 import type { NextConfig } from "next";
 import { SITE_URL } from "./src/lib/site-url";
 
+// Server/build configuration only. Never put R2 credentials in frontend variables.
+let r2ImageOrigin = "";
+const configuredMediaUrl = process.env.R2_PUBLIC_URL?.trim() ||
+  (["nakathata.lk", "www.nakathata.lk"].includes(new URL(SITE_URL).hostname)
+    ? "https://media.nakathata.lk" : "");
+if (configuredMediaUrl) {
+  const url = new URL(configuredMediaUrl);
+  if (url.protocol !== "https:" || url.username || url.password || url.port ||
+      url.pathname !== "/" || url.search || url.hash ||
+      (process.env.NODE_ENV === "production" && url.hostname.endsWith(".r2.dev"))) {
+    throw new Error("R2_PUBLIC_URL must be an HTTPS custom image domain origin");
+  }
+  r2ImageOrigin = ` ${url.origin}`;
+}
+
 const nextConfig: NextConfig = {
   async redirects() {
     if (process.env.LEGACY_DOMAIN_REDIRECT === "false") return [];
@@ -53,7 +68,7 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value:
-              "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'",
+              `default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://res.cloudinary.com https://images.unsplash.com${r2ImageOrigin}; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'self'`,
           },
         ],
       },

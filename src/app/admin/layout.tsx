@@ -123,6 +123,7 @@ const navGroups: { title: string; items: NavItem[] }[] = [
           { href: "/admin/settings/email", label: "Email" },
           { href: "/admin/settings/social", label: "Social Media" },
           { href: "/admin/settings/api-keys", label: "API Keys" },
+          { href: "/admin/settings/media", label: "Media Storage" },
         ],
       },
     ],
