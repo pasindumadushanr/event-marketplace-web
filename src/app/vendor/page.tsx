@@ -1,15 +1,14 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Eye, Clock, XCircle, FileText } from "lucide-react";
+import { Clock, XCircle, FileText, Sparkles, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import api from "@/lib/api";
-import { toast } from "sonner";
-import { GuidedSetup } from "@/components/vendor/GuidedSetup";
-import { DailyOverview } from "@/components/vendor/DailyOverview";
+import { VendorDashboardV1 } from "@/components/vendor/VendorDashboardV1";
+import { VendorDashboardV2 } from "@/components/vendor/VendorDashboardV2";
 
 export default function VendorDashboardPage() {
   const router = useRouter();
@@ -27,25 +26,51 @@ export default function VendorDashboardPage() {
     null,
   );
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
+  const [refreshAttempt, setRefreshAttempt] = useState(0);
 
-  const fetchStatus = useCallback(async () => {
-    setIsLoadingStatus(true);
-    setStatus(null);
-    try {
-      const { data } = await api.get("/vendor/business/onboarding/status");
-      setStatus(data.vendorStatus);
-      setRejectionReason(data.rejectionReason);
-      setInformationRequest(data.informationRequest);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoadingStatus(false);
+  // Dashboard view mode: 'v2' (Simple) by default, or 'v1' (Detailed / Advanced)
+  const [viewMode, setViewMode] = useState<"v2" | "v1">(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const savedMode = localStorage.getItem("nakathata_vendor_dashboard_mode");
+        if (savedMode === "v1" || savedMode === "v2") return savedMode;
+      } catch {
+        /* localStorage unavailable */
+      }
     }
-  }, []);
+    return "v2";
+  });
+
+  const handleModeChange = (mode: "v2" | "v1") => {
+    setViewMode(mode);
+    try {
+      localStorage.setItem("nakathata_vendor_dashboard_mode", mode);
+    } catch {
+      /* ignore */
+    }
+  };
 
   useEffect(() => {
-    fetchStatus();
-  }, [fetchStatus]);
+    let active = true;
+    api
+      .get("/vendor/business/onboarding/status")
+      .then(({ data }) => {
+        if (!active) return;
+        setStatus(data.vendorStatus);
+        setRejectionReason(data.rejectionReason);
+        setInformationRequest(data.informationRequest);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        if (active) setIsLoadingStatus(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [refreshAttempt]);
 
   if (businessLoading || isLoadingStatus) {
     return (
@@ -124,7 +149,7 @@ export default function VendorDashboardPage() {
             className="inline-flex items-center rounded-lg border px-4 py-2 text-sm"
             href="/vendor/documents"
           >
-              Verification document guidance
+            Verification document guidance
           </Link>
         </div>
       </div>
@@ -174,7 +199,9 @@ export default function VendorDashboardPage() {
         <div className="flex flex-wrap items-center gap-4">
           <Button
             onClick={() => {
-              void Promise.all([fetchStatus(), refreshBusiness()]);
+              setIsLoadingStatus(true);
+              setRefreshAttempt((a) => a + 1);
+              void refreshBusiness();
             }}
           >
             Try again
@@ -187,125 +214,60 @@ export default function VendorDashboardPage() {
     );
 
   return (
-    <div className="space-y-8">
-      <div className="vendor-hero flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
-        <div className="max-w-xl">
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#dfc18b]">
-            A little progress. A memorable celebration.
-          </p>
-          <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
-            Welcome back,
-            <br />
-            {business.name || "Vendor"}.
-          </h2>
-          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/70">
-            Your next great event starts here. Stay connected with customers and
-            keep your business moving forward.
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-col items-start gap-4 sm:items-end">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1.5 text-xs text-white/80">
-            <span
-              className={`h-1.5 w-1.5 rounded-full ${business.status === "ACTIVE" ? "bg-[#b7d7a8]" : "bg-amber-300"}`}
-            />
-            {business.status === "ACTIVE"
-              ? "Your business page is live"
-              : "Let’s get your page ready"}
+    <div className="space-y-6">
+      {/* 🔄 MODE SWITCHER: SIMPLE (V2) vs DETAILED (V1) */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white border border-slate-200/80 px-4 py-3 shadow-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Dashboard View:
           </span>
-          <Link
-            href="/vendor/business"
-            className="inline-flex items-center gap-2 rounded-xl bg-[#e7c991] px-5 py-3 text-sm font-semibold text-[#283c30] hover:bg-[#f0d8ac]"
+          <span className="text-xs text-slate-400 hidden sm:inline">
+            (Compare both modes and choose what works best for your team)
+          </span>
+        </div>
+
+        <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+          <button
+            type="button"
+            onClick={() => handleModeChange("v2")}
+            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "v2"
+                ? "bg-white text-emerald-800 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
           >
-            Manage my business <ArrowRight className="h-4 w-4" />
-          </Link>
+            <Sparkles className="size-3.5 text-emerald-600" />
+            Simple (V2)
+          </button>
+          <button
+            type="button"
+            onClick={() => handleModeChange("v1")}
+            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+              viewMode === "v1"
+                ? "bg-white text-slate-900 shadow-sm"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            <LayoutDashboard className="size-3.5 text-slate-500" />
+            Detailed (V1)
+          </button>
         </div>
       </div>
-      {business.status === "ACTIVE" && <DailyOverview />}
 
-      <GuidedSetup />
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-        {/* Page visibility */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="vendor-status relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl"></div>
-            <h3 className="font-serif font-semibold text-primary mb-6">
-              Profile Status
-            </h3>
-            {business.status === "ACTIVE" ? (
-              <>
-                <p className="text-2xl font-bold text-emerald-400 mb-2">
-                  Live & Active
-                </p>
-                <p className="text-sm text-slate-400 font-medium mb-6">
-                  Your business is visible to customers.
-                </p>
-                <Button
-                  disabled={isTogglingStatus}
-                  onClick={async () => {
-                    if (
-                      !window.confirm(
-                        "Hide your business page? Customers will no longer find it in search. Existing bookings will remain.",
-                      )
-                    )
-                      return;
-                    setIsTogglingStatus(true);
-                    try {
-                      await api.patch("/vendor/business/unpublish");
-                      updateBusinessLocally({ status: "INACTIVE" });
-                      toast.success(
-                        "Your business is now unpublished and hidden from public search.",
-                      );
-                    } catch (e: any) {
-                      toast.error(
-                        e?.response?.data?.message ||
-                          "Failed to unpublish business",
-                      );
-                    } finally {
-                      setIsTogglingStatus(false);
-                    }
-                  }}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold border-0 cursor-pointer"
-                >
-                  {isTogglingStatus ? "Updating..." : "Hide My Business Page"}
-                </Button>
-              </>
-            ) : (
-              <>
-                <p className="text-2xl font-bold text-slate-400 mb-2">
-                  Not yet published
-                </p>
-                <p className="text-sm text-amber-400 font-medium mb-6">
-                  Your profile is currently hidden from customers.
-                </p>
-                <Link
-                  href="/vendor/business#business-setup"
-                  className="text-sm text-white underline"
-                >
-                  View setup checklist
-                </Link>
-              </>
-            )}
-          </div>
-
-          <Link
-            href={
-              business.status === "ACTIVE"
-                ? `/business/${business.profileSettings?.seo?.slug || business.id}`
-                : "/vendor/preview"
-            }
-          >
-            <Button
-              variant="outline"
-              className="w-full h-14 rounded-2xl bg-white hover:bg-slate-50 text-secondary font-semibold shadow-sm border-slate-200 mt-4"
-            >
-              <Eye className="w-4 h-4 mr-2" />{" "}
-              {business.status === "ACTIVE"
-                ? "View Public Profile"
-                : "Preview My Business Page"}
-            </Button>
-          </Link>
-        </div>
-      </div>
+      {/* RENDER SELECTED VIEW */}
+      {viewMode === "v2" ? (
+        <VendorDashboardV2
+          business={business}
+          updateBusinessLocally={updateBusinessLocally}
+        />
+      ) : (
+        <VendorDashboardV1
+          business={business}
+          isTogglingStatus={isTogglingStatus}
+          setIsTogglingStatus={setIsTogglingStatus}
+          updateBusinessLocally={updateBusinessLocally}
+        />
+      )}
     </div>
   );
 }
