@@ -4,6 +4,7 @@ const overview = {
   checkedAt: "2026-11-01T06:00:00Z",
   cacheSeconds: 300,
   uploadMode: "cloudinary",
+  invitationUploadMode: "r2",
   cloudinary: {
     status: "ok",
     level: "warning",
@@ -54,6 +55,14 @@ describe("Admin media capacity monitor", () => {
     visit();
     cy.wait("@usage");
     cy.get("h1").should("contain", "Media storage");
+    cy.contains("p", "Configured upload destination:").should(
+      "contain",
+      "Cloudinary",
+    );
+    cy.contains("p", "Invitation images:").should(
+      "contain",
+      "R2 (public images)",
+    );
     cy.contains("a", "Media Storage").should(
       "have.attr",
       "href",

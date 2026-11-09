@@ -27,6 +27,7 @@ import {
 import api from "@/lib/api";
 import { submissionError } from "@/lib/recaptcha";
 import { usePlatformSettings } from "@/lib/platform-settings-context";
+import { BUSINESS_CONTACT } from "@/lib/platform-settings";
 
 const socialLinks = [
   {
@@ -253,16 +254,38 @@ export default function ContactPage() {
                   <Mail className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-900">Email</h4>
+                  <h4 className="font-bold text-slate-900">
+                    General enquiries
+                  </h4>
                   <a
                     href={`mailto:${general.contactEmail}`}
                     className="inline-block break-all text-slate-600 mt-1 hover:underline"
                   >
                     {general.contactEmail}
                   </a>
+                  <p className="mt-3 font-semibold text-slate-900">
+                    Customer support
+                  </p>
+                  <a
+                    href={`mailto:${BUSINESS_CONTACT.supportEmail}`}
+                    className="inline-block break-all text-slate-600 mt-1 hover:underline"
+                  >
+                    {BUSINESS_CONTACT.supportEmail}
+                  </a>
                 </div>
               </div>
             </div>
+
+            <a
+              href={BUSINESS_CONTACT.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#245c45] px-6 py-3 font-semibold text-white hover:bg-[#194331] focus-visible:outline-2 focus-visible:outline-offset-4"
+              aria-label="Chat with Nakathata on WhatsApp (opens in a new tab)"
+            >
+              <MessageCircle className="h-5 w-5" aria-hidden="true" />
+              Chat on WhatsApp
+            </a>
 
             <Link
               href="/faq"

@@ -15,6 +15,7 @@ type Overview = {
   checkedAt: string;
   cacheSeconds: number;
   uploadMode: string;
+  invitationUploadMode?: string;
   cloudinary: Provider & {
     cloudName: string | null;
     plan: string | null;
@@ -191,6 +192,17 @@ export default function MediaStoragePage() {
                     "Cloudinary first, R2 on upload quota errors",
                 } as Record<string, string>
               )[data.uploadMode] || "Unknown"}
+            </p>
+            <p className="mt-1">
+              <strong className="text-slate-900">Invitation images:</strong>{" "}
+              {(
+                {
+                  cloudinary: "Cloudinary",
+                  r2: "R2 (public images)",
+                  "cloudinary-r2-fallback":
+                    "Cloudinary first, R2 on upload quota errors",
+                } as Record<string, string>
+              )[data.invitationUploadMode || data.uploadMode] || "Unknown"}
             </p>
             <p className="mt-1">
               Checked: {timestamp(data.checkedAt)}. Results are cached for up to

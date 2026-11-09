@@ -25,7 +25,7 @@ export default function GeneralSettingsPage() {
         },
         {
           key: "contactEmail",
-          label: "Support email",
+          label: "General enquiries email",
           type: "email",
           help: "Public contact address and recipient of new contact-form notifications.",
         },
@@ -45,8 +45,22 @@ export default function GeneralSettingsPage() {
       ]}
     >
       <div className="flex flex-wrap gap-4 text-sm">
-        <Link href="/home-v1" target="_blank" rel="noopener noreferrer" className="underline">Preview Home V1</Link>
-        <Link href="/home-v2" target="_blank" rel="noopener noreferrer" className="underline">Preview Home V2</Link>
+        <Link
+          href="/home-v1"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Preview Home V1
+        </Link>
+        <Link
+          href="/home-v2"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          Preview Home V2
+        </Link>
       </div>
     </SettingsEditor>
   );

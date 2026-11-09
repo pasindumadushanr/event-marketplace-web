@@ -4,10 +4,9 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { MessageCircleQuestion, Mail } from "lucide-react";
-import { usePlatformSettings } from "@/lib/platform-settings-context";
+import { BUSINESS_CONTACT } from "@/lib/platform-settings";
 
 export function FaqHelp() {
-  const { general } = usePlatformSettings();
   return (
     <section className="public-page-blush py-20 border-y border-[#e8dfd0]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -39,7 +38,7 @@ export function FaqHelp() {
                 Contact Support
               </Button>
             </Link>
-            <a href={`mailto:${general.contactEmail}`}>
+            <a href={`mailto:${BUSINESS_CONTACT.supportEmail}`}>
               <Button
                 variant="outline"
                 size="lg"

@@ -15,6 +15,7 @@ import {
   AtSign,
 } from "lucide-react";
 import { usePlatformSettings } from "@/lib/platform-settings-context";
+import { BUSINESS_CONTACT } from "@/lib/platform-settings";
 import "./footer.css";
 
 function WeddingSprig({ className }: { className: string }) {
@@ -175,6 +176,37 @@ export function Footer() {
               <BrandLogo className="w-32 sm:w-36" />
             </Link>
             <p className="text-sm leading-7 max-w-sm mb-5">{description}</p>
+            <div className="mb-5 space-y-2 text-sm">
+              <a
+                href={BUSINESS_CONTACT.whatsapp}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-[#245c45] px-5 py-2 font-semibold text-white hover:bg-[#194331] focus-visible:outline-2 focus-visible:outline-offset-4"
+                aria-label="Chat with Nakathata on WhatsApp (opens in a new tab)"
+              >
+                <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                Chat on WhatsApp
+              </a>
+              <p>{BUSINESS_CONTACT.phone}</p>
+              <p>
+                Enquiries:{" "}
+                <a
+                  className="break-all underline"
+                  href={`mailto:${general.contactEmail}`}
+                >
+                  {general.contactEmail}
+                </a>
+              </p>
+              <p>
+                Support:{" "}
+                <a
+                  className="break-all underline"
+                  href={`mailto:${BUSINESS_CONTACT.supportEmail}`}
+                >
+                  {BUSINESS_CONTACT.supportEmail}
+                </a>
+              </p>
+            </div>
             <div
               className="flex flex-wrap gap-2.5"
               aria-label="Social media links"

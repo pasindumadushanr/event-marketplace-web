@@ -1,7 +1,15 @@
+// Public customer-service details, separate from email login credentials.
+export const BUSINESS_CONTACT = {
+  email: "hello@nakathata.lk",
+  supportEmail: "support@nakathata.lk",
+  phone: "+94 76 076 2353",
+  whatsapp: "https://wa.me/94760762353",
+};
+
 export const DEFAULT_GENERAL = {
   siteName: "Nakathata.lk",
-  contactEmail: "support@nakathata.lk",
-  supportPhone: "",
+  contactEmail: BUSINESS_CONTACT.email,
+  supportPhone: BUSINESS_CONTACT.phone,
   contactAddress: "Sri Lanka",
   currency: "LKR",
   homepageVersion: "v2",
@@ -46,7 +54,8 @@ export function isPlatformSettings(value: unknown): value is PlatformSettings {
     if (
       !Object.keys(defaults).every(
         (key) =>
-          (group === "general" && key === "homepageVersion" &&
+          (group === "general" &&
+            key === "homepageVersion" &&
             (record as Record<string, unknown>)[key] === undefined) ||
           typeof (record as Record<string, unknown>)[key] === "string",
       )
