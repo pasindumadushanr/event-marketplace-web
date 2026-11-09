@@ -257,6 +257,7 @@ export default function VendorDashboardPage() {
       {/* RENDER SELECTED VIEW */}
       {viewMode === "v2" ? (
         <VendorDashboardV2
+          key={business.id || "v2"}
           business={business}
           updateBusinessLocally={updateBusinessLocally}
         />
