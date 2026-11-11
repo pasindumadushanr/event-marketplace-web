@@ -4,6 +4,7 @@ import { ClassicHomepage } from "@/components/home/ClassicHomepage";
 import { Footer } from "@/components/home/Footer";
 import { pageMetadata, BRAND_DESCRIPTION } from "@/lib/seo";
 import { getPlatformSettings } from "@/lib/platform-settings-server";
+import { PrelaunchCover } from "@/components/home/PrelaunchCover";
 
 export async function generateMetadata() {
   const { seo, general } = await getPlatformSettings();
@@ -35,6 +36,7 @@ const brandStructuredData = {
 export default async function HomePage() {
   const settings = await getPlatformSettings();
   const classic = settings.general.homepageVersion === "v1";
+  const prelaunchEnabled = settings.general.prelaunchBanner !== "disabled";
   return (
     <div className="min-h-screen bg-background font-sans">
       <script
@@ -49,6 +51,9 @@ export default async function HomePage() {
           }).replace(/</g, "\\u003c"),
         }}
       />
+      {prelaunchEnabled && (
+        <PrelaunchCover siteName={settings.general.siteName} />
+      )}
       <Navbar solid={!classic} simple={!classic} />
       <main className="wedding-typography">
         {classic ? <ClassicHomepage /> : <SimpleHomepage />}

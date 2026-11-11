@@ -10,6 +10,21 @@ export default function GeneralSettingsPage() {
       defaults={DEFAULT_GENERAL}
       fields={[
         {
+          key: "prelaunchBanner",
+          label: "Pre-launch cover banner (Launch Jan 1, 2027)",
+          options: [
+            {
+              value: "enabled",
+              label: "Enabled — Show Launching Jan 1, 2027 cover banner with countdown & close icon",
+            },
+            {
+              value: "disabled",
+              label: "Disabled — Standard full marketplace homepage",
+            },
+          ],
+          help: "Controls the pre-launch cover banner on the homepage. When enabled, visitors see the countdown, vendor registration button, and notify-me form, with a close (X) icon to preview the website. Set to Disabled when you are ready to open the full marketplace.",
+        },
+        {
           key: "homepageVersion",
           label: "Homepage version",
           options: [
