@@ -8,12 +8,10 @@ import {
   Sparkles,
   ArrowRight,
   Mail,
-  CheckCircle2,
   Calendar,
   Phone,
   Eye,
   Loader2,
-  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,11 +111,11 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
         consent: true,
       });
       setIsSuccess(true);
-      setSubscribeMessage("✨ You're on the VIP waitlist! We'll notify you on launch day with exclusive vendor offers.");
+      setSubscribeMessage("✨ You're on the waitlist! We'll notify you on launch day.");
       setEmail("");
     } catch {
       setIsSuccess(false);
-      setSubscribeMessage("We couldn't save your email right now. Please try again or message us on WhatsApp.");
+      setSubscribeMessage("Could not save your email. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -243,7 +241,7 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           MAIN HERO CONTENT WITH SRI LANKAN WEDDING TEXT STYLE
       ===================================================================== */}
       <div className="relative min-h-[calc(100vh-80px)] flex flex-col justify-between p-4 sm:p-6 lg:p-10 max-w-6xl mx-auto">
-        <main className="my-auto py-6 sm:py-10 flex flex-col items-center text-center space-y-7 max-w-4xl mx-auto">
+        <main className="my-auto py-6 sm:py-10 flex flex-col items-center text-center space-y-7 max-w-3xl mx-auto">
           {/* Traditional Auspicious Badge */}
           <div className="inline-flex items-center gap-2 rounded-full border border-amber-600/30 bg-amber-500/10 px-4 py-1.5 text-xs sm:text-sm font-bold text-[#8a6b35] shadow-xs">
             <Sparkles className="size-4 text-amber-600" />
@@ -330,59 +328,37 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           </div>
 
           {/* ===============================================================
-              BIG PROMINENT VENDOR REGISTRATION CTA
+              CLEAN, MINIMAL & INTEGRATED ACTION SECTION (NO BULKY BOXES)
           =============================================================== */}
-          <div className="w-full max-w-xl rounded-3xl border-2 border-[#183e38]/20 bg-white/95 p-6 sm:p-8 shadow-xl space-y-4 text-left sm:text-center">
-            <div className="space-y-1.5">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
-                <Crown className="size-4 text-amber-600" /> Are You an Event or Wedding Vendor?
-              </span>
-              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#14382e]">
-                Get Your Storefront Ready for 2027 Couples
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                Create your business profile, upload packages & past event photos, and connect directly with clients via WhatsApp.
+          <div className="w-full max-w-md mx-auto pt-4 space-y-5">
+            {/* 1. Main Vendor Action Button */}
+            <div className="space-y-2">
+              <Link href="/vendor/register" className="block">
+                <Button
+                  size="lg"
+                  className="w-full h-13 rounded-2xl bg-[#14382e] hover:bg-[#0e261f] text-white text-base font-bold shadow-md hover:shadow-lg transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 cursor-pointer"
+                >
+                  <span>Are You a Vendor? Join Free</span>
+                  <ArrowRight className="size-4 text-amber-300" />
+                </Button>
+              </Link>
+              <p className="text-xs text-slate-600 font-medium">
+                Free early registration • Direct WhatsApp inquiries • Dedicated profile
               </p>
             </div>
 
-            <Link href="/vendor/register" className="block">
-              <Button
-                size="lg"
-                className="w-full h-14 rounded-2xl bg-[#14382e] hover:bg-[#0e261f] text-white text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 cursor-pointer"
-              >
-                <span>Are You a Vendor? Join Free</span>
-                <ArrowRight className="size-5 text-amber-300" />
-              </Button>
-            </Link>
-
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-[#14382e] font-semibold pt-1">
-              <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5 text-emerald-600" /> Free early vendor registration
+            {/* Subtle Divider */}
+            <div className="flex items-center gap-3 pt-1">
+              <span className="h-px flex-1 bg-amber-900/15" />
+              <span className="text-[11px] uppercase tracking-wider font-semibold text-[#8a6b35]">
+                or get notified on launch day
               </span>
-              <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5 text-emerald-600" /> Direct WhatsApp booking inquiries
-              </span>
-              <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5 text-emerald-600" /> Shareable profile website link
-              </span>
-            </div>
-          </div>
-
-          {/* ===============================================================
-              CUSTOMER WAITLIST / "NOTIFY ME" FORM
-          =============================================================== */}
-          <div className="w-full max-w-lg rounded-2xl border border-amber-900/10 bg-white/90 p-5 shadow-sm space-y-3">
-            <div className="text-center space-y-1">
-              <h3 className="text-sm sm:text-base font-bold text-[#14382e]">
-                Planning a Wedding or Celebration in 2027?
-              </h3>
-              <p className="text-xs text-slate-500">
-                Be the first to browse verified vendors, launch packages & special discounts.
-              </p>
+              <span className="h-px flex-1 bg-amber-900/15" />
             </div>
 
-            <form onSubmit={handleNotifySubmit} className="space-y-2">
-              <div className="flex flex-col sm:flex-row gap-2">
+            {/* 2. Customer Waitlist Form */}
+            <div className="space-y-2">
+              <form onSubmit={handleNotifySubmit} className="flex gap-2">
                 <div className="relative flex-1">
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
                   <Input
@@ -390,35 +366,33 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Enter your email address"
-                    className="h-11 pl-10 rounded-xl bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 text-xs sm:text-sm font-medium"
+                    placeholder="Enter email for launch updates"
+                    className="h-11 pl-10 rounded-xl bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 text-xs sm:text-sm font-medium shadow-2xs"
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-11 rounded-xl bg-[#8a6b35] hover:bg-[#73582a] text-white font-bold text-xs sm:text-sm px-5 shrink-0 shadow-sm cursor-pointer"
+                  className="h-11 rounded-xl bg-[#8a6b35] hover:bg-[#73582a] text-white font-bold text-xs sm:text-sm px-5 shrink-0 shadow-2xs cursor-pointer"
                 >
                   {isSubmitting ? (
-                    <>
-                      <Loader2 className="size-4 animate-spin mr-1.5" /> Saving...
-                    </>
+                    <Loader2 className="size-4 animate-spin" />
                   ) : (
                     "Notify Me"
                   )}
                 </Button>
-              </div>
+              </form>
 
               {subscribeMessage && (
                 <p
-                  className={`text-xs text-left font-semibold pt-1 ${
+                  className={`text-xs text-center font-semibold pt-1 ${
                     isSuccess ? "text-emerald-700" : "text-amber-700"
                   }`}
                 >
                   {subscribeMessage}
                 </p>
               )}
-            </form>
+            </div>
           </div>
         </main>
 
