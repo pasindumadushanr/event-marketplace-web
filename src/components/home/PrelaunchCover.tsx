@@ -10,10 +10,10 @@ import {
   Mail,
   CheckCircle2,
   Calendar,
-  Building2,
   Phone,
   Eye,
   Loader2,
+  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,7 @@ function calculateTimeRemaining(): TimeRemaining {
 }
 
 export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProps) {
-  // Check if the user previously dismissed the cover during this browser session
+  // Check if user previously closed the banner in this browser session
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       try {
@@ -65,7 +65,7 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
 
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>(calculateTimeRemaining);
 
-  // Notify Me waitlist form state
+  // Customer Waitlist state
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscribeMessage, setSubscribeMessage] = useState("");
@@ -116,18 +116,18 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
       setEmail("");
     } catch {
       setIsSuccess(false);
-      setSubscribeMessage("We couldn't save your email right now. Please try again or reach out on WhatsApp.");
+      setSubscribeMessage("We couldn't save your email right now. Please try again or message us on WhatsApp.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // If dismissed, render a sleek, non-intrusive floating ribbon at the top
+  // If user closed the banner, show an elegant notification bar at the top with a reopen button
   if (isDismissed) {
     return (
       <aside
         aria-label="Launch announcement"
-        className="relative z-40 bg-gradient-to-r from-[#0d221c] via-[#16382f] to-[#0d221c] text-white border-b border-amber-400/30 px-4 py-2.5 shadow-md"
+        className="relative z-40 bg-gradient-to-r from-[#112a23] via-[#1a4438] to-[#112a23] text-white border-b border-amber-300/40 px-4 py-2.5 shadow-md"
       >
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
           <div className="flex items-center gap-2">
@@ -135,26 +135,27 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               <Calendar className="size-3.5" />
             </span>
             <span className="font-semibold text-amber-200">
-              Official Public Launch: January 1, 2027
+              Official Launch: January 1, 2027
             </span>
-            <span className="text-slate-300 hidden md:inline">
-              — Currently welcoming vendor applications across Sri Lanka.
+            <span className="text-emerald-100/80 hidden md:inline">
+              — Currently welcoming wedding and event vendors across Sri Lanka.
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/vendor/register"
-              className="font-bold text-amber-400 hover:text-amber-300 underline underline-offset-4"
+              className="font-bold text-amber-300 hover:text-amber-200 underline underline-offset-4"
             >
               Are you a vendor? Join Free →
             </Link>
             <button
               type="button"
               onClick={handleReopen}
-              className="inline-flex items-center gap-1 rounded-lg bg-white/10 hover:bg-white/20 px-2.5 py-1 text-xs font-semibold text-white transition cursor-pointer"
+              className="inline-flex items-center gap-1 rounded-lg bg-white/15 hover:bg-white/25 px-2.5 py-1 text-xs font-semibold text-white transition cursor-pointer"
             >
-              <span>View Countdown</span>
+              <Eye className="size-3" />
+              <span>Show Launch Cover</span>
             </button>
           </div>
         </div>
@@ -167,95 +168,108 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
       role="dialog"
       aria-modal="true"
       aria-label="Nakathata.lk Official Launch January 1, 2027"
-      className="fixed inset-0 z-50 overflow-y-auto bg-slate-950"
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-[#f8f5ee] font-sans"
     >
-      {/* Background Wedding Image with Multi-Layer Gradients */}
+      {/* =====================================================================
+          BACKGROUND: AUTHENTIC SRI LANKAN WEDDING IMAGE WITH LUXURY OVERLAY
+      ===================================================================== */}
       <div className="fixed inset-0 pointer-events-none">
         <img
-          src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=80"
-          alt="Sri Lankan Wedding Celebration"
-          className="h-full w-full object-cover object-center scale-105 filter brightness-75"
+          src="/images/prelaunch-wedding-banner.jpg"
+          alt="Traditional Sri Lankan Wedding Celebration with Oil Lamp and Jasmine Flowers"
+          className="h-full w-full object-cover object-center filter contrast-[1.02] brightness-[0.98]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/90 via-slate-950/80 to-slate-950/95" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(217,119,6,0.12)_0,transparent_70%)]" />
+        {/* Soft elegant champagne-gold overlay so text and cards remain ultra-sharp */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#fbf8f2]/92 via-[#faf6ee]/80 to-[#f6f0e2]/96" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.12)_0%,transparent_75%)]" />
       </div>
 
-      {/* Main Container */}
-      <div className="relative min-h-screen flex flex-col justify-between p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto text-white">
-        {/* =================================================================
-            1. TOP BAR: LOGO, QUICK LOGINS & PROMINENT CLOSE BUTTON
-        ================================================================= */}
-        <header className="flex items-center justify-between gap-4 py-2 border-b border-white/10 pb-4">
-          {/* Logo */}
+      {/* =====================================================================
+          FLOATING TOP BAR: BRANDING + TOP RIGHT CLOSE BUTTON
+      ===================================================================== */}
+      <div className="sticky top-0 z-30 px-4 sm:px-8 py-3.5 bg-[#fbf8f2]/85 backdrop-blur-md border-b border-amber-900/10 shadow-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          {/* Brand Identity */}
           <div className="flex items-center gap-3">
             <span
               aria-hidden="true"
-              className="flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 text-slate-950 font-black text-lg shadow-lg"
+              className="flex size-10 items-center justify-center rounded-2xl bg-[#183e38] text-amber-300 font-serif font-black text-xl shadow-sm border border-amber-400/30"
             >
-              N✦
+              N
             </span>
             <div>
-              <span className="text-xl sm:text-2xl font-serif font-black tracking-tight text-white block">
+              <span className="text-xl sm:text-2xl font-serif font-black text-[#183e38] tracking-tight block">
                 {siteName}
               </span>
-              <span className="text-[10px] sm:text-xs font-sans uppercase tracking-[0.2em] text-amber-300/90 font-semibold block -mt-1">
-                Sri Lanka Wedding & Event Marketplace
+              <span className="text-[10px] font-sans uppercase tracking-[0.2em] text-[#8a6b35] font-bold block -mt-1">
+                Wedding & Event Services • Sri Lanka
               </span>
             </div>
           </div>
 
-          {/* Quick Actions & Close Button */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          {/* RIGHT SIDE: QUICK LOGINS + CLOSE BUTTON */}
+          <div className="flex items-center gap-3 sm:gap-4">
             <div className="hidden sm:flex items-center gap-3 text-xs font-semibold">
               <Link
                 href="/login"
-                className="text-slate-300 hover:text-white transition"
+                className="text-slate-600 hover:text-[#183e38] transition"
               >
                 Customer Login
               </Link>
-              <span className="text-slate-600">|</span>
+              <span className="text-slate-300">|</span>
               <Link
                 href="/vendor/login"
-                className="text-amber-300 hover:text-amber-200 transition"
+                className="text-[#183e38] font-bold hover:underline"
               >
-                Vendor Portal
+                Vendor Login
               </Link>
             </div>
 
-            {/* PROMINENT CLOSE BUTTON (TOP RIGHT) */}
+            {/* TOP RIGHT CLOSE BUTTON */}
             <button
               type="button"
               onClick={handleDismiss}
               aria-label="Close launch cover and view website preview"
-              className="inline-flex items-center gap-2 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 px-3.5 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm font-bold text-white shadow-lg backdrop-blur-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="group inline-flex items-center gap-2 rounded-2xl bg-[#183e38] hover:bg-[#12302b] text-white px-4 py-2 sm:px-5 sm:py-2.5 text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
             >
               <span>Explore Website</span>
-              <span className="flex size-6 items-center justify-center rounded-full bg-white text-slate-950 font-bold">
+              <span className="flex size-5 items-center justify-center rounded-full bg-white/20 text-white font-bold group-hover:rotate-90 transition-transform duration-200">
                 <X className="size-3.5" />
               </span>
             </button>
           </div>
-        </header>
+        </div>
+      </div>
 
-        {/* =================================================================
-            2. HERO CENTERPIECE: LAUNCH ANNOUNCEMENT + LIVE COUNTDOWN
-        ================================================================= */}
-        <main className="my-auto py-8 sm:py-12 flex flex-col items-center text-center space-y-8 max-w-4xl mx-auto">
-          {/* Official Launch Badge */}
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/50 bg-amber-500/15 px-4 py-1.5 text-xs sm:text-sm font-bold text-amber-300 backdrop-blur-md shadow-lg animate-pulse">
-            <Sparkles className="size-4 text-amber-400" />
-            <span>OFFICIAL PUBLIC LAUNCH: JANUARY 1, 2027</span>
+      {/* =====================================================================
+          MAIN HERO CONTENT
+      ===================================================================== */}
+      <div className="relative min-h-[calc(100vh-80px)] flex flex-col justify-between p-4 sm:p-6 lg:p-10 max-w-6xl mx-auto">
+        <main className="my-auto py-6 sm:py-10 flex flex-col items-center text-center space-y-7 max-w-4xl mx-auto">
+          {/* Traditional Auspicious Badge */}
+          <div className="inline-flex items-center gap-2 rounded-full border border-amber-600/30 bg-amber-500/10 px-4 py-1.5 text-xs sm:text-sm font-bold text-[#8a6b35] shadow-xs">
+            <Sparkles className="size-4 text-amber-600" />
+            <span>OFFICIAL PUBLIC LAUNCH • JANUARY 1, 2027</span>
           </div>
 
-          {/* Main Headline */}
+          {/* Grand Sri Lankan Wedding Headline */}
           <div className="space-y-3">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-white leading-tight">
-              A Grand New Beginning for <br className="hidden sm:inline" />
-              <span className="bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black text-[#183e38] tracking-tight leading-[1.15]">
+              A Grand New Beginning for <br />
+              <span className="text-[#8a6b35] italic font-serif">
                 Weddings in Sri Lanka
               </span>
             </h1>
-            <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-300 leading-relaxed font-sans">
+
+            <div className="flex items-center justify-center gap-2 text-amber-600/60 pt-1">
+              <span className="h-px w-12 bg-amber-600/30" />
+              <span className="text-xs uppercase tracking-widest font-serif font-bold text-[#8a6b35]">
+                ✦ Nakathata.lk ✦
+              </span>
+              <span className="h-px w-12 bg-amber-600/30" />
+            </div>
+
+            <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-700 leading-relaxed font-sans pt-1">
               We are currently onboarding Sri Lanka&apos;s finest wedding venues,
               photographers, bridal artists, wedding cars, and caterers before
               opening to customers nationwide on January 1, 2027.
@@ -263,49 +277,49 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           </div>
 
           {/* ===============================================================
-              LIVE COUNTDOWN TIMER TO JANUARY 1, 2027
+              LIVE COUNTDOWN TIMER CARDS (CHAMPAGNE GOLD & EMERALD)
           =============================================================== */}
-          <div className="w-full max-w-2xl">
-            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-amber-300/80 mb-3">
+          <div className="w-full max-w-2xl pt-2">
+            <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#8a6b35] mb-3">
               COUNTDOWN TO LAUNCH DAY
             </p>
             <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
               {/* Days */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-white/20 bg-white/10 p-3 sm:p-5 backdrop-blur-md shadow-2xl">
-                <span className="text-2xl sm:text-5xl font-black tracking-tight text-amber-300 drop-shadow">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#183e38]">
                   {String(timeRemaining.days).padStart(2, "0")}
                 </span>
-                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-300">
+                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
                   Days
                 </span>
               </div>
 
               {/* Hours */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-white/20 bg-white/10 p-3 sm:p-5 backdrop-blur-md shadow-2xl">
-                <span className="text-2xl sm:text-5xl font-black tracking-tight text-amber-300 drop-shadow">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#183e38]">
                   {String(timeRemaining.hours).padStart(2, "0")}
                 </span>
-                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-300">
+                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
                   Hours
                 </span>
               </div>
 
               {/* Minutes */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-white/20 bg-white/10 p-3 sm:p-5 backdrop-blur-md shadow-2xl">
-                <span className="text-2xl sm:text-5xl font-black tracking-tight text-amber-300 drop-shadow">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#183e38]">
                   {String(timeRemaining.minutes).padStart(2, "0")}
                 </span>
-                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-300">
+                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
                   Minutes
                 </span>
               </div>
 
               {/* Seconds */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-white/20 bg-white/10 p-3 sm:p-5 backdrop-blur-md shadow-2xl">
-                <span className="text-2xl sm:text-5xl font-black tracking-tight text-amber-300 drop-shadow">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#8a6b35]">
                   {String(timeRemaining.seconds).padStart(2, "0")}
                 </span>
-                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-300">
+                <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-slate-500">
                   Seconds
                 </span>
               </div>
@@ -313,54 +327,54 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           </div>
 
           {/* ===============================================================
-              3. PRIMARY ACTION: BIG VENDOR JOIN FREE BUTTON
+              BIG PROMINENT VENDOR REGISTRATION CTA
           =============================================================== */}
-          <div className="w-full max-w-xl rounded-3xl border border-amber-400/40 bg-gradient-to-b from-amber-950/40 via-slate-900/80 to-slate-950/90 p-6 sm:p-7 shadow-2xl backdrop-blur-md space-y-4">
-            <div className="space-y-1">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-amber-300">
-                <Building2 className="size-4" /> Are You an Event or Wedding Vendor?
+          <div className="w-full max-w-xl rounded-3xl border-2 border-[#183e38]/20 bg-white/95 p-6 sm:p-8 shadow-xl space-y-4 text-left sm:text-center">
+            <div className="space-y-1.5">
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
+                <Crown className="size-4 text-amber-600" /> Are You an Event or Wedding Vendor?
               </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-white">
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#183e38]">
                 Get Your Storefront Ready for 2027 Couples
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300">
-                Create your business page, upload packages and portfolio photos, and be featured at launch.
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                Create your business profile, upload packages & past event photos, and connect directly with clients via WhatsApp.
               </p>
             </div>
 
             <Link href="/vendor/register" className="block">
               <Button
                 size="lg"
-                className="w-full h-14 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-base sm:text-lg font-black shadow-xl shadow-amber-400/20 hover:scale-[1.02] active:scale-[0.98] transition-all gap-2 cursor-pointer"
+                className="w-full h-14 rounded-2xl bg-[#183e38] hover:bg-[#12302b] text-white text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 cursor-pointer"
               >
                 <span>Are You a Vendor? Join Free</span>
-                <ArrowRight className="size-5" />
+                <ArrowRight className="size-5 text-amber-400" />
               </Button>
             </Link>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-amber-200/90 font-medium pt-1">
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-[#183e38] font-semibold pt-1">
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5 text-emerald-400" /> Free pre-launch registration
+                <CheckCircle2 className="size-3.5 text-emerald-600" /> Free early vendor registration
               </span>
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5 text-emerald-400" /> Direct WhatsApp inquiries
+                <CheckCircle2 className="size-3.5 text-emerald-600" /> Direct WhatsApp booking inquiries
               </span>
               <span className="flex items-center gap-1">
-                <CheckCircle2 className="size-3.5 text-emerald-400" /> Shareable profile link
+                <CheckCircle2 className="size-3.5 text-emerald-600" /> Shareable profile website link
               </span>
             </div>
           </div>
 
           {/* ===============================================================
-              4. CUSTOMER WAITLIST / "NOTIFY ME" FORM
+              CUSTOMER WAITLIST / "NOTIFY ME" FORM
           =============================================================== */}
-          <div className="w-full max-w-lg rounded-2xl border border-white/15 bg-white/5 p-5 backdrop-blur-md space-y-3">
+          <div className="w-full max-w-lg rounded-2xl border border-amber-900/10 bg-white/80 p-5 shadow-sm space-y-3">
             <div className="text-center space-y-1">
-              <h3 className="text-sm sm:text-base font-bold text-white">
+              <h3 className="text-sm sm:text-base font-bold text-[#183e38]">
                 Planning a Wedding or Celebration in 2027?
               </h3>
-              <p className="text-xs text-slate-400">
-                Leave your email below. We&apos;ll notify you on launch day with exclusive vendor offers.
+              <p className="text-xs text-slate-500">
+                Be the first to browse verified vendors, launch packages & special discounts.
               </p>
             </div>
 
@@ -374,13 +388,13 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email address"
-                    className="h-11 pl-10 rounded-xl bg-white/90 text-slate-900 placeholder:text-slate-500 border-0 focus-visible:ring-amber-400 text-xs sm:text-sm font-medium"
+                    className="h-11 pl-10 rounded-xl bg-white text-slate-900 placeholder:text-slate-400 border-slate-200 text-xs sm:text-sm font-medium"
                   />
                 </div>
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="h-11 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm px-5 shrink-0 shadow-md cursor-pointer"
+                  className="h-11 rounded-xl bg-[#8a6b35] hover:bg-[#73582a] text-white font-bold text-xs sm:text-sm px-5 shrink-0 shadow-sm cursor-pointer"
                 >
                   {isSubmitting ? (
                     <>
@@ -394,8 +408,8 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
 
               {subscribeMessage && (
                 <p
-                  className={`text-xs text-left font-medium pt-1 ${
-                    isSuccess ? "text-emerald-300" : "text-amber-300"
+                  className={`text-xs text-left font-semibold pt-1 ${
+                    isSuccess ? "text-emerald-700" : "text-amber-700"
                   }`}
                 >
                   {subscribeMessage}
@@ -405,10 +419,10 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           </div>
         </main>
 
-        {/* =================================================================
-            5. BOTTOM FOOTER & DIRECT PREVIEW LINK
-        ================================================================= */}
-        <footer className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/10 pt-4 text-xs text-slate-400">
+        {/* =====================================================================
+            FOOTER: DIRECT CLOSE LINK & CONTACT SUPPORT
+        ===================================================================== */}
+        <footer className="flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-amber-900/10 pt-4 text-xs text-slate-500">
           <p>© 2026 {siteName}. Sri Lanka&apos;s Wedding Marketplace.</p>
 
           <div className="flex items-center gap-4">
@@ -416,17 +430,17 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               href="https://wa.me/94760762353"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-amber-300 transition flex items-center gap-1"
+              className="hover:text-[#183e38] transition flex items-center gap-1 font-semibold"
             >
-              <Phone className="size-3" /> Vendor Support: 076 076 2353
+              <Phone className="size-3 text-[#183e38]" /> WhatsApp Support: 076 076 2353
             </a>
             <span>•</span>
             <button
               type="button"
               onClick={handleDismiss}
-              className="hover:text-white font-semibold underline underline-offset-4 flex items-center gap-1 cursor-pointer"
+              className="text-[#183e38] font-bold underline underline-offset-4 flex items-center gap-1 cursor-pointer"
             >
-              <Eye className="size-3" /> Preview Website (Close Banner)
+              <Eye className="size-3" /> Close and View Website
             </button>
           </div>
         </footer>
