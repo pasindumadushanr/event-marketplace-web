@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import api from "@/lib/api";
 
 interface PrelaunchCoverProps {
@@ -168,51 +169,48 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
       role="dialog"
       aria-modal="true"
       aria-label="Nakathata.lk Official Launch January 1, 2027"
-      className="fixed inset-0 z-[9999] overflow-y-auto bg-[#f8f5ee] font-sans"
+      className="fixed inset-0 z-[9999] overflow-y-auto bg-[#faf6f0] font-sans"
     >
       {/* =====================================================================
-          BACKGROUND: AUTHENTIC SRI LANKAN WEDDING IMAGE WITH LUXURY OVERLAY
+          BACKGROUND: CLEAN LUXURY WEDDING PHOTOGRAPH (WITHOUT BAKED-IN TEXT)
       ===================================================================== */}
       <div className="fixed inset-0 pointer-events-none">
         <img
-          src="/images/prelaunch-wedding-banner.jpg"
-          alt="Traditional Sri Lankan Wedding Celebration with Oil Lamp and Jasmine Flowers"
-          className="h-full w-full object-cover object-center filter contrast-[1.02] brightness-[0.98]"
+          src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=2000&q=80"
+          alt="Luxury Wedding Setting"
+          className="h-full w-full object-cover object-center filter contrast-[1.02] brightness-[0.97]"
         />
-        {/* Soft elegant champagne-gold overlay so text and cards remain ultra-sharp */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#fbf8f2]/92 via-[#faf6ee]/80 to-[#f6f0e2]/96" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.12)_0%,transparent_75%)]" />
+        {/* Soft champagne-gold luminous overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#fbf8f2]/94 via-[#faf5eb]/88 to-[#f5eee0]/96" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.14)_0%,transparent_75%)]" />
       </div>
 
       {/* =====================================================================
-          FLOATING TOP BAR: BRANDING + TOP RIGHT CLOSE BUTTON
+          FLOATING TOP BAR: ORIGINAL BRAND LOGO + TOP RIGHT CLOSE BUTTON
       ===================================================================== */}
-      <div className="sticky top-0 z-30 px-4 sm:px-8 py-3.5 bg-[#fbf8f2]/85 backdrop-blur-md border-b border-amber-900/10 shadow-xs">
+      <div className="sticky top-0 z-30 px-4 sm:px-8 py-3 bg-[#fbf8f2]/90 backdrop-blur-md border-b border-amber-900/10 shadow-xs">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Brand Identity */}
+          {/* Original Official Platform Logo */}
           <div className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="flex size-10 items-center justify-center rounded-2xl bg-[#183e38] text-amber-300 font-serif font-black text-xl shadow-sm border border-amber-400/30"
-            >
-              N
-            </span>
-            <div>
-              <span className="text-xl sm:text-2xl font-serif font-black text-[#183e38] tracking-tight block">
-                {siteName}
+            <Link href="/" aria-label={siteName} className="flex items-center gap-2">
+              <BrandLogo priority className="w-24 sm:w-28 shadow-xs border border-amber-900/10" />
+            </Link>
+            <div className="hidden md:block border-l border-amber-900/15 pl-3">
+              <span className="text-xs uppercase tracking-[0.2em] text-[#8a6b35] font-bold block font-serif">
+                Wedding & Event Services
               </span>
-              <span className="text-[10px] font-sans uppercase tracking-[0.2em] text-[#8a6b35] font-bold block -mt-1">
-                Wedding & Event Services • Sri Lanka
+              <span className="text-[10px] text-slate-500 font-medium block">
+                Sri Lanka&apos;s Premier Marketplace
               </span>
             </div>
           </div>
 
-          {/* RIGHT SIDE: QUICK LOGINS + CLOSE BUTTON */}
+          {/* RIGHT SIDE: CUSTOMER LOGIN | VENDOR LOGIN | EXPLORE WEBSITE CLOSE BUTTON */}
           <div className="flex items-center gap-3 sm:gap-4">
-            <div className="hidden sm:flex items-center gap-3 text-xs font-semibold">
+            <div className="hidden sm:flex items-center gap-3 text-xs font-semibold text-slate-600">
               <Link
                 href="/login"
-                className="text-slate-600 hover:text-[#183e38] transition"
+                className="hover:text-[#183e38] transition"
               >
                 Customer Login
               </Link>
@@ -242,7 +240,7 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
       </div>
 
       {/* =====================================================================
-          MAIN HERO CONTENT
+          MAIN HERO CONTENT WITH SRI LANKAN WEDDING TEXT STYLE
       ===================================================================== */}
       <div className="relative min-h-[calc(100vh-80px)] flex flex-col justify-between p-4 sm:p-6 lg:p-10 max-w-6xl mx-auto">
         <main className="my-auto py-6 sm:py-10 flex flex-col items-center text-center space-y-7 max-w-4xl mx-auto">
@@ -252,22 +250,27 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
             <span>OFFICIAL PUBLIC LAUNCH • JANUARY 1, 2027</span>
           </div>
 
-          {/* Grand Sri Lankan Wedding Headline */}
+          {/* Traditional Sri Lankan Wedding Heading & Typography */}
           <div className="space-y-3">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black text-[#183e38] tracking-tight leading-[1.15]">
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black text-[#14382e] tracking-tight leading-[1.18]">
               A Grand New Beginning for <br />
               <span className="text-[#8a6b35] italic font-serif">
                 Weddings in Sri Lanka
               </span>
             </h1>
 
-            <div className="flex items-center justify-center gap-2 text-amber-600/60 pt-1">
-              <span className="h-px w-12 bg-amber-600/30" />
+            {/* Lotus Motif Divider */}
+            <div className="flex items-center justify-center gap-2 text-[#8a6b35] pt-1">
+              <span className="h-px w-12 sm:w-16 bg-gradient-to-r from-transparent to-[#8a6b35]/50" />
               <span className="text-xs uppercase tracking-widest font-serif font-bold text-[#8a6b35]">
-                ✦ Nakathata.lk ✦
+                ✦ Wedding & Event Services ✦
               </span>
-              <span className="h-px w-12 bg-amber-600/30" />
+              <span className="h-px w-12 sm:w-16 bg-gradient-to-l from-transparent to-[#8a6b35]/50" />
             </div>
+
+            <p className="text-sm sm:text-base font-serif italic text-[#8a6b35] font-semibold">
+              Personalised Sinhala Wedding Invitations & Curated Event Vendors
+            </p>
 
             <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-700 leading-relaxed font-sans pt-1">
               We are currently onboarding Sri Lanka&apos;s finest wedding venues,
@@ -285,8 +288,8 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
             </p>
             <div className="grid grid-cols-4 gap-2.5 sm:gap-4">
               {/* Days */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
-                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#183e38]">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/95 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#14382e]">
                   {String(timeRemaining.days).padStart(2, "0")}
                 </span>
                 <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
@@ -295,8 +298,8 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               </div>
 
               {/* Hours */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
-                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#183e38]">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/95 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#14382e]">
                   {String(timeRemaining.hours).padStart(2, "0")}
                 </span>
                 <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
@@ -305,8 +308,8 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               </div>
 
               {/* Minutes */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
-                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#183e38]">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/95 p-3 sm:p-5 shadow-md">
+                <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#14382e]">
                   {String(timeRemaining.minutes).padStart(2, "0")}
                 </span>
                 <span className="mt-1 text-[9px] sm:text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
@@ -315,7 +318,7 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               </div>
 
               {/* Seconds */}
-              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/90 p-3 sm:p-5 shadow-md">
+              <div className="flex flex-col items-center justify-center rounded-2xl sm:rounded-3xl border border-amber-900/15 bg-white/95 p-3 sm:p-5 shadow-md">
                 <span className="text-2xl sm:text-5xl font-serif font-black tracking-tight text-[#8a6b35]">
                   {String(timeRemaining.seconds).padStart(2, "0")}
                 </span>
@@ -334,7 +337,7 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-[#8a6b35]">
                 <Crown className="size-4 text-amber-600" /> Are You an Event or Wedding Vendor?
               </span>
-              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#183e38]">
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#14382e]">
                 Get Your Storefront Ready for 2027 Couples
               </h2>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -345,14 +348,14 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
             <Link href="/vendor/register" className="block">
               <Button
                 size="lg"
-                className="w-full h-14 rounded-2xl bg-[#183e38] hover:bg-[#12302b] text-white text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 cursor-pointer"
+                className="w-full h-14 rounded-2xl bg-[#14382e] hover:bg-[#0e261f] text-white text-base sm:text-lg font-bold shadow-lg hover:shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] gap-2 cursor-pointer"
               >
                 <span>Are You a Vendor? Join Free</span>
-                <ArrowRight className="size-5 text-amber-400" />
+                <ArrowRight className="size-5 text-amber-300" />
               </Button>
             </Link>
 
-            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-[#183e38] font-semibold pt-1">
+            <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 text-[11px] text-[#14382e] font-semibold pt-1">
               <span className="flex items-center gap-1">
                 <CheckCircle2 className="size-3.5 text-emerald-600" /> Free early vendor registration
               </span>
@@ -368,9 +371,9 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           {/* ===============================================================
               CUSTOMER WAITLIST / "NOTIFY ME" FORM
           =============================================================== */}
-          <div className="w-full max-w-lg rounded-2xl border border-amber-900/10 bg-white/80 p-5 shadow-sm space-y-3">
+          <div className="w-full max-w-lg rounded-2xl border border-amber-900/10 bg-white/90 p-5 shadow-sm space-y-3">
             <div className="text-center space-y-1">
-              <h3 className="text-sm sm:text-base font-bold text-[#183e38]">
+              <h3 className="text-sm sm:text-base font-bold text-[#14382e]">
                 Planning a Wedding or Celebration in 2027?
               </h3>
               <p className="text-xs text-slate-500">
