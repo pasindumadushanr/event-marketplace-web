@@ -24,7 +24,9 @@ function openDashboard(mode = "v3") {
   cy.visit("/vendor", {
     onBeforeLoad(win) {
       win.localStorage.setItem("accessToken", "test-token");
-      win.localStorage.setItem("nakathata_vendor_dashboard_mode", mode);
+      if (mode)
+        win.localStorage.setItem("nakathata_vendor_dashboard_mode", mode);
+      else win.localStorage.removeItem("nakathata_vendor_dashboard_mode");
       win.localStorage.setItem(
         "user",
         JSON.stringify({
@@ -40,7 +42,7 @@ function openDashboard(mode = "v3") {
 describe("Easy vendor dashboard V3", () => {
   it("shows three simple tasks, keeps advanced options closed, and remembers the choice", () => {
     openDashboard("v1");
-    cy.contains("button", "Easy (V3)").click();
+    cy.contains("button", "Easy setup").click();
     cy.get('[data-testid="vendor-dashboard-v3"]').should("be.visible");
     cy.contains("1. About your business").should("be.visible");
     cy.contains("2. Show your work").should("be.visible");
@@ -54,14 +56,33 @@ describe("Easy vendor dashboard V3", () => {
       "/vendor/business/contact",
     );
     cy.reload();
-    cy.contains("button", "Easy (V3)").should(
+    cy.contains("button", "Easy setup").should(
       "have.attr",
       "aria-pressed",
       "true",
     );
-    cy.contains("button", "Simple (V2)").should("exist");
-    cy.contains("button", "Detailed (V1)").should("exist");
+    cy.contains("button", "Simple (V2)").should("not.exist");
+    cy.contains("button", "Full dashboard").click();
+    cy.reload();
+    cy.contains("button", "Full dashboard").should(
+      "have.attr",
+      "aria-pressed",
+      "true",
+    );
   });
+
+  for (const savedMode of ["", "v2"]) {
+    it(`opens easy setup for ${savedMode || "new"} preferences`, () => {
+      openDashboard(savedMode);
+      cy.get('[data-testid="vendor-dashboard-v3"]').should("be.visible");
+      cy.contains("button", "Easy setup").should(
+        "have.attr",
+        "aria-pressed",
+        "true",
+      );
+      cy.contains("button", "Simple (V2)").should("not.exist");
+    });
+  }
 
   it("requires review before publishing, without requiring a paid package", () => {
     openDashboard();

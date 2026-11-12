@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import api from "@/lib/api";
 import { VendorDashboardV1 } from "@/components/vendor/VendorDashboardV1";
-import { VendorDashboardV2 } from "@/components/vendor/VendorDashboardV2";
 import { VendorDashboardV3 } from "@/components/vendor/VendorDashboardV3";
 
 export default function VendorDashboardPage() {
@@ -35,23 +34,22 @@ export default function VendorDashboardPage() {
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [refreshAttempt, setRefreshAttempt] = useState(0);
 
-  // Dashboard view mode: 'v2' (Simple) by default, or 'v1' (Detailed / Advanced)
-  const [viewMode, setViewMode] = useState<"v3" | "v2" | "v1">(() => {
+  // Retain saved full-dashboard preferences; legacy V2 falls back to easy setup.
+  const [viewMode, setViewMode] = useState<"v3" | "v1">(() => {
     if (typeof window !== "undefined") {
       try {
         const savedMode = localStorage.getItem(
           "nakathata_vendor_dashboard_mode",
         );
-        if (savedMode === "v1" || savedMode === "v2" || savedMode === "v3")
-          return savedMode;
+        if (savedMode === "v1" || savedMode === "v3") return savedMode;
       } catch {
         /* localStorage unavailable */
       }
     }
-    return "v2";
+    return "v3";
   });
 
-  const handleModeChange = (mode: "v3" | "v2" | "v1") => {
+  const handleModeChange = (mode: "v3" | "v1") => {
     setViewMode(mode);
     try {
       localStorage.setItem("nakathata_vendor_dashboard_mode", mode);
@@ -225,14 +223,14 @@ export default function VendorDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* 🔄 MODE SWITCHER: SIMPLE (V2) vs DETAILED (V1) */}
+      {/* Both views edit the same business. V2 is retained in source only. */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white border border-slate-200/80 px-4 py-3 shadow-xs">
         <div className="flex items-center gap-2">
           <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Dashboard View:
+            Your workspace
           </span>
           <span className="text-xs text-slate-400 hidden sm:inline">
-            (Compare both modes and choose what works best for your team)
+            Choose the view that suits you. Your saved details stay the same.
           </span>
         </div>
 
@@ -241,35 +239,23 @@ export default function VendorDashboardPage() {
             type="button"
             aria-pressed={viewMode === "v3"}
             onClick={() => handleModeChange("v3")}
-            className={`min-h-11 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${viewMode === "v3" ? "bg-white text-emerald-800 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
-          >
-            Easy (V3)
-          </button>
-          <button
-            type="button"
-            onClick={() => handleModeChange("v2")}
-            aria-pressed={viewMode === "v2"}
-            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
-              viewMode === "v2"
-                ? "bg-white text-emerald-800 shadow-sm"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
+            className={`flex min-h-11 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${viewMode === "v3" ? "bg-white text-emerald-800 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
           >
             <Sparkles className="size-3.5 text-emerald-600" />
-            Simple (V2)
+            Easy setup
           </button>
           <button
             type="button"
             onClick={() => handleModeChange("v1")}
             aria-pressed={viewMode === "v1"}
-            className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
+            className={`flex min-h-11 items-center gap-1.5 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
               viewMode === "v1"
                 ? "bg-white text-slate-900 shadow-sm"
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
             <LayoutDashboard className="size-3.5 text-slate-500" />
-            Detailed (V1)
+            Full dashboard
           </button>
         </div>
       </div>
@@ -277,12 +263,6 @@ export default function VendorDashboardPage() {
       {/* RENDER SELECTED VIEW */}
       {viewMode === "v3" ? (
         <VendorDashboardV3 />
-      ) : viewMode === "v2" ? (
-        <VendorDashboardV2
-          key={business.id || "v2"}
-          business={business}
-          updateBusinessLocally={updateBusinessLocally}
-        />
       ) : (
         <VendorDashboardV1
           business={business}
