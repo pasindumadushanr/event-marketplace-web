@@ -2,13 +2,14 @@ import { Navbar } from "@/components/home/Navbar";
 import { Footer } from "@/components/home/Footer";
 import { policyDefaults, PolicyPage as PageData } from "@/data/policies";
 import { PolicyContent } from "./PolicyContent";
+import { cache } from "react";
 
-export async function loadPublishedPolicy(slug: string) {
+export const loadPublishedPolicy = cache(async (slug: string) => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"}/admin/cms/public/pages/${slug}`,
     { next: { revalidate: 60 }, signal: AbortSignal.timeout(15000) },
   );
-  // Non-404 failures fail ISR regeneration, preserving the last successful page.
+  // Never replace an unavailable published policy with different default text.
   let page: PageData = policyDefaults[slug];
   if (response.ok) {
     const data = await response.json();
@@ -23,7 +24,7 @@ export async function loadPublishedPolicy(slug: string) {
   } else if (response.status !== 404)
     throw new Error("Published policy is temporarily unavailable");
   return page;
-}
+});
 
 export async function PolicyPage({ slug }: { slug: string }) {
   const page = await loadPublishedPolicy(slug);

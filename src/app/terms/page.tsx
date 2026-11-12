@@ -2,7 +2,8 @@ import {
   PolicyPage,
   loadPublishedPolicy,
 } from "@/components/policies/PolicyPage";
-export const revalidate = 60;
+// Keep deployment independent of the availability of the policy CMS.
+export const dynamic = "force-dynamic";
 export async function generateMetadata() {
   const page = await loadPublishedPolicy("terms-and-conditions");
   return {
