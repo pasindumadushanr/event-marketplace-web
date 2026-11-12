@@ -636,12 +636,12 @@ export default function VendorPreviewPage() {
             )}
           </div>
           <div className="order-first min-w-0 space-y-5 lg:order-2">
+            {wrap("contact", <BusinessContact contact={business.contact} />)}
             <p className="rounded-xl bg-slate-100 p-4 text-xs text-slate-500">
               Customer booking actions are disabled in this preview.
             </p>
             <BusinessAvailability blockedDates={business.blockedDates} />
             {wrap("hours", <BusinessHours hours={business.businessHours} />)}
-            {wrap("contact", <BusinessContact contact={business.contact} />)}
             {wrap(
               "location",
               <BusinessLocation location={business.location} />,

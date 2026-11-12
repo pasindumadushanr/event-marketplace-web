@@ -149,14 +149,16 @@ export default function BusinessProfileClient({
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           <div className="lg:order-2 lg:col-span-4">
-            <div className="space-y-6 lg:sticky lg:top-28">
+            <div className="flex flex-col gap-6 lg:sticky lg:top-28">
               <BusinessCTA
                 businessId={business.id}
                 whatsapp={business.contact.whatsapp}
               />
               <BusinessAvailability blockedDates={business.blockedDates} />
               <BusinessHours hours={business.businessHours} />
-              <BusinessContact contact={business.contact} />
+              <div className="order-first lg:order-none">
+                <BusinessContact contact={business.contact} />
+              </div>
               <BusinessLocation location={business.location} />
             </div>
           </div>
@@ -181,7 +183,6 @@ export default function BusinessProfileClient({
             <BusinessFAQ faq={business.faq} />
             <BusinessPolicies policies={business.policies} />
           </div>
-
         </div>
 
         <SimilarBusinesses currentCategoryId={business.categoryId} />

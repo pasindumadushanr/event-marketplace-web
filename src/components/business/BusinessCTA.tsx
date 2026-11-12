@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle } from "lucide-react";
+import { WhatsAppIcon } from "@/components/ui/social-icons";
 import { ShortlistButton } from "@/components/discovery/ShortlistButton";
 import { whatsappEnquiryUrl } from "@/lib/whatsapp";
 
@@ -24,9 +24,11 @@ export function BusinessCTA({ businessId, whatsapp }: BusinessCTAProps) {
       >
         <div className="mb-5 text-center">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-700">
-            <MessageCircle className="h-6 w-6" aria-hidden="true" />
+            <WhatsAppIcon className="h-6 w-6" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Contact this vendor</h2>
+          <h2 className="text-xl font-bold text-slate-900">
+            Contact this vendor
+          </h2>
           <p className="mt-2 text-sm text-slate-500">
             Connect directly to discuss your event.
           </p>
@@ -34,7 +36,10 @@ export function BusinessCTA({ businessId, whatsapp }: BusinessCTAProps) {
         {whatsappHref ? (
           <div className="mb-5 space-y-3">
             <p className="text-center text-sm text-slate-500">
-              WhatsApp <span className="ml-1 font-semibold text-slate-900">{number}</span>
+              WhatsApp{" "}
+              <span className="ml-1 font-semibold text-slate-900">
+                {number}
+              </span>
             </p>
             <a
               href={whatsappHref}
@@ -42,7 +47,7 @@ export function BusinessCTA({ businessId, whatsapp }: BusinessCTAProps) {
               rel="noopener noreferrer"
               className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 text-lg font-bold text-white transition-colors hover:bg-emerald-800"
             >
-              <MessageCircle className="h-5 w-5" aria-hidden="true" /> Chat on WhatsApp
+              <WhatsAppIcon className="h-5 w-5" /> Chat on WhatsApp
             </a>
           </div>
         ) : (
@@ -65,7 +70,7 @@ export function BusinessCTA({ businessId, whatsapp }: BusinessCTAProps) {
             rel="noopener noreferrer"
             className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-3 text-sm font-semibold text-white hover:bg-emerald-800"
           >
-            <MessageCircle className="h-5 w-5" aria-hidden="true" /> Chat on WhatsApp
+            <WhatsAppIcon className="h-5 w-5" /> Chat on WhatsApp
           </a>
         </div>
       )}
