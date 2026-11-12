@@ -189,29 +189,18 @@ export function Navbar({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const links = simple
-    ? [
-        { name: "Home", href: "/" },
-        { name: "Find Vendors", href: "/search" },
-        { name: "Services", href: "/categories" },
-      ]
-    : [
-        { name: "Home", href: "/" },
-        { name: "Categories", href: "/categories" },
-        { name: "Vendors", href: "/search" },
-        { name: "Locations", href: "/locations" },
-        { name: "Packages", href: "/packages" },
-        { name: "About", href: "/about" },
-        { name: "Contact", href: "/contact" },
-      ];
+  // Keep public navigation consistent, including the simplified homepage.
+  const links = [
+    { name: "Home", href: "/" },
+    { name: "Find Vendors", href: "/search" },
+    { name: "Services", href: "/categories" },
+    { name: "Locations", href: "/locations" },
+    { name: "Packages", href: "/packages" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
+  ];
   const mobileLinks = [
     ...links,
-    ...(simple
-      ? [
-          { name: "About", href: "/about" },
-          { name: "Contact", href: "/contact" },
-        ]
-      : []),
     { name: "Blog", href: "/blog" },
     { name: "FAQ", href: "/faq" },
   ];
