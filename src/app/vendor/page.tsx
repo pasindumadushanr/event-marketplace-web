@@ -3,12 +3,19 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Clock, XCircle, FileText, Sparkles, LayoutDashboard } from "lucide-react";
+import {
+  Clock,
+  XCircle,
+  FileText,
+  Sparkles,
+  LayoutDashboard,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useBusinessProfile } from "@/contexts/BusinessProfileContext";
 import api from "@/lib/api";
 import { VendorDashboardV1 } from "@/components/vendor/VendorDashboardV1";
 import { VendorDashboardV2 } from "@/components/vendor/VendorDashboardV2";
+import { VendorDashboardV3 } from "@/components/vendor/VendorDashboardV3";
 
 export default function VendorDashboardPage() {
   const router = useRouter();
@@ -29,11 +36,14 @@ export default function VendorDashboardPage() {
   const [refreshAttempt, setRefreshAttempt] = useState(0);
 
   // Dashboard view mode: 'v2' (Simple) by default, or 'v1' (Detailed / Advanced)
-  const [viewMode, setViewMode] = useState<"v2" | "v1">(() => {
+  const [viewMode, setViewMode] = useState<"v3" | "v2" | "v1">(() => {
     if (typeof window !== "undefined") {
       try {
-        const savedMode = localStorage.getItem("nakathata_vendor_dashboard_mode");
-        if (savedMode === "v1" || savedMode === "v2") return savedMode;
+        const savedMode = localStorage.getItem(
+          "nakathata_vendor_dashboard_mode",
+        );
+        if (savedMode === "v1" || savedMode === "v2" || savedMode === "v3")
+          return savedMode;
       } catch {
         /* localStorage unavailable */
       }
@@ -41,7 +51,7 @@ export default function VendorDashboardPage() {
     return "v2";
   });
 
-  const handleModeChange = (mode: "v2" | "v1") => {
+  const handleModeChange = (mode: "v3" | "v2" | "v1") => {
     setViewMode(mode);
     try {
       localStorage.setItem("nakathata_vendor_dashboard_mode", mode);
@@ -226,10 +236,19 @@ export default function VendorDashboardPage() {
           </span>
         </div>
 
-        <div className="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200">
+        <div className="inline-flex flex-wrap rounded-xl bg-slate-100 p-1 border border-slate-200">
+          <button
+            type="button"
+            aria-pressed={viewMode === "v3"}
+            onClick={() => handleModeChange("v3")}
+            className={`min-h-11 rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors ${viewMode === "v3" ? "bg-white text-emerald-800 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+          >
+            Easy (V3)
+          </button>
           <button
             type="button"
             onClick={() => handleModeChange("v2")}
+            aria-pressed={viewMode === "v2"}
             className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               viewMode === "v2"
                 ? "bg-white text-emerald-800 shadow-sm"
@@ -242,6 +261,7 @@ export default function VendorDashboardPage() {
           <button
             type="button"
             onClick={() => handleModeChange("v1")}
+            aria-pressed={viewMode === "v1"}
             className={`flex items-center gap-1.5 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               viewMode === "v1"
                 ? "bg-white text-slate-900 shadow-sm"
@@ -255,7 +275,9 @@ export default function VendorDashboardPage() {
       </div>
 
       {/* RENDER SELECTED VIEW */}
-      {viewMode === "v2" ? (
+      {viewMode === "v3" ? (
+        <VendorDashboardV3 />
+      ) : viewMode === "v2" ? (
         <VendorDashboardV2
           key={business.id || "v2"}
           business={business}
