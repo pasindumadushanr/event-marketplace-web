@@ -1,21 +1,22 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useAuth } from '@/lib/auth-context';
-import api from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { toast } from 'sonner';
-import Link from 'next/link';
-import { BrandLogo } from '@/components/brand/BrandLogo';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAuth } from "@/lib/auth-context";
+import api from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import Link from "next/link";
+import { BrandLogo } from "@/components/brand/BrandLogo";
+import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -25,26 +26,35 @@ export default function VendorLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      const response = await api.post('/auth/login', data);
-      
-      const role = response.data.user?.roleName || response.data.user?.role?.name;
-      if (role !== 'VENDOR') {
-        toast.error('Unauthorized. Please use the customer login.');
+      const response = await api.post("/auth/login", data);
+
+      const role =
+        response.data.user?.roleName || response.data.user?.role?.name;
+      if (role !== "VENDOR") {
+        toast.error("Unauthorized. Please use the customer login.");
         setIsLoading(false);
         return;
       }
 
-      login(response.data.accessToken, response.data.refreshToken, response.data.user);
-      toast.success('Logged in successfully!');
+      login(
+        response.data.accessToken,
+        response.data.refreshToken,
+        response.data.user,
+      );
+      toast.success("Logged in successfully!");
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to login');
+      toast.error(error.response?.data?.message || "Failed to login");
       setIsLoading(false);
     }
   };
@@ -53,9 +63,9 @@ export default function VendorLoginPage() {
     <div className="min-h-screen bg-slate-50 flex">
       {/* Left Side - Image */}
       <div className="hidden lg:block lg:w-1/2 relative bg-slate-900 overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80" 
-          alt="Luxury Event Setup" 
+        <img
+          src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+          alt="Luxury Event Setup"
           className="absolute inset-0 w-full h-full object-cover opacity-60 mix-blend-overlay"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
@@ -67,7 +77,8 @@ export default function VendorLoginPage() {
             Manage your premium bookings.
           </h2>
           <p className="text-lg text-slate-300 font-light max-w-md">
-            Welcome back to the vendor portal. Sign in to access your dashboard, respond to clients, and grow your business.
+            Welcome back to the vendor portal. Sign in to access your dashboard,
+            respond to clients, and grow your business.
           </p>
         </div>
       </div>
@@ -76,41 +87,95 @@ export default function VendorLoginPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-16 relative">
         <div className="absolute top-8 right-8">
           <p className="text-sm text-slate-500">
-            Don't have an account?{' '}
-            <Link href="/vendor/register" className="text-primary hover:underline font-semibold">
+            Don't have an account?{" "}
+            <Link
+              href="/vendor/register"
+              className="text-primary hover:underline font-semibold"
+            >
               Register here
             </Link>
           </p>
         </div>
 
         <div className="w-full max-w-md space-y-8 mt-12 lg:mt-0">
-          
           <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
             <BrandLogo className="w-48" />
           </div>
 
           <div className="text-center lg:text-left">
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Vendor Sign In</h1>
+            <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
+              Vendor Sign In
+            </h1>
             <p className="text-slate-500">
               Enter your credentials to access your vendor dashboard.
             </p>
           </div>
 
-          <form noValidate method="POST" onSubmit={(e) => { e.preventDefault(); handleSubmit(onSubmit)(e); }} className="space-y-6 mt-8">
+          <div className="space-y-4">
+            <GoogleAuthButton
+              mode="login"
+              intent="vendor"
+              disabled={isLoading}
+            />
+            <p className="text-center text-xs text-slate-500">
+              or sign in with email
+            </p>
+          </div>
+          <form
+            noValidate
+            method="POST"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit(onSubmit)(e);
+            }}
+            className="space-y-6 mt-8"
+          >
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-slate-700 font-semibold">Business Email</Label>
-              <Input id="email" type="email" className="h-12 bg-white border-slate-200 focus-visible:ring-primary" {...register('email')} />
-              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+              <Label htmlFor="email" className="text-slate-700 font-semibold">
+                Business Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                className="h-12 bg-white border-slate-200 focus-visible:ring-primary"
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-slate-700 font-semibold">Password</Label>
-                <Link href="/forgot-password?from=vendor" className="text-sm font-medium text-primary hover:underline">Forgot password?</Link>
+                <Label
+                  htmlFor="password"
+                  className="text-slate-700 font-semibold"
+                >
+                  Password
+                </Label>
+                <Link
+                  href="/forgot-password?from=vendor"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
               </div>
-              <Input id="password" type={showPassword ? 'text' : 'password'} autoComplete="current-password" className="h-12 bg-white border-slate-200 focus-visible:ring-primary" {...register('password')} />
-              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-              <label htmlFor="show-password" className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-600">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                className="h-12 bg-white border-slate-200 focus-visible:ring-primary"
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
+              <label
+                htmlFor="show-password"
+                className="flex min-h-11 cursor-pointer items-center gap-2 text-sm text-slate-600"
+              >
                 <input
                   id="show-password"
                   type="checkbox"
@@ -123,8 +188,13 @@ export default function VendorLoginPage() {
               </label>
             </div>
 
-            <Button type="button" onClick={handleSubmit(onSubmit)} className="w-full h-12 text-lg bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 transition-all" disabled={isLoading}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
+            <Button
+              type="button"
+              onClick={handleSubmit(onSubmit)}
+              className="w-full h-12 text-lg bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 transition-all"
+              disabled={isLoading}
+            >
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
         </div>

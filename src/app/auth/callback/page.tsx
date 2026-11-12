@@ -1,49 +1,56 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/lib/auth-context';
-import { toast } from 'sonner';
+import { useEffect, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useAuth } from "@/lib/auth-context";
+import { toast } from "sonner";
 
-import { Suspense } from 'react';
+import { Suspense } from "react";
 
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
+  const handled = useRef(false);
 
   useEffect(() => {
-    const accessToken = searchParams.get('accessToken');
-    const refreshToken = searchParams.get('refreshToken');
-    
+    if (handled.current) return;
+    handled.current = true;
+    const fragment = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken =
+      fragment.get("accessToken") || searchParams.get("accessToken");
+    const refreshToken =
+      fragment.get("refreshToken") || searchParams.get("refreshToken");
+    window.history.replaceState(null, "", window.location.pathname);
+
     if (accessToken && refreshToken) {
       try {
-        const base64Url = accessToken.split('.')[1];
-        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const base64Url = accessToken.split(".")[1];
+        let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
         // Pad the base64 string
         while (base64.length % 4) {
-          base64 += '=';
+          base64 += "=";
         }
         const payload = JSON.parse(atob(base64));
         const user = {
           id: payload.sub,
           email: payload.email,
-          roleId: payload.roleId || '',
+          roleId: payload.roleId || "",
           roleName: payload.role, // Essential for routing!
-          firstName: payload.firstName || '',
-          lastName: payload.lastName || ''
+          firstName: payload.firstName || "",
+          lastName: payload.lastName || "",
         };
-        
-        login(accessToken, refreshToken, user as any);
-        toast.success('Successfully logged in with Google!');
+
+        login(accessToken, refreshToken, user);
+        toast.success("Successfully logged in with Google!");
       } catch (e) {
-        console.error('Failed to parse token payload', e);
-        toast.error('Authentication failed');
-        router.push('/login');
+        console.error("Failed to parse token payload", e);
+        toast.error("Authentication failed");
+        router.push("/login");
       }
     } else {
-      toast.error('Authentication failed');
-      router.push('/login');
+      toast.error("Authentication failed");
+      router.push("/login");
     }
   }, [router, searchParams, login]);
 

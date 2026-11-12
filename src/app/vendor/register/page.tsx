@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { GoogleAuthButton } from "@/components/auth/google-auth-button";
 
 const registerSchema = z.object({
   firstName: z.string().min(2, "First name is required"),
@@ -120,6 +121,16 @@ export default function VendorRegisterPage() {
             </p>
           </div>
 
+          <div className="space-y-4">
+            <GoogleAuthButton
+              mode="register"
+              intent="vendor"
+              disabled={isLoading}
+            />
+            <p className="text-center text-xs text-slate-500">
+              or register with email
+            </p>
+          </div>
           <form
             noValidate
             onSubmit={handleSubmit(onSubmit)}
