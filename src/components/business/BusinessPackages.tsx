@@ -3,12 +3,10 @@
 import { Package } from "@/types/business-profile";
 import { Button } from "@/components/ui/button";
 import { Check, Clock, Package as PackageIcon, Sparkles } from "lucide-react";
-import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { serviceCardCopy, servicePriceLabel } from "@/lib/service-card-copy";
-import { useAuth } from "@/lib/auth-context";
-import { useRouter } from "next/navigation";
-import { EventInquiryDialog } from "./EventInquiryDialog";
+import { whatsappUrl } from "@/lib/whatsapp";
+import { WhatsAppIcon } from "@/components/ui/social-icons";
 
 interface BusinessPackagesProps {
   packages: Package[];
@@ -17,42 +15,52 @@ interface BusinessPackagesProps {
   categoryName?: string;
   blockedDates?: string[];
   previewOnly?: boolean;
+  whatsapp?: string;
 }
 
 export function BusinessPackages({
   packages,
   businessName,
-  businessId,
+  whatsapp,
   categoryName = "",
   previewOnly = false,
 }: BusinessPackagesProps) {
-  const [inquiryOpen, setInquiryOpen] = useState(false);
-  const [inquiryListing, setInquiryListing] = useState<Package | undefined>();
   const copy = serviceCardCopy(categoryName);
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const router = useRouter();
-  function enquire(listing?: Package) {
-    if (previewOnly || !businessId || authLoading) return;
-    if (!isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    setInquiryListing(listing);
-    setInquiryOpen(true);
+  function contactButton(listing?: Package) {
+    const message = listing
+      ? `Hi ${businessName}, I found your business on Nakathata.lk. I'm interested in your "${listing.name}" package. Could you share the details and availability?`
+      : `Hi ${businessName}, I found your business on Nakathata.lk. Could you share details about your services and availability?`;
+    const href = whatsappUrl(whatsapp, message);
+    const style =
+      "inline-flex w-full sm:w-auto min-h-12 items-center justify-center gap-2 rounded-xl bg-[#128c50] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0d7040]";
+    return href && !previewOnly ? (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={style}
+        aria-label={
+          listing
+            ? `Ask about ${listing.name} on WhatsApp`
+            : "Contact vendor on WhatsApp"
+        }
+      >
+        <WhatsAppIcon className="h-5 w-5 shrink-0" /> Chat on WhatsApp
+      </a>
+    ) : (
+      <Button disabled className={`${style} disabled:opacity-60`}>
+        <WhatsAppIcon className="h-5 w-5 shrink-0" />
+        {href ? "Chat on WhatsApp (preview)" : "WhatsApp not added yet"}
+      </Button>
+    );
   }
-  const inquiryDialog = businessId && (
-    <EventInquiryDialog
-      open={inquiryOpen}
-      onClose={() => setInquiryOpen(false)}
-      businessId={businessId}
-      businessName={businessName}
-      listing={inquiryListing}
-    />
-  );
 
   if (!packages || packages.length === 0) {
     return (
-      <div className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 text-center py-16">
+      <div
+        aria-label="Services and packages"
+        className="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 mb-8 text-center py-16"
+      >
         <div className="bg-slate-50 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-slate-300 text-3xl font-serif font-bold">
             $
@@ -65,20 +73,16 @@ export function BusinessPackages({
           This vendor creates custom packages tailored specifically to your
           event&apos;s unique needs rather than set pricing tiers.
         </p>
-        <Button
-          disabled={previewOnly || !businessId || authLoading}
-          onClick={() => enquire()}
-          className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
-        >
-          Request a Custom Quote
-        </Button>
-        {inquiryDialog}
+        {contactButton()}
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 mb-8">
+    <div
+      aria-label="Services and packages"
+      className="bg-white rounded-3xl p-6 sm:p-8 shadow-sm border border-slate-100 mb-8"
+    >
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-100">
         <div>
           <h3 className="text-2xl font-serif font-bold text-slate-900">
@@ -177,22 +181,12 @@ export function BusinessPackages({
 
               {/* Action Button */}
               <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-end">
-                <Button
-                  disabled={previewOnly || !businessId || authLoading}
-                  onClick={() => enquire(pkg)}
-                  className="w-full sm:w-auto bg-slate-900 text-white hover:bg-primary font-bold text-sm rounded-xl px-6 min-h-12 shadow-sm transition-all"
-                >
-                  {Number(pkg.price) > 0
-                    ? `Request this ${copy.singular}`
-                    : "Enquire about pricing"}
-                </Button>
+                {contactButton(pkg)}
               </div>
             </div>
           </div>
         ))}
       </div>
-
-      {inquiryDialog}
     </div>
   );
 }

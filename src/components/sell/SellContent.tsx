@@ -22,7 +22,7 @@ export function SellContent() {
 
       <SellTestimonials data={sellData.testimonials} />
 
-      <AboutStatistics data={sellData.statistics} />
+      <AboutStatistics />
 
       <SellPricing data={sellData.pricing} />
 

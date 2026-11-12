@@ -85,13 +85,6 @@ export const aboutData = {
     }
   ],
 
-  statistics: [
-    { label: 'Active Vendors', value: '2,500+' },
-    { label: 'Happy Customers', value: '15,000+' },
-    { label: 'Events Booked', value: '25,000+' },
-    { label: 'Categories', value: '45+' }
-  ],
-
   values: [
     {
       title: 'Trust & Transparency',

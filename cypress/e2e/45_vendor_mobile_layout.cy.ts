@@ -99,6 +99,10 @@ describe("Vendor mobile layout", () => {
     cy.viewport(320, 844);
     open("/vendor/preview");
     cy.contains("h1", business.name).should("exist");
+    cy.get(".visual-editor-intro h1").should("have.css", "font-size", "20px");
+    cy.get(".business-profile-summary h1").should("have.css", "font-size", "20px");
+    cy.get(".visual-editor-intro > p").first().should("have.css", "font-size", "13px");
+    cy.get(".business-profile-logo").should("have.css", "width", "72px");
     cy.get(".visual-editor-topbar .business-subtle-button").each(($button) => {
       expect($button[0].getBoundingClientRect().height).to.be.at.least(44);
     });

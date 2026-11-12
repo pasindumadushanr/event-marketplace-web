@@ -18,7 +18,7 @@ export function AboutContent() {
       <AboutMissionVision data={aboutData.missionVision} />
       <AboutWhyChooseUs data={aboutData.whyChooseUs} />
       <AboutHowItWorks data={aboutData.howItWorks} />
-      <AboutStatistics data={aboutData.statistics} />
+      <AboutStatistics />
       <AboutValues data={aboutData.values} />
       <AboutCTA data={aboutData.cta} />
     </main>

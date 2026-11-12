@@ -29,6 +29,14 @@
 .visual-canvas {
   min-width: 0;
 }
+@media (max-width: 1023px) {
+  .visual-profile-columns > .contents > [data-profile-section="contact"] {
+    order: -2;
+  }
+  .visual-profile-columns > .contents > [data-profile-section="packages"] {
+    order: -1;
+  }
+}
 .visual-section {
   min-width: 0;
   margin-bottom: 20px;
@@ -286,6 +294,76 @@
 @media (max-width: 639px) {
   .vendor-page-content {
     overflow-wrap: anywhere;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .vendor-page-content h1 {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .vendor-page-content h2 {
+    font-size: 18px;
+    line-height: 26px;
+    font-weight: 600;
+  }
+  .vendor-page-content h3 {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+  .visual-editor-intro {
+    margin-top: 20px;
+    margin-bottom: 20px;
+  }
+  .visual-editor-intro > p {
+    font-size: 13px;
+    line-height: 21px;
+    font-weight: 400;
+  }
+  .visual-editor-intro .visual-editor-status {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-left: 2px solid #d1b77c;
+    border-radius: 0 8px 8px 0;
+    background: #f5f0e6;
+    color: #775b28;
+  }
+  .visual-canvas .business-profile-cover {
+    height: 160px;
+  }
+  .visual-canvas .business-profile-logo {
+    width: 72px;
+    height: 72px;
+    top: -36px;
+    padding: 5px;
+    border-radius: 16px;
+  }
+  .visual-canvas .business-profile-summary {
+    margin-top: 24px;
+    gap: 16px;
+  }
+  .visual-canvas .business-profile-summary h1 {
+    margin-bottom: 10px;
+  }
+  .visual-canvas .business-profile-summary > div:last-child > p:last-child {
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .visual-canvas .business-profile-summary span {
+    line-height: 20px;
+  }
+  .visual-canvas .business-profile-cover span {
+    max-width: 100%;
+    font-size: 10px;
+    line-height: 16px;
+    letter-spacing: 0.04em;
+    padding: 5px 8px;
+  }
+  .visual-canvas .business-profile-hero {
+    border-radius: 18px;
+    margin-bottom: 0;
   }
   .vendor-page-content :is(input, textarea, select) {
     font-size: 16px;
@@ -324,6 +402,14 @@
     padding: 4px 4px 10px;
     font-size: 12px;
     line-height: 1.5;
+    color: #52665a;
+  }
+  .visual-section-bar button {
+    min-width: 72px;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 10px;
   }
   .visual-canvas :is(.p-8) {
     padding: 20px;

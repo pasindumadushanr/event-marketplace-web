@@ -9,9 +9,9 @@ interface BusinessHeroProps {
 
 export function BusinessHero({ business }: BusinessHeroProps) {
   return (
-    <div className="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 mb-8">
+    <div className="business-profile-hero bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 mb-8">
       {/* Cover Image */}
-      <div className="relative h-48 sm:h-64 md:h-96 w-full bg-slate-100">
+      <div className="business-profile-cover relative h-48 sm:h-64 md:h-96 w-full bg-slate-100">
         <img
           src={business.coverImage}
           alt={`${business.name} Cover`}
@@ -30,7 +30,7 @@ export function BusinessHero({ business }: BusinessHeroProps) {
       {/* Main Info Section */}
       <div className="px-4 sm:px-6 md:px-10 pb-6 md:pb-10 pt-6 relative">
         {/* Logo (Overlapping) */}
-        <div className="absolute -top-12 left-4 sm:left-6 md:-top-16 md:left-10 h-24 w-24 md:h-32 md:w-32 rounded-2xl bg-white p-1.5 md:p-2 shadow-lg border border-slate-100">
+        <div className="business-profile-logo absolute -top-12 left-4 sm:left-6 md:-top-16 md:left-10 h-24 w-24 md:h-32 md:w-32 rounded-2xl bg-white p-1.5 md:p-2 shadow-lg border border-slate-100">
           <img
             src={business.logo}
             alt={`${business.name} Logo`}
@@ -38,7 +38,7 @@ export function BusinessHero({ business }: BusinessHeroProps) {
           />
         </div>
 
-        <div className="ml-0 md:ml-40 mt-8 md:mt-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+        <div className="business-profile-summary ml-0 md:ml-40 mt-8 md:mt-0 flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
           <div className="min-w-0 w-full">
             <h1 className="text-2xl leading-tight md:text-4xl font-bold text-slate-900 mb-3 break-words [overflow-wrap:anywhere]">
               {business.name}

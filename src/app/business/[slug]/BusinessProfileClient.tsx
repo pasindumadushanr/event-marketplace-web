@@ -148,8 +148,8 @@ export default function BusinessProfileClient({
         <BusinessHero business={business} />
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
-          <div className="lg:order-2 lg:col-span-4">
-            <div className="flex flex-col gap-6 lg:sticky lg:top-28">
+          <div className="contents lg:block lg:order-2 lg:col-span-4">
+            <div className="contents lg:flex lg:flex-col lg:gap-6 lg:sticky lg:top-28">
               <BusinessCTA
                 businessId={business.id}
                 whatsapp={business.contact.whatsapp}
@@ -163,17 +163,20 @@ export default function BusinessProfileClient({
             </div>
           </div>
 
-          <div className="lg:order-1 lg:col-span-8 space-y-8">
+          <div className="contents lg:block lg:order-1 lg:col-span-8 lg:space-y-8">
             <BusinessAbout business={business} />
             <BusinessFeatures featureGroups={business.featureGroups} />
             <BusinessGallery gallery={business.gallery} />
-            <BusinessPackages
-              packages={business.packages}
-              businessName={business.name}
-              businessId={business.id}
-              categoryName={business.categoryName}
-              blockedDates={business.blockedDates}
-            />
+            <div className="-order-1 lg:order-none">
+              <BusinessPackages
+                packages={business.packages}
+                businessName={business.name}
+                businessId={business.id}
+                categoryName={business.categoryName}
+                blockedDates={business.blockedDates}
+                whatsapp={business.contact.whatsapp}
+              />
+            </div>
             <BusinessReviews
               businessId={business.id}
               reviews={business.reviews}

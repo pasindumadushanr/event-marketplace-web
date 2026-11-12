@@ -77,13 +77,6 @@ export const sellData = {
     }
   ],
 
-  statistics: [
-    { label: 'Active Vendors', value: '2,500+' },
-    { label: 'Monthly Visitors', value: '500K+' },
-    { label: 'Booking Value', value: '$10M+' },
-    { label: 'Cities Covered', value: '150+' }
-  ],
-
   testimonials: [
     {
       quote: "Since joining Nakathata.lk, our photography business has doubled its bookings. The caliber of clients on this platform is unmatched.",

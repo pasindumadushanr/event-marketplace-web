@@ -15,6 +15,11 @@ describe("Consistent public navigation", () => {
     it(`shows all links on desktop at ${route}`, () => {
       cy.viewport(1440, 900);
       cy.visit(route);
+      cy.get('nav[aria-label="Main navigation"]').should(
+        "have.css",
+        "background-color",
+        "rgb(255, 255, 255)",
+      );
       cy.get('nav[aria-label="Main navigation"]').within(() => {
         for (const [label, href] of links)
           cy.contains("a", new RegExp(`^${label}$`))
@@ -27,6 +32,11 @@ describe("Consistent public navigation", () => {
       cy.visit(route);
       // The dev server can paint the server-rendered header before hydration.
       cy.wait(1000);
+      cy.get('nav[aria-label="Main navigation"]').should(
+        "have.css",
+        "background-color",
+        "rgb(255, 255, 255)",
+      );
       cy.get('button[aria-label="Open navigation menu"]').click();
       cy.get("#mobile-navigation").within(() => {
         for (const [label, href] of links)

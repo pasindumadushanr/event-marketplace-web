@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { usePathname } from "next/navigation";
@@ -132,7 +132,6 @@ function UserAccountNav() {
 }
 
 export function Navbar({
-  solid = false,
   simple = false,
 }: {
   solid?: boolean;
@@ -140,14 +139,11 @@ export function Navbar({
 }) {
   const { general } = usePlatformSettings();
   const { user, logout } = useAuth();
-  const [scrollPastHeader, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const usesLightHeader =
-    pathname === "/careers" ||
-    pathname === "/blog" ||
-    pathname.startsWith("/blog/");
-  const isScrolled = solid || scrollPastHeader || usesLightHeader;
+  // One light public header on every route, including image-hero pages.
+  // Keep the legacy `solid` prop accepted so existing callers remain compatible.
+  const isScrolled = true;
   const pageNames: Record<string, string> = {
     "/about": "About Us",
     "/contact": "Contact Us",
@@ -181,14 +177,6 @@ export function Navbar({
     );
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   // Keep public navigation consistent, including the simplified homepage.
   const links = [
     { name: "Home", href: "/" },
@@ -208,11 +196,7 @@ export function Navbar({
   return (
     <nav
       aria-label="Main navigation"
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-slate-100 py-1"
-          : "bg-transparent py-1"
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b border-slate-100 py-1"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
