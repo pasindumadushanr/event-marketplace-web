@@ -279,21 +279,21 @@ export default function VendorLayout({
       {/* Main Content */}
       <main className="flex-1 min-w-0 overflow-y-auto">
         {/* Top Header */}
-        <header className="vendor-topbar flex h-20 items-center justify-between gap-4 px-5 pl-20 lg:px-9">
-          <div>
+        <header className="vendor-topbar flex min-h-20 items-center justify-between gap-2 px-3 pl-16 sm:gap-4 sm:px-5 sm:pl-20 lg:px-9">
+          <div className="min-w-0 py-3">
             <p className="text-[10px] uppercase tracking-[0.18em] text-slate-500">
               Your workspace
             </p>
-            <p className="mt-1 text-sm font-semibold text-slate-800">
+            <p className="mt-1 text-xs sm:text-sm font-semibold leading-5 text-slate-800 break-words">
               {navConfig.find((item) => pathname === item.href)?.label ||
                 "Business management"}
             </p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
             <Link
               href="/vendor/notifications"
               aria-label="View notifications"
-              className="rounded-full border border-slate-200 bg-white text-slate-500 hover:text-slate-900 p-3"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 hover:text-slate-900"
             >
               <Bell className="h-5 w-5" />
             </Link>

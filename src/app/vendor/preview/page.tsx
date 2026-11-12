@@ -552,12 +552,12 @@ export default function VendorPreviewPage() {
         <h1 className="text-xl font-semibold text-[#183e38]">
           {customerView ? "Customer view" : "Edit My Business Page"}
         </h1>
-        <p className="mt-1 text-xs text-slate-500">
+        <p className="mt-2 text-sm leading-6 text-slate-500">
           {customerView
             ? "Editing controls are hidden. Customer booking actions are disabled in this preview."
             : "Choose Edit beside a section. See your changes here, then save when you’re happy."}
         </p>
-        <p className="mt-2 text-xs font-medium text-[#986c22]">
+        <p className="mt-2 text-sm leading-6 font-medium text-[#986c22]">
           {dirty
             ? "Unsaved preview — customers still see your saved page."
             : saved.status === "ACTIVE"

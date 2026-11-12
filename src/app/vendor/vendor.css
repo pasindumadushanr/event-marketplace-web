@@ -7,6 +7,7 @@
 }
 .visual-editor {
   position: relative;
+  min-width: 0;
 }
 .visual-editor-open {
   padding-right: 350px;
@@ -59,6 +60,8 @@
   background: #183e38;
   color: white;
   padding: 9px 12px;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 .visual-edit-panel {
   position: fixed;
@@ -281,6 +284,61 @@
   box-shadow: 0 4px 20px #183e380a;
 }
 @media (max-width: 639px) {
+  .vendor-page-content {
+    overflow-wrap: anywhere;
+  }
+  .vendor-page-content :is(input, textarea, select) {
+    font-size: 16px;
+  }
+  .visual-editor-topbar {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+  }
+  .visual-editor-topbar > a {
+    min-height: 36px;
+  }
+  .visual-editor-topbar > div {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+  .visual-editor-topbar .business-subtle-button {
+    min-width: 0;
+    min-height: 44px;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: center;
+    white-space: normal;
+  }
+  .visual-editor-topbar .business-subtle-button svg {
+    flex-shrink: 0;
+  }
+  .visual-section-editable {
+    padding: 6px;
+    border-radius: 20px;
+  }
+  .visual-section-bar {
+    padding: 4px 4px 10px;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+  .visual-canvas :is(.p-8) {
+    padding: 20px;
+  }
+  .visual-canvas :is(h1, h2, h3, p) {
+    overflow-wrap: anywhere;
+  }
+  .visual-field {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .visual-field :is(input, textarea, select) {
+    min-height: 44px;
+    font-size: 16px;
+  }
   .business-overview-hero,
   .business-editor-surface {
     padding: 20px;
