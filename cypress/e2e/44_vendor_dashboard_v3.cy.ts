@@ -15,6 +15,13 @@ const business = {
 };
 
 function openDashboard(mode = "v3") {
+  cy.intercept("GET", "**/auth/vendor-trial", {
+    body: {
+      startsAt: "2026-11-13T00:00:00Z",
+      endsAt: "2027-01-13T00:00:00Z",
+      status: "ACTIVE",
+    },
+  });
   cy.intercept("GET", "**/vendor/business/onboarding/status", {
     body: { emailVerified: true, vendorStatus: "APPROVED" },
   });
@@ -40,6 +47,87 @@ function openDashboard(mode = "v3") {
 }
 
 describe("Easy vendor dashboard V3", () => {
+  it("shows original signup dates and no automatic charges during the free period", () => {
+    openDashboard();
+    cy.get('[aria-label="Your free vendor period"]').within(() => {
+      cy.contains("Free access until 13 Jan 2027").should("be.visible");
+      cy.contains("13 Nov 2026").should("be.visible");
+      cy.contains("No automatic charges").should("be.visible");
+    });
+  });
+
+  it("keeps an expired vendor live and directs them to support without payment or visibility writes", () => {
+    openDashboard();
+    let writes = 0;
+    cy.intercept(
+      { method: "+(POST|PATCH|DELETE)", url: "**/vendor/**" },
+      () => {
+        writes++;
+      },
+    );
+    cy.intercept("GET", "**/auth/vendor-trial", {
+      body: {
+        startsAt: "2026-01-01T00:00:00Z",
+        endsAt: "2026-03-01T00:00:00Z",
+        status: "EXPIRED",
+      },
+    });
+    cy.intercept("GET", "**/vendor/business", {
+      body: { ...business, status: "ACTIVE" },
+    });
+    cy.reload();
+    cy.get('[aria-label="Your free vendor period"]').within(() => {
+      cy.contains("Your free period has ended").should("be.visible");
+      cy.contains("Your page will not be hidden").should("be.visible");
+      cy.contains("a", "Contact our team").should(
+        "have.attr",
+        "href",
+        "/vendor/support",
+      );
+    });
+    cy.contains("Visible to customers").should("be.visible");
+    cy.then(() => expect(writes).to.equal(0));
+  });
+
+  it("can recover from unavailable free-period dates without blocking the dashboard", () => {
+    openDashboard();
+    cy.intercept("GET", "**/auth/vendor-trial", { statusCode: 503 });
+    cy.reload();
+    cy.contains(
+      '[role="status"]',
+      "We couldn’t load your free-period dates",
+    ).as("trialError");
+    cy.get('[data-testid="vendor-dashboard-v3"]').should("be.visible");
+    cy.intercept("GET", "**/auth/vendor-trial", {
+      body: {
+        startsAt: "2026-11-13T00:00:00Z",
+        endsAt: "2027-01-13T00:00:00Z",
+        status: "ACTIVE",
+      },
+    });
+    cy.get("@trialError").contains("button", "Try again").click();
+    cy.contains("Free access until 13 Jan 2027").should("be.visible");
+  });
+
+  it("reminds an incomplete live vendor without hiding the page", () => {
+    openDashboard();
+    cy.intercept("GET", "**/vendor/business", {
+      body: { ...business, status: "ACTIVE", address: "", logo: "" },
+    });
+    cy.reload();
+    cy.get('[aria-label="Complete your business details"]').within(() => {
+      cy.contains("Your page is still live").should("be.visible");
+      cy.contains("a", "Business address").should(
+        "have.attr",
+        "href",
+        "/vendor/business/location",
+      );
+      cy.contains("a", "Business logo").should("be.visible");
+    });
+    cy.contains("Visible to customers").should("be.visible");
+    cy.contains("button", "Hide my page").should("be.enabled");
+  });
+
   it("shows three simple tasks, keeps advanced options closed, and remembers the choice", () => {
     openDashboard("v1");
     cy.contains("button", "Easy setup").click();

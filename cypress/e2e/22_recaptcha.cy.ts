@@ -73,9 +73,10 @@ describe("reCAPTCHA protected forms", () => {
     }).as("recovery");
     cy.visit("/forgot-password");
     cy.get("#email").type("test@example.com");
-    cy.get("form").submit();
+    cy.contains("button", "Send Recovery Code").should("be.enabled").click();
     cy.wait("@recovery");
-    cy.contains("Reset code sent!").should("be.visible");
+    cy.contains("If an account exists, a reset email will be sent.").should("be.visible");
+    cy.contains("h1", "Set New Password").should("be.visible");
   });
   it("protects vendor registration and handles backend rejection", () => {
     googleScript();
@@ -93,7 +94,9 @@ describe("reCAPTCHA protected forms", () => {
     cy.get("#email").type("vendor@example.com");
     cy.get("#phone").type("0771234567");
     cy.get("#password").type("TestPassword123");
-    cy.get("form").submit();
+    cy.contains("button", "Continue to Onboarding")
+      .should("be.enabled")
+      .click();
     cy.wait("@registration");
     cy.contains("Security verification failed.").should("be.visible");
   });
@@ -110,7 +113,9 @@ describe("reCAPTCHA protected forms", () => {
     cy.get("#email").type("vendor@example.com");
     cy.get("#phone").type("0771234567");
     cy.get("#password").type("TestPassword123");
-    cy.get("form").submit();
+    cy.contains("button", "Continue to Onboarding")
+      .should("be.enabled")
+      .click();
     cy.contains("Security verification is not configured correctly.").should(
       "be.visible",
     );

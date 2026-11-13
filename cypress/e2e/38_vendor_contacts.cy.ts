@@ -114,8 +114,11 @@ describe("Direct vendor contact and social links", () => {
     cy.visit("/business/vendor-test");
     cy.get('section[aria-label="Contact this vendor"]').within(() => {
       cy.contains("+94771234567").should("exist");
-      cy.contains("a", "Chat on WhatsApp")
-        .should("have.attr", "href", whatsappEnquiryUrl("0771234567"));
+      cy.contains("a", "Chat on WhatsApp").should(
+        "have.attr",
+        "href",
+        whatsappEnquiryUrl("0771234567"),
+      );
       cy.contains("Request a Quote").should("not.exist");
       cy.contains("Custom Quote").should("not.exist");
       cy.contains("Message Vendor").should("not.exist");
@@ -220,7 +223,9 @@ describe("Direct vendor contact and social links", () => {
       req.reply({ body: saved }),
     );
     cy.visit("/business/vendor-test");
-    cy.get('a[href^="https://wa.me"]').should("not.exist");
+    cy.get(
+      'section[aria-label="Contact this vendor"] a[href^="https://wa.me"]',
+    ).should("not.exist");
     cy.get('a[aria-label="Visit vendor on Instagram"]').should("not.exist");
   });
   it("rejects invalid values before saving and retains edits after an API failure", () => {

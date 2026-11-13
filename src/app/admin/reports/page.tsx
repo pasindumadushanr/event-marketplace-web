@@ -59,8 +59,7 @@ export default function AdminReportsPage() {
         'Customer Name': `${p.customer?.firstName} ${p.customer?.lastName}`,
         'Customer Email': p.customer?.email,
         'Vendor Business': p.business?.name,
-        'Gross Amount (LKR)': p.totalAmount,
-        'Platform Commission (LKR)': Number(p.totalAmount) * 0.1,
+        'Recorded Amount (LKR)': p.totalAmount,
         'Status': p.paymentStatus
       }));
 
@@ -116,15 +115,15 @@ export default function AdminReportsPage() {
             <div className="h-12 w-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4">
               <DollarSign className="h-6 w-6 text-emerald-700" />
             </div>
-            <CardTitle>Financial Ledger</CardTitle>
+            <CardTitle>Legacy payment records</CardTitle>
             <CardDescription>
-              A complete history of all successful transactions and platform commission cuts.
+              Historical records only. Online payments are disabled; these records are not proof of money received.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6">
             <ul className="text-sm text-slate-500 mb-6 space-y-2 list-disc pl-5">
               <li>Includes Transaction IDs and Timestamps</li>
-              <li>Calculates 10% platform commission</li>
+              <li>No assumed platform commission is calculated</li>
               <li>Includes associated Vendor and Customer details</li>
             </ul>
             <Button 

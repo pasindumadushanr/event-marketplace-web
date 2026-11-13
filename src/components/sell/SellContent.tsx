@@ -1,7 +1,6 @@
 "use client";
 
 import { SellHero } from "@/components/sell/SellHero";
-import { SellTestimonials } from "@/components/sell/SellTestimonials";
 import { SellPricing } from "@/components/sell/SellPricing";
 import { AboutWhyChooseUs } from "@/components/about/AboutWhyChooseUs";
 import { AboutHowItWorks } from "@/components/about/AboutHowItWorks";
@@ -19,8 +18,6 @@ export function SellContent() {
       </div>
 
       <AboutHowItWorks data={sellData.howItWorks} />
-
-      <SellTestimonials data={sellData.testimonials} />
 
       <AboutStatistics />
 

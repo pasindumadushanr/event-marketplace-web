@@ -53,7 +53,7 @@ export default function CareersPage() {
       location: "Colombo / Remote",
       type: "Full-time",
       description:
-        "Lead architecture on our Next.js 15 frontend, NestJS backend, real-time WebSockets, and escrow payment systems.",
+        "Work on our Next.js frontend, NestJS backend, vendor profiles, messaging, and customer discovery tools.",
     },
     {
       title: "Vendor Partnerships & Onboarding Lead",

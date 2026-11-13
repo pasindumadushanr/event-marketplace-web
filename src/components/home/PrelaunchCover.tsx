@@ -49,12 +49,16 @@ function calculateTimeRemaining(): TimeRemaining {
   return { days, hours, minutes, seconds, isExpired: false };
 }
 
-export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProps) {
+export function PrelaunchCover({
+  siteName = "Nakathata.lk",
+}: PrelaunchCoverProps) {
   // Check if user previously closed the banner in this browser session
   const [isDismissed, setIsDismissed] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       try {
-        return sessionStorage.getItem("nakathata_prelaunch_dismissed") === "true";
+        return (
+          sessionStorage.getItem("nakathata_prelaunch_dismissed") === "true"
+        );
       } catch {
         return false;
       }
@@ -62,7 +66,9 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
     return false;
   });
 
-  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>(calculateTimeRemaining);
+  const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>(
+    calculateTimeRemaining,
+  );
 
   // Customer Waitlist state
   const [email, setEmail] = useState("");
@@ -111,7 +117,9 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
         consent: true,
       });
       setIsSuccess(true);
-      setSubscribeMessage("✨ You're on the waitlist! We'll notify you on launch day.");
+      setSubscribeMessage(
+        "✨ You're on the waitlist! We'll notify you on launch day.",
+      );
       setEmail("");
     } catch {
       setIsSuccess(false);
@@ -134,10 +142,10 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               <Calendar className="size-3.5" />
             </span>
             <span className="font-semibold text-amber-200">
-              Official Launch: January 1, 2027
+              Customer Launch: January 1, 2027
             </span>
             <span className="text-emerald-100/80 hidden md:inline">
-              — Currently welcoming wedding and event vendors across Sri Lanka.
+              — Vendor registration is open now.
             </span>
           </div>
 
@@ -190,8 +198,15 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Original Official Platform Logo */}
           <div className="flex items-center gap-3">
-            <Link href="/" aria-label={siteName} className="flex items-center gap-2">
-              <BrandLogo priority className="w-24 sm:w-28 shadow-xs border border-amber-900/10" />
+            <Link
+              href="/"
+              aria-label={siteName}
+              className="flex items-center gap-2"
+            >
+              <BrandLogo
+                priority
+                className="w-24 sm:w-28 shadow-xs border border-amber-900/10"
+              />
             </Link>
             <div className="hidden md:block border-l border-amber-900/15 pl-3">
               <span className="text-xs uppercase tracking-[0.2em] text-[#8a6b35] font-bold block font-serif">
@@ -206,10 +221,7 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
           {/* RIGHT SIDE: CUSTOMER LOGIN | VENDOR LOGIN | EXPLORE WEBSITE CLOSE BUTTON */}
           <div className="flex items-center gap-3 sm:gap-4">
             <div className="hidden sm:flex items-center gap-3 text-xs font-semibold text-slate-600">
-              <Link
-                href="/login"
-                className="hover:text-[#183e38] transition"
-              >
+              <Link href="/login" className="hover:text-[#183e38] transition">
                 Customer Login
               </Link>
               <span className="text-slate-300">|</span>
@@ -271,9 +283,9 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
             </p>
 
             <p className="max-w-2xl mx-auto text-sm sm:text-base text-slate-700 leading-relaxed font-sans pt-1">
-              We are currently onboarding Sri Lanka&apos;s finest wedding venues,
-              photographers, bridal artists, wedding cars, and caterers before
-              opening to customers nationwide on January 1, 2027.
+              We are currently onboarding Sri Lanka&apos;s finest wedding
+              venues, photographers, bridal artists, wedding cars, and caterers
+              before opening to customers nationwide on January 1, 2027.
             </p>
           </div>
 
@@ -343,7 +355,10 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
                 </Button>
               </Link>
               <p className="text-xs text-slate-600 font-medium">
-                Free early registration • Direct WhatsApp inquiries • Dedicated profile
+                Vendor registration is open • First two months free from signup
+              </p>
+              <p className="text-xs text-slate-600 font-medium">
+                Direct WhatsApp contact • No automatic charges
               </p>
             </div>
 
@@ -409,7 +424,8 @@ export function PrelaunchCover({ siteName = "Nakathata.lk" }: PrelaunchCoverProp
               rel="noopener noreferrer"
               className="hover:text-[#183e38] transition flex items-center gap-1 font-semibold"
             >
-              <Phone className="size-3 text-[#183e38]" /> WhatsApp Support: 076 076 2353
+              <Phone className="size-3 text-[#183e38]" /> WhatsApp Support: 076
+              076 2353
             </a>
             <span>•</span>
             <button

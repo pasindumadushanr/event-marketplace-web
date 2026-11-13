@@ -45,17 +45,18 @@ export function SellPricing({ data }: { data: any }) {
 
               <div className="relative z-10">
                 <p className="text-primary font-semibold tracking-wider uppercase text-sm mb-2">
-                  Platform Fee
+                  Vendor launch offer
                 </p>
                 <div className="flex items-baseline justify-center gap-1 mb-4">
-                  <span className="text-5xl font-bold">{data.commission}</span>
+                  <span className="text-5xl font-bold">{data.price}</span>
                 </div>
-                <p className="text-slate-300 text-sm mb-6">
-                  commission only on successful bookings. No hidden fees.
-                </p>
+                <p className="text-slate-300 text-sm mb-6">{data.period}</p>
                 <div className="inline-block px-4 py-1.5 rounded-full bg-white/10 text-white text-sm font-medium backdrop-blur-md">
-                  Free to Register
+                  No automatic charges
                 </div>
+                <p className="mt-5 text-xs leading-6 text-slate-300">
+                  {data.notice}
+                </p>
               </div>
             </div>
           </motion.div>

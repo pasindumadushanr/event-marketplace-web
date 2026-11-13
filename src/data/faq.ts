@@ -28,7 +28,7 @@ export const faqData = {
         {
           question: "Do I need an account to browse vendors?",
           answer:
-            "No, you can browse all vendors and packages without an account. However, you will need to create a free account to contact a vendor or request a booking.",
+            "No account is needed to browse vendors or use their public WhatsApp links. Discuss your event, availability and booking arrangements directly with the vendor.",
         },
         {
           question: "How do you verify your vendors?",
@@ -44,7 +44,7 @@ export const faqData = {
         {
           question: "How much does it cost to become a vendor?",
           answer:
-            "Check the current vendor plans and ask our team about any charges before choosing a plan. Do not treat test payment screens as proof of a real subscription payment.",
+            "Your first two calendar months are free, starting from your original account-registration date. Your dashboard shows your dates. After this period your page stays live; contact our team about the next steps. There are no automatic charges or online subscription payments.",
         },
         {
           question: "How do I get paid?",

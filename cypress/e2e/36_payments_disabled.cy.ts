@@ -7,7 +7,7 @@ describe("Launch without online payments", () => {
     });
     cy.intercept("GET", "**/admin/cms/public/settings/*", { body: {} });
   });
-  it("routes fixed-price packages and direct-booking profiles to inquiries", () => {
+  it("routes fixed-price packages to vendor WhatsApp, never checkout", () => {
     cy.intercept("GET", "**/discovery/vendors/vendor-test", {
       body: {
         id: "vendor-test",
@@ -15,7 +15,10 @@ describe("Launch without online payments", () => {
         status: "ACTIVE",
         category: { name: "Photography" },
         bookingMethod: "DIRECT_BOOKING",
-        profileSettings: { bookingMethod: "DIRECT_BOOKING" },
+        profileSettings: {
+          bookingMethod: "DIRECT_BOOKING",
+          whatsapp: "0771234567",
+        },
         packages: [
           {
             id: "paid-package",
@@ -38,12 +41,17 @@ describe("Launch without online payments", () => {
     cy.contains("button", "Book Now").should("not.exist");
     cy.get('section[aria-label="Contact this vendor"]').should("be.visible");
     cy.contains("button", "Request a Quote").should("not.exist");
-    cy.contains("button", "Request this package").click();
-    cy.get('[role="dialog"]').should("contain.text", "Full day photography");
-    cy.contains("button", "Send enquiry").should("be.visible");
-    cy.contains("This does not make a booking or reserve your date.").should(
-      "be.visible",
-    );
+    cy.get('a[aria-label="Ask about Full day photography on WhatsApp"]')
+      .should("have.attr", "href")
+      .then((href) => {
+        const url = new URL(String(href));
+        expect(url.origin).to.equal("https://wa.me");
+        expect(url.pathname).to.equal("/94771234567");
+        expect(url.searchParams.get("text"))
+          .to.include("Nakathata.lk")
+          .and.include("Full day photography");
+      });
+    cy.get('a[href*="checkout"]').should("not.exist");
   });
   it("keeps membership details without subscription purchase buttons", () => {
     cy.intercept("GET", "**/vendor/business/onboarding/status", {

@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { BusinessProfileProvider } from "@/contexts/BusinessProfileContext";
+import { VendorTrialNotice } from "@/components/vendor/VendorTrialNotice";
+import { ProfileCompletionNotice } from "@/components/vendor/ProfileCompletionNotice";
 import "./vendor.css";
 
 const navConfig = [
@@ -309,7 +311,16 @@ export default function VendorLayout({
 
         {/* Page Content */}
         <div className="vendor-page-content p-4 sm:p-6 lg:p-9 max-w-[1440px] mx-auto">
-          <BusinessProfileProvider>{children}</BusinessProfileProvider>
+          <BusinessProfileProvider>
+            {user?.roleName === "VENDOR" &&
+              ["/vendor", "/vendor/account"].includes(pathname) && (
+                <>
+                  <VendorTrialNotice key={user.id} />
+                  <ProfileCompletionNotice />
+                </>
+              )}
+            {children}
+          </BusinessProfileProvider>
         </div>
       </main>
 

@@ -268,9 +268,9 @@ export default function AdminOverview() {
               />
               {stats.platformRevenue !== null && (
                 <Metric
-                  title="Platform revenue"
+                  title="Legacy commission estimate"
                   value={`LKR ${Number(stats.platformRevenue).toLocaleString()}`}
-                  description="Calculated commission · 10%"
+                  description="Historical calculation, not money received"
                   icon={Wallet}
                   color="bg-amber-50 text-amber-700"
                 />
