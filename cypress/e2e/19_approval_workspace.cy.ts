@@ -84,6 +84,26 @@ function mocks(data: ReturnType<typeof details>) {
   cy.on("window:confirm", () => true);
 }
 describe("Vendor approval workspace", () => {
+  it("shows custom category requests without treating them as approved categories", () => {
+    const data = details();
+    (data.application as any).profileSettings = {
+      customCategoryRequests: ["Drone filming", "Wedding invitation designer"],
+    };
+    cy.intercept("GET", `**/admin/vendors/applications/${id}?*`, {
+      body: data,
+    });
+    cy.visit(`/admin/vendors/approvals/${id}`, {
+      onBeforeLoad: (win) => auth(win),
+    });
+    cy.contains("Custom categories requested").should("be.visible");
+    cy.contains("Drone filming").should("be.visible");
+    cy.contains("not public categories").should("be.visible");
+    cy.contains("Manage business categories").should(
+      "have.attr",
+      "href",
+      "/admin/business/categories",
+    );
+  });
   it("filters, switches queues, paginates and shows waiting badges on phones", () => {
     cy.viewport(390, 844);
     cy.intercept("GET", "**/business-categories", { body: categories });
@@ -136,7 +156,7 @@ describe("Vendor approval workspace", () => {
     cy.contains("button", "Filters").click();
     cy.contains("button", "Reset filters").click();
     cy.wait("@queue");
-    cy.contains('button', 'Filters').click();
+    cy.contains("button", "Filters").click();
     cy.document().then((doc) =>
       expect(doc.documentElement.scrollWidth).to.be.at.most(390),
     );

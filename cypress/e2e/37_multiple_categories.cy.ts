@@ -55,6 +55,54 @@ describe("Multiple categories for one vendor", () => {
       body: { vendorStatus: "APPROVED", emailVerified: true },
     });
   });
+  it("saves, reloads and removes custom category requests on mobile", () => {
+    cy.viewport(390, 844);
+    let saved: any = structuredClone(original);
+    cy.intercept("GET", "**/vendor/business", (req) => req.reply({ body: saved }));
+    cy.intercept("PATCH", "**/vendor/business", (req) => {
+      saved = {
+        ...saved,
+        ...req.body,
+        profileSettings: {
+          ...saved.profileSettings,
+          ...req.body.profileSettings,
+        },
+      };
+      req.reply({ body: saved });
+    }).as("saveCustom");
+    cy.visit("/vendor/business/general", { onBeforeLoad: auth });
+    cy.contains("button", "Can’t find your category?").click();
+    cy.contains("label", "Custom category")
+      .parent()
+      .find("input")
+      .type("Wedding invitation designer");
+    cy.contains("button", "Add category").click();
+    cy.contains("label", "Custom category")
+      .parent()
+      .find("input")
+      .type("wedding invitation designer");
+    cy.contains("button", "Add category").click();
+    cy.contains("You already added this category").should("be.visible");
+    cy.contains("button", "Save Changes").click();
+    cy.wait("@saveCustom")
+      .its("request.body.profileSettings.customCategoryRequests")
+      .should("deep.equal", ["Wedding invitation designer"]);
+    cy.reload();
+    cy.get('[aria-label="Requested categories"]').should(
+      "contain.text",
+      "Wedding invitation designer",
+    );
+    cy.get(
+      '[aria-label="Remove requested category Wedding invitation designer"]',
+    ).click();
+    cy.contains("button", "Save Changes").click();
+    cy.wait("@saveCustom")
+      .its("request.body.profileSettings.customCategoryRequests")
+      .should("deep.equal", []);
+    cy.document().then((doc) =>
+      expect(doc.documentElement.scrollWidth).to.be.at.most(390),
+    );
+  });
   it("keeps the existing main category, saves another, reloads and removes it", () => {
     let saved: any = structuredClone(original);
     cy.intercept("GET", "**/vendor/business", (req) =>
@@ -147,6 +195,9 @@ describe("Multiple categories for one vendor", () => {
         "photo",
         "video",
       ]);
+      expect(req.body.profileSettings.customCategoryRequests).to.deep.equal([
+        "Drone filming",
+      ]);
       req.reply({ body: { id: "new-vendor" } });
     }).as("application");
     cy.visit("/vendor/onboarding", { onBeforeLoad: auth });
@@ -160,7 +211,15 @@ describe("Multiple categories for one vendor", () => {
     cy.contains('label:has(input[type="checkbox"])', "Videography")
       .find('input[type="checkbox"]')
       .check();
+    cy.contains("button", "Can’t find your category?").click();
+    cy.contains("label", "Custom category")
+      .parent()
+      .find("input")
+      .type("Drone filming");
+    cy.contains("button", "Add category").click();
     for (let step = 0; step < 3; step++) cy.contains("button", "Next").click();
+    cy.contains("Custom categories requested").should("be.visible");
+    cy.contains("Drone filming").should("be.visible");
     cy.contains("button", "Submit Application").click();
     cy.wait("@application");
   });

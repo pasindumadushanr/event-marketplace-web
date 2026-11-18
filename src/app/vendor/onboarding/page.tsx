@@ -50,6 +50,7 @@ export default function VendorOnboardingWizard() {
     website: "",
     categoryId: "",
     categoryIds: [] as string[],
+    customCategoryRequests: [] as string[],
     address: "",
     city: "",
     district: "",
@@ -75,7 +76,7 @@ export default function VendorOnboardingWizard() {
               Object.fromEntries(
                 Object.keys(previous).map((key) => [
                   key,
-                  key === "categoryIds"
+                  ["categoryIds", "customCategoryRequests"].includes(key)
                     ? Array.isArray(saved.fields[key])
                       ? saved.fields[key].filter(
                           (v: unknown) => typeof v === "string",
@@ -129,11 +130,13 @@ export default function VendorOnboardingWizard() {
           Object.fromEntries(
             Object.keys(previous).map((key) => [
               key,
-              key === "categoryIds"
-                ? business.categoryIds ||
-                  business.profileSettings?.categoryIds ||
-                  []
-                : business[key] || "",
+              key === "customCategoryRequests"
+                ? business.profileSettings?.customCategoryRequests || []
+                : key === "categoryIds"
+                  ? business.categoryIds ||
+                    business.profileSettings?.categoryIds ||
+                    []
+                  : business[key] || "",
             ]),
           ) as typeof previous,
       );
@@ -182,11 +185,15 @@ export default function VendorOnboardingWizard() {
       const payload: any = {};
       Object.keys(formData).forEach((key) => {
         const val = (formData as any)[key];
-        if (val !== "" && key !== "categoryIds") {
+        if (
+          val !== "" &&
+          !["categoryIds", "customCategoryRequests"].includes(key)
+        ) {
           payload[key] = val;
         }
       });
       payload.profileSettings = {
+        customCategoryRequests: formData.customCategoryRequests,
         categoryIds: [
           ...new Set(
             [formData.categoryId, ...formData.categoryIds].filter(Boolean),
@@ -374,6 +381,13 @@ export default function VendorOnboardingWizard() {
                   required
                   categoryId={formData.categoryId}
                   categoryIds={formData.categoryIds}
+                  customCategoryRequests={formData.customCategoryRequests}
+                  onCustomCategoryRequestsChange={(names) =>
+                    setFormData((previous) => ({
+                      ...previous,
+                      customCategoryRequests: names,
+                    }))
+                  }
                   onChange={(selection) =>
                     setFormData((previous) => ({ ...previous, ...selection }))
                   }
@@ -523,6 +537,19 @@ export default function VendorOnboardingWizard() {
               <h3 className="text-xl font-bold border-b pb-4">
                 {t("Step 5: Review & Submit")}
               </h3>
+              {formData.customCategoryRequests.length > 0 && (
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm">
+                  <p className="font-semibold">Custom categories requested</p>
+                  <ul className="mt-2 list-inside list-disc break-words">
+                    {formData.customCategoryRequests.map((name) => (
+                      <li key={name}>{name}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-slate-600">
+                    Our team will review these with your application.
+                  </p>
+                </div>
+              )}
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 text-blue-900">
                 <h4 className="font-bold text-lg mb-2">
                   {t("Ready to join Nakathata.lk?")}

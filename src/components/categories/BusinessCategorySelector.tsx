@@ -8,17 +8,22 @@ import {
   orderedCategories,
 } from "@/lib/categories";
 import { CategorySelector } from "./CategorySelector";
+import { CustomCategoryRequests } from "./CustomCategoryRequests";
 
 export function BusinessCategorySelector({
   categoryId,
   categoryIds,
   onChange,
   required = false,
+  customCategoryRequests = [],
+  onCustomCategoryRequestsChange,
 }: {
   categoryId: string;
   categoryIds: string[];
   onChange: (selection: { categoryId: string; categoryIds: string[] }) => void;
   required?: boolean;
+  customCategoryRequests?: string[];
+  onCustomCategoryRequestsChange?: (names: string[]) => void;
 }) {
   const [categories, setCategories] = useState<BusinessCategory[]>([]);
   const [query, setQuery] = useState("");
@@ -157,6 +162,12 @@ export function BusinessCategorySelector({
           category.
         </p>
       </fieldset>
+      {onCustomCategoryRequestsChange && (
+        <CustomCategoryRequests
+          value={customCategoryRequests}
+          onChange={onCustomCategoryRequestsChange}
+        />
+      )}
     </div>
   );
 }

@@ -334,6 +334,35 @@ export default function ApplicationDetailPage() {
             <h2 className="text-lg font-semibold">
               Business & contact details
             </h2>
+            {Array.isArray(app.profileSettings?.customCategoryRequests) &&
+              app.profileSettings.customCategoryRequests.length > 0 && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
+                  <h3 className="font-semibold text-amber-950">
+                    Custom categories requested
+                  </h3>
+                  <ul className="mt-2 list-inside list-disc break-words text-amber-950">
+                    {app.profileSettings.customCategoryRequests
+                      .filter((name: unknown) => typeof name === "string")
+                      .map((name: string, index: number) => (
+                        <li key={index}>{name}</li>
+                      ))}
+                  </ul>
+                  <p className="mt-2 leading-relaxed text-slate-600">
+                    These are vendor suggestions, not public categories. Review
+                    for duplicates before adding an appropriate category.
+                    Approving the application does not automatically add these
+                    to search.
+                  </p>
+                  <Link
+                    href="/admin/business/categories"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex min-h-11 items-center font-semibold text-teal-800 underline"
+                  >
+                    Manage business categories ↗
+                  </Link>
+                </div>
+              )}
             <p className="whitespace-pre-wrap break-words text-sm text-slate-600">
               {app.description || "No business introduction provided."}
             </p>

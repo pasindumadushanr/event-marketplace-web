@@ -17,6 +17,7 @@ export default function GeneralSettingsPage() {
     name: "",
     categoryId: "",
     categoryIds: [] as string[],
+    customCategoryRequests: [] as string[],
     description: "",
     languages: "",
     highlights: "",
@@ -32,6 +33,8 @@ export default function GeneralSettingsPage() {
         categoryIds:
           business.categoryIds || business.profileSettings?.categoryIds || [],
         description: business.description || "",
+        customCategoryRequests:
+          business.profileSettings?.customCategoryRequests || [],
         languages: business.profileSettings?.languages || "",
         highlights: business.profileSettings?.highlights || "",
         coverImage: business.coverImage || "",
@@ -89,6 +92,7 @@ export default function GeneralSettingsPage() {
         coverImage: formData.coverImage,
         logo: formData.logo,
         profileSettings: {
+          customCategoryRequests: formData.customCategoryRequests,
           // Existing servers already accept profile settings during rollout.
           categoryIds: [
             ...new Set(
@@ -196,6 +200,13 @@ export default function GeneralSettingsPage() {
         required
         categoryId={formData.categoryId}
         categoryIds={formData.categoryIds}
+        customCategoryRequests={formData.customCategoryRequests}
+        onCustomCategoryRequestsChange={(names) =>
+          setFormData((previous) => ({
+            ...previous,
+            customCategoryRequests: names,
+          }))
+        }
         onChange={(selection) =>
           setFormData((previous) => ({ ...previous, ...selection }))
         }
