@@ -13,7 +13,9 @@ export function CustomCategoryRequests({
   const id = useId();
   const [name, setName] = useState("");
   const [error, setError] = useState("");
-  const [open, setOpen] = useState(value.length > 0);
+  const [open, setOpen] = useState<boolean | null>(null);
+  // Saved settings arrive asynchronously; reveal existing requests after loading.
+  const expanded = open ?? value.length > 0;
   function add() {
     const next = name.normalize("NFC").trim().replace(/\s+/gu, " ");
     if (
@@ -40,8 +42,8 @@ export function CustomCategoryRequests({
     <section className="min-w-0 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4 sm:p-5">
       <button
         type="button"
-        onClick={() => setOpen(!open)}
-        aria-expanded={open}
+        onClick={() => setOpen(!expanded)}
+        aria-expanded={expanded}
         aria-controls={id}
         className="flex min-h-11 w-full items-center justify-between gap-3 text-left text-sm font-semibold text-emerald-950"
       >
@@ -49,10 +51,10 @@ export function CustomCategoryRequests({
         <Plus
           aria-hidden="true"
           size={18}
-          className={open ? "rotate-45 shrink-0" : "shrink-0"}
+          className={expanded ? "rotate-45 shrink-0" : "shrink-0"}
         />
       </button>
-      <div id={id} hidden={!open} className="mt-3 space-y-3">
+      <div id={id} hidden={!expanded} className="mt-3 space-y-3">
         <p className="text-sm leading-relaxed text-slate-600">
           Choose the closest category above, then add your missing service here.
           Our team will review it. It won’t appear as a public category yet.
