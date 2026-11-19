@@ -30,7 +30,7 @@ const business = {
   reviews: [],
 };
 describe("Package WhatsApp contact", () => {
-  it("puts packages immediately below contact on mobile and includes the selected package in WhatsApp", () => {
+  it("puts the introduction before packages on mobile and includes the selected package in WhatsApp", () => {
     cy.viewport(390, 844);
     cy.intercept("GET", "**/discovery/vendors/vendor-test", {
       body: business,
@@ -58,8 +58,8 @@ describe("Package WhatsApp contact", () => {
             $contact[0].getBoundingClientRect().bottom,
           );
           cy.contains("h3", "About Wedding Studio").then(($about) => {
-            expect($about[0].getBoundingClientRect().top).to.be.at.least(
-              $packages[0].getBoundingClientRect().bottom,
+            expect($about[0].getBoundingClientRect().bottom).to.be.at.most(
+              $packages[0].getBoundingClientRect().top,
             );
           });
         });

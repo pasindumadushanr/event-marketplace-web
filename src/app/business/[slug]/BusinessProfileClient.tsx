@@ -22,6 +22,7 @@ import { BusinessHours } from "@/components/business/BusinessHours";
 import { BusinessContact } from "@/components/business/BusinessContact";
 import { BusinessLocation } from "@/components/business/BusinessLocation";
 import { SimilarBusinesses } from "@/components/business/SimilarBusinesses";
+import { ProfileSection } from "@/components/business/ProfileSection";
 
 export default function BusinessProfileClient({
   slug,
@@ -150,24 +151,40 @@ export default function BusinessProfileClient({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
           <div className="contents lg:block lg:order-2 lg:col-span-4">
             <div className="contents lg:flex lg:flex-col lg:gap-6 lg:sticky lg:top-28">
-              <BusinessCTA
-                businessId={business.id}
-                whatsapp={business.contact.whatsapp}
-              />
-              <BusinessAvailability blockedDates={business.blockedDates} />
-              <BusinessHours hours={business.businessHours} />
-              <div className="order-first lg:order-none">
+              <ProfileSection name="contactAction">
+                <BusinessCTA
+                  businessId={business.id}
+                  whatsapp={business.contact.whatsapp}
+                />
+              </ProfileSection>
+              <ProfileSection name="availability">
+                <BusinessAvailability blockedDates={business.blockedDates} />
+              </ProfileSection>
+              <ProfileSection name="hours">
+                <BusinessHours hours={business.businessHours} />
+              </ProfileSection>
+              <ProfileSection name="contact">
                 <BusinessContact contact={business.contact} />
-              </div>
-              <BusinessLocation location={business.location} />
+              </ProfileSection>
+              <ProfileSection name="location">
+                <BusinessLocation location={business.location} />
+              </ProfileSection>
             </div>
           </div>
 
           <div className="contents lg:block lg:order-1 lg:col-span-8 lg:space-y-8">
-            <BusinessAbout business={business} />
-            <BusinessFeatures featureGroups={business.featureGroups} />
-            <BusinessGallery gallery={business.gallery} />
-            <div className="-order-1 lg:order-none">
+            <ProfileSection name="about">
+              <BusinessAbout business={business} />
+            </ProfileSection>
+            <ProfileSection name="features">
+              <BusinessFeatures featureGroups={business.featureGroups} />
+            </ProfileSection>
+            <ProfileSection name="gallery">
+              {business.gallery.length > 0 && (
+                <BusinessGallery gallery={business.gallery} />
+              )}
+            </ProfileSection>
+            <ProfileSection name="packages">
               <BusinessPackages
                 packages={business.packages}
                 businessName={business.name}
@@ -176,15 +193,21 @@ export default function BusinessProfileClient({
                 blockedDates={business.blockedDates}
                 whatsapp={business.contact.whatsapp}
               />
-            </div>
-            <BusinessReviews
-              businessId={business.id}
-              reviews={business.reviews}
-              rating={business.rating}
-              reviewCount={business.reviewCount}
-            />
-            <BusinessFAQ faq={business.faq} />
-            <BusinessPolicies policies={business.policies} />
+            </ProfileSection>
+            <ProfileSection name="reviews">
+              <BusinessReviews
+                businessId={business.id}
+                reviews={business.reviews}
+                rating={business.rating}
+                reviewCount={business.reviewCount}
+              />
+            </ProfileSection>
+            <ProfileSection name="faq">
+              {business.faq.length > 0 && <BusinessFAQ faq={business.faq} />}
+            </ProfileSection>
+            <ProfileSection name="policies">
+              <BusinessPolicies policies={business.policies} />
+            </ProfileSection>
           </div>
         </div>
 

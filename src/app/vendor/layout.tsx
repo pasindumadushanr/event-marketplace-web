@@ -24,10 +24,15 @@ import { ProfileCompletionNotice } from "@/components/vendor/ProfileCompletionNo
 import "./vendor.css";
 
 const navConfig = [
-  { href: "/vendor", label: "Home", icon: LayoutDashboard },
+  { href: "/vendor", label: "My Business Page", icon: Building2 },
   { href: "/vendor/bookings", label: "Bookings", icon: CalendarDays },
   { href: "/vendor/messages", label: "Messages", icon: MessageCircle },
-  { href: "/vendor/business", label: "My Business Page", icon: Building2 },
+  { href: "/vendor/business", label: "Setup checklist", icon: Building2 },
+  {
+    href: "/vendor/dashboard",
+    label: "Dashboard & tools",
+    icon: LayoutDashboard,
+  },
   { href: "/vendor/calendar", label: "Availability", icon: CalendarRange },
   { href: "/vendor/account", label: "Account & Help", icon: Settings },
 ];
@@ -158,12 +163,12 @@ export default function VendorLayout({
           const isActive =
             pathname === item.href ||
             (item.href !== "/vendor" && pathname.startsWith(item.href + "/")) ||
+            (item.href === "/vendor" && pathname === "/vendor/preview") ||
             (item.href === "/vendor/business" &&
               [
                 "/vendor/gallery",
                 "/vendor/packages",
                 "/vendor/reviews",
-                "/vendor/preview",
               ].includes(pathname)) ||
             (item.href === "/vendor/account" &&
               [
@@ -228,7 +233,7 @@ export default function VendorLayout({
 
           {vendorStatus === "APPROVED" && (
             <div className="p-4 shrink-0">
-              <Link href="/vendor/preview" className="vendor-preview-link">
+              <Link href="/vendor" className="vendor-preview-link">
                 <Eye className="h-4 w-4" />
                 Edit My Business Page
               </Link>
@@ -287,7 +292,9 @@ export default function VendorLayout({
               Your workspace
             </p>
             <p className="mt-1 text-xs sm:text-sm font-semibold leading-5 text-slate-800 break-words">
-              {navConfig.find((item) => pathname === item.href)?.label ||
+              {(pathname === "/vendor/preview"
+                ? "My Business Page"
+                : navConfig.find((item) => pathname === item.href)?.label) ||
                 "Business management"}
             </p>
           </div>
@@ -313,7 +320,7 @@ export default function VendorLayout({
         <div className="vendor-page-content p-4 sm:p-6 lg:p-9 max-w-[1440px] mx-auto">
           <BusinessProfileProvider>
             {user?.roleName === "VENDOR" &&
-              ["/vendor", "/vendor/account"].includes(pathname) && (
+              ["/vendor/dashboard", "/vendor/account"].includes(pathname) && (
                 <>
                   <VendorTrialNotice key={user.id} />
                   <ProfileCompletionNotice />

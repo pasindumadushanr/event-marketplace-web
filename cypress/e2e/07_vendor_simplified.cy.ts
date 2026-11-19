@@ -92,7 +92,7 @@ describe("Simplified vendor workspace", () => {
       cy.scrollTo(0, offset);
       cy.get("@priceCard").should(($card) => {
         const card = $card[0];
-        const calendar = card.nextElementSibling;
+        const calendar = card.closest('[data-profile-section="contactAction"]')?.parentElement?.querySelector('[data-profile-section="availability"]');
         expect(calendar, "calendar follows the price card").not.to.be.null;
         expect(card.getBoundingClientRect().bottom).to.be.at.most(
           calendar!.getBoundingClientRect().top,

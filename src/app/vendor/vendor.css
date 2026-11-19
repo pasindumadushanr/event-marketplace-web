@@ -29,14 +29,6 @@
 .visual-canvas {
   min-width: 0;
 }
-@media (max-width: 1023px) {
-  .visual-profile-columns > .contents > [data-profile-section="contact"] {
-    order: -2;
-  }
-  .visual-profile-columns > .contents > [data-profile-section="packages"] {
-    order: -1;
-  }
-}
 .visual-section {
   min-width: 0;
   margin-bottom: 20px;

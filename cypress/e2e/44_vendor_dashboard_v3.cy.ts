@@ -28,7 +28,7 @@ function openDashboard(mode = "v3") {
   cy.intercept("GET", "**/vendor/business", { body: business });
   cy.intercept("GET", "**/vendor/packages", { body: [] });
   cy.intercept("GET", "**/vendor/gallery", { body: [] });
-  cy.visit("/vendor", {
+  cy.visit("/vendor/dashboard", {
     onBeforeLoad(win) {
       win.localStorage.setItem("accessToken", "test-token");
       if (mode)
