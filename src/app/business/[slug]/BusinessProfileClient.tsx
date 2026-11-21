@@ -23,6 +23,7 @@ import { BusinessContact } from "@/components/business/BusinessContact";
 import { BusinessLocation } from "@/components/business/BusinessLocation";
 import { SimilarBusinesses } from "@/components/business/SimilarBusinesses";
 import { ProfileSection } from "@/components/business/ProfileSection";
+import profileLayout from "@/components/business/ProfileLayout.module.css";
 
 export default function BusinessProfileClient({
   slug,
@@ -146,9 +147,11 @@ export default function BusinessProfileClient({
           </span>
         </nav>
 
-        <BusinessHero business={business} />
+        <ProfileSection name="hero">
+          <BusinessHero business={business} />
+        </ProfileSection>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-8">
+        <div className={`${profileLayout.sections} grid grid-cols-1 lg:grid-cols-12 gap-8 mt-5 lg:mt-8`}>
           <div className="contents lg:block lg:order-2 lg:col-span-4">
             <div className="contents lg:flex lg:flex-col lg:gap-6 lg:sticky lg:top-28">
               <ProfileSection name="contactAction">

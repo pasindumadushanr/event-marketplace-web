@@ -1,0 +1,20 @@
+/* The mobile stack owns spacing; individual cards must not add a second gap. */
+@media (max-width: 1023px) {
+  .sections {
+    gap: 20px;
+  }
+
+  .canvas {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .section[data-profile-section] {
+    margin-block: 0;
+  }
+
+  .section[data-profile-section] > :last-child {
+    margin-bottom: 0;
+  }
+}

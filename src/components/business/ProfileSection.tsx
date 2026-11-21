@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import styles from "./ProfileLayout.module.css";
 
 // One mobile order for the public page and the vendor's visual editor.
 // Desktop sections remain in their existing two-column document order.
@@ -29,7 +30,7 @@ export function ProfileSection({
   return (
     <div
       data-profile-section={name}
-      className={`${profileSectionOrder[name]} min-w-0 empty:hidden lg:order-none`}
+      className={`${styles.section} ${profileSectionOrder[name]} min-w-0 empty:hidden lg:order-none`}
     >
       {children}
     </div>

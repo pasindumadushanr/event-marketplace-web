@@ -33,6 +33,7 @@ import { BusinessAvailability } from "@/components/business/BusinessAvailability
 import { BusinessHours } from "@/components/business/BusinessHours";
 import { BusinessContact } from "@/components/business/BusinessContact";
 import { BusinessLocation } from "@/components/business/BusinessLocation";
+import profileLayout from "@/components/business/ProfileLayout.module.css";
 import {
   ProfileSection,
   profileSectionOrder,
@@ -54,7 +55,7 @@ function EditableSection({
   return (
     <section
       data-profile-section={name}
-      className={`visual-section ${profileSectionOrder[name]} lg:order-none ${editing ? "visual-section-editable" : ""} ${selected ? "visual-section-selected" : ""}`}
+      className={`${profileLayout.section} visual-section ${profileSectionOrder[name]} lg:order-none ${editing ? "visual-section-editable" : ""} ${selected ? "visual-section-selected" : ""}`}
     >
       {editing && (
         <div className="visual-section-bar">
@@ -588,9 +589,9 @@ export function VisualBusinessEditor() {
           </p>
         )}
       </div>
-      <div className="visual-canvas">
+      <div className={`${profileLayout.canvas} visual-canvas`}>
         {wrap("hero", <BusinessHero business={business} />)}
-        <div className="visual-profile-columns grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+        <div className={`${profileLayout.sections} visual-profile-columns grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]`}>
           <div className="contents lg:block min-w-0 lg:space-y-5 lg:order-1">
             {wrap("about", <BusinessAbout business={business} />)}
             {wrap(

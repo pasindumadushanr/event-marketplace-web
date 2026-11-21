@@ -71,6 +71,24 @@ function assertMobileOrder() {
       ).to.be.at.least(positions[i - 1].bottom - 1);
   });
 }
+function assertEvenMobileSpacing() {
+  cy.get('[data-profile-section="policies"]').should("exist");
+  cy.get("[data-profile-section]").should((elements) => {
+    const cards = [...elements]
+      .filter((element) => element.getBoundingClientRect().height > 0)
+      .map((element) => ({
+        name: element.getAttribute("data-profile-section"),
+        rect: element.getBoundingClientRect(),
+      }))
+      .sort((a, b) => a.rect.top - b.rect.top);
+    for (let i = 1; i < cards.length; i++) {
+      expect(
+        cards[i].rect.top - cards[i - 1].rect.bottom,
+        `gap between ${cards[i - 1].name} and ${cards[i].name}`,
+      ).to.be.closeTo(20, 1);
+    }
+  });
+}
 function openEditor() {
   cy.intercept("GET", "**/vendor/business/onboarding/status", {
     body: { vendorStatus: "APPROVED", emailVerified: true },
@@ -98,6 +116,7 @@ describe("Mobile vendor profile section order", () => {
     cy.intercept("GET", "**/discovery/vendors/vendor-test", { body: profile });
     cy.visit("/business/vendor-test");
     assertMobileOrder();
+    assertEvenMobileSpacing();
     cy.get('[aria-label="Quick contact"] a')
       .should("have.attr", "href")
       .and("include", "wa.me/94771234567");
@@ -106,8 +125,10 @@ describe("Mobile vendor profile section order", () => {
     cy.viewport(375, 812);
     openEditor();
     assertMobileOrder();
+    assertEvenMobileSpacing();
     cy.contains("button", "View as customer").click();
     assertMobileOrder();
+    assertEvenMobileSpacing();
     cy.get('[aria-label="Edit Name, logo & cover"]').should("not.exist");
   });
   it("keeps editing controls for missing optional sections but hides them from customers", () => {
@@ -127,7 +148,17 @@ describe("Mobile vendor profile section order", () => {
     cy.get('[data-profile-section="gallery"]').should("not.be.visible");
     cy.get('[data-profile-section="faq"]').should("not.be.visible");
     cy.get('[data-profile-section="features"]').should("not.be.visible");
+    assertEvenMobileSpacing();
   });
+  for (const width of [320, 430, 768]) {
+    it(`keeps equal section gaps at ${width}px in the editor and preview`, () => {
+      cy.viewport(width, 900);
+      openEditor();
+      assertEvenMobileSpacing();
+      cy.contains("button", "View as customer").click();
+      assertEvenMobileSpacing();
+    });
+  }
   it("preserves the desktop columns and their original order", () => {
     cy.viewport(1440, 900);
     cy.intercept("GET", "**/discovery/vendors/vendor-test", { body: profile });
