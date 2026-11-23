@@ -227,7 +227,7 @@ export default function VendorOnboardingWizard() {
         } catch {}
       }
       await refreshBusiness();
-      toast.success(t("Application submitted successfully!"));
+      toast.success("Business details saved. You can start editing your private profile now.");
       router.push("/vendor");
     } catch (error: any) {
       toast.error(
@@ -546,7 +546,7 @@ export default function VendorOnboardingWizard() {
                     ))}
                   </ul>
                   <p className="mt-2 text-slate-600">
-                    Our team will review these with your application.
+                    Our team will review these when you submit your finished profile.
                   </p>
                 </div>
               )}
@@ -556,7 +556,7 @@ export default function VendorOnboardingWizard() {
                 </h4>
                 <p className="text-sm">
                   {t(
-                    "By submitting this application, our administrative team will review your business details. Once approved, you will gain full access to the vendor dashboard to manage packages, bookings, and your public gallery.",
+                    "You can start editing as soon as you save these details. Your page stays private until you submit it for review, receive approval, and publish it.",
                   )}
                 </p>
               </div>

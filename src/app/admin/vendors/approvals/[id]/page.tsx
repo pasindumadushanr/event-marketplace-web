@@ -100,6 +100,7 @@ function Fields({ values }: { values: Record<string, string | undefined> }) {
 const titles: Record<string, string> = {
   NOTE: "Private reviewer note",
   APPROVED: "Application approved",
+  SUBMITTED: "Profile submitted for review",
   REJECTED: "Application rejected",
   INFORMATION_REQUESTED: "More information requested",
   RESUBMITTED: "Vendor resubmitted application",
@@ -189,7 +190,7 @@ export default function ApplicationDetailPage() {
     if (
       !confirm(
         action === "approve"
-          ? "Approve this application? The vendor must publish their profile separately."
+          ? "Approve this profile? It will remain private until the vendor publishes it."
           : action === "reject"
             ? "Reject this application and notify the vendor with this reason?"
             : "Send this request to the vendor? They can update and resubmit.",
@@ -204,7 +205,7 @@ export default function ApplicationDetailPage() {
           ? { reason: message }
           : action === "request-information"
             ? { message }
-            : {},
+            : { submittedAt: data?.application.submittedAt },
       );
       if (applicationId.current !== id) return;
       toast.success("Review decision saved.");
@@ -276,7 +277,7 @@ export default function ApplicationDetailPage() {
       </div>
     );
   const app = data.application;
-  const reviewable = ["PENDING", "UNDER_REVIEW"].includes(app.vendorStatus);
+  const reviewable = app.vendorStatus === "UNDER_REVIEW";
   return (
     <section className="mx-auto max-w-7xl space-y-6">
       <Link
@@ -560,14 +561,14 @@ export default function ApplicationDetailPage() {
                     <option value="request-information">
                       Request more information
                     </option>
-                    <option value="approve">Approve application</option>
+                    <option value="approve">Approve profile</option>
                     <option value="reject">Reject application</option>
                   </select>
                 </label>
                 {action === "approve" ? (
                   <p className="rounded-xl bg-teal-50 p-4 text-sm text-teal-900">
-                    This approves the application only. The vendor must complete
-                    setup and publish their profile separately.
+                    The vendor can publish this approved profile from their dashboard.
+                    It stays private until they do.
                   </p>
                 ) : (
                   <label className="block text-sm font-medium">

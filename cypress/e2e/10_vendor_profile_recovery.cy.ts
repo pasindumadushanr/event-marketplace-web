@@ -7,6 +7,8 @@ describe("Vendor dashboard loading recovery", () => {
   };
 
   function visitDashboard() {
+    cy.intercept("GET", "**/vendor/packages", { body: [] });
+    cy.intercept("GET", "**/vendor/gallery", { body: [] });
     cy.visit("/vendor", {
       onBeforeLoad(win) {
         win.localStorage.setItem("accessToken", "local-test-only");
@@ -33,11 +35,11 @@ describe("Vendor dashboard loading recovery", () => {
     cy.intercept("GET", "**/vendor/business", { body: business }).as(
       "profileRetry",
     );
-    cy.contains("button", "Try again").click();
+    cy.contains('[role="alert"]', "We couldn’t load your business profile")
+      .contains("button", "Try again").click();
     cy.wait("@profileRetry");
-    cy.contains("Welcome back,").should("be.visible");
+    cy.contains("Edit My Business Page").should("be.visible");
     cy.contains("Sunrise Photography").should("be.visible");
-    cy.contains("Manage my business").should("be.visible");
   });
 
   it("keeps a failed approval request blocked and retries it independently", () => {
@@ -48,12 +50,12 @@ describe("Vendor dashboard loading recovery", () => {
     cy.intercept("GET", "**/vendor/business", { body: business });
     visitDashboard();
     cy.contains("We couldn’t check your business status").should("be.visible");
-    cy.contains("Welcome back,").should("not.exist");
+    cy.contains("Edit My Business Page").should("not.exist");
     cy.intercept("GET", "**/vendor/business/onboarding/status", {
       body: { vendorStatus: "UNDER_REVIEW", emailVerified: true },
     });
-    cy.contains("button", "Try again").click();
-    cy.contains("Application Under Review").should("be.visible");
-    cy.contains("Welcome back,").should("not.exist");
+    cy.contains('[role="alert"]', "We couldn’t check your business status")
+      .contains("button", "Try again").click();
+    cy.contains("Edit My Business Page").should("be.visible");
   });
 });

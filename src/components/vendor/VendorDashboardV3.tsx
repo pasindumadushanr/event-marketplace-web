@@ -269,7 +269,11 @@ export function VendorDashboardV3() {
             </div>
           ) : (
             <p className="mt-3 text-sm text-emerald-800">
-              Everything is ready. You can show your page to customers now.
+              {progress.waitingForReview
+                ? "Your profile is under review and is still private."
+                : progress.needsReview
+                  ? "Submit your finished profile for review before publishing."
+                  : "Everything is ready. You can show your page to customers now."}
             </p>
           )
         ) : (
@@ -286,14 +290,18 @@ export function VendorDashboardV3() {
               <Eye size={17} /> Check my page
             </Link>
           )}
-          <button
+          {!live && progress?.needsReview ? (
+            <Link className={linkStyle} href="/vendor/business#business-setup">
+              {progress.waitingForReview ? "View review status" : "Open review checklist"}
+            </Link>
+          ) : <button
             type="button"
             onClick={changeVisibility}
             disabled={busy || (!live && !progress?.canPublish)}
             className={`${linkStyle} disabled:cursor-not-allowed disabled:opacity-50`}
           >
             {busy ? "Please wait…" : live ? "Hide my page" : "Publish my page"}
-          </button>
+          </button>}
         </div>
         {message && (
           <p role="status" className="mt-4 text-sm text-emerald-800">

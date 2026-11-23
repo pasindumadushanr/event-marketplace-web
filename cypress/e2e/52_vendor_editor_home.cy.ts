@@ -20,7 +20,7 @@ function visitHome(status = "APPROVED", mode = "v1") {
   cy.intercept("GET", "**/vendor/business/onboarding/status", {
     body: { emailVerified: true, vendorStatus: status },
   });
-  cy.intercept("GET", "**/vendor/business", { body: savedBusiness }).as(
+  cy.intercept("GET", "**/vendor/business", { body: { ...savedBusiness, vendorStatus: status } }).as(
     "business",
   );
   cy.intercept("GET", "**/vendor/packages", { body: [] }).as("packages");
@@ -86,20 +86,35 @@ describe("Visual business editor as vendor home", () => {
     cy.contains("button", "Easy setup").should("be.visible");
     cy.contains("button", "Full dashboard").should("be.visible");
   });
-  for (const [status, heading] of [
-    ["NOT_STARTED", "Welcome to Nakathata.lk!"],
-    ["UNDER_REVIEW", "Application Under Review"],
-    ["NEEDS_INFO", "A few more details are needed"],
-    ["REJECTED", "Application Rejected"],
-  ])
-    it(`keeps ${status} vendors on their application screen`, () => {
+  for (const status of ["PENDING", "UNDER_REVIEW", "NEEDS_INFO", "REJECTED"])
+    it(`lets ${status} vendors edit a private profile`, () => {
       visitHome(status);
-      cy.contains("h2", heading).should("be.visible");
-      cy.get('[aria-label="Edit Name, logo & cover"]').should("not.exist");
+      cy.get('[aria-label="Edit Name, logo & cover"]').should("be.visible");
       cy.get(
         'nav[aria-label="Vendor navigation"] a[href="/vendor/dashboard"]',
-      ).should("not.exist");
+      ).should("exist");
     });
+  it("sends a finished draft for review without publishing it", () => {
+    visitHome("PENDING");
+    cy.intercept("PATCH", "**/vendor/business", (req) => {
+      Object.assign(savedBusiness.profileSettings, req.body.profileSettings);
+      req.reply({ body: savedBusiness });
+    });
+    cy.intercept("POST", "**/vendor/business/profile-review", {
+      body: { vendorStatus: "UNDER_REVIEW", reviewStale: false },
+    }).as("submitReview");
+    cy.intercept("PATCH", "**/vendor/business/publish", () => {
+      throw new Error("Draft must not be published");
+    });
+    cy.contains("button", "View as customer").click();
+    cy.contains("button", "I’ve checked my page").click();
+    cy.contains("Preview checked.").should("be.visible");
+    cy.contains("a", "Prepare for review").click();
+    cy.contains("button", "Submit for review").click();
+    cy.wait("@submitReview");
+    cy.contains("Your profile is under review").should("be.visible");
+    cy.contains("button", "Publish my page").should("not.exist");
+  });
   it("shows a status error rather than opening the editor on a failed status check", () => {
     visitHome();
     cy.intercept("GET", "**/vendor/business/onboarding/status", {

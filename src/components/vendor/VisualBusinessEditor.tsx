@@ -435,7 +435,7 @@ export function VisualBusinessEditor() {
       setSaved(next);
       setDraft(next);
       updateBusinessLocally({ profileSettings: { setupReview } });
-      setNotice("Preview checked. Return to your setup checklist to publish.");
+      setNotice("Preview checked. Return to your setup checklist for the next step.");
     } catch {
       setError("Could not save your review. Please try again.");
     } finally {
@@ -538,7 +538,9 @@ export function VisualBusinessEditor() {
               href="/vendor/business#business-setup"
               className="business-subtle-button"
             >
-              Continue to publish
+              {saved.vendorStatus === "APPROVED" || !saved.vendorStatus
+                ? "Continue to publish"
+                : saved.vendorStatus === "UNDER_REVIEW" ? "View review status" : "Prepare for review"}
             </Link>
           ) : (
             <button
@@ -570,6 +572,12 @@ export function VisualBusinessEditor() {
               ? "Your page is live. Saved edits appear publicly."
               : "Your page is hidden. Saving edits does not publish it."}
         </p>
+        {typeof (saved.informationRequest || saved.rejectionReason) === "string" && (
+          <p role="status" className="mt-3 whitespace-pre-wrap rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+            <strong>Review team feedback:</strong>{" "}
+            {String(saved.informationRequest || saved.rejectionReason)}
+          </p>
+        )}
         {notice && (
           <p role="status" className="mt-2 text-sm text-emerald-700">
             {notice}

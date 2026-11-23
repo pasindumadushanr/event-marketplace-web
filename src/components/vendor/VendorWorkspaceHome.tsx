@@ -2,10 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
-  Clock,
-  XCircle,
   FileText,
   Sparkles,
   LayoutDashboard,
@@ -22,7 +19,6 @@ export function VendorWorkspaceHome({
 }: {
   showDashboard?: boolean;
 }) {
-  const router = useRouter();
   const {
     business,
     isLoading: businessLoading,
@@ -32,10 +28,6 @@ export function VendorWorkspaceHome({
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
 
   const [status, setStatus] = useState<string | null>(null);
-  const [rejectionReason, setRejectionReason] = useState<string | null>(null);
-  const [informationRequest, setInformationRequest] = useState<string | null>(
-    null,
-  );
   const [isLoadingStatus, setIsLoadingStatus] = useState(true);
   const [refreshAttempt, setRefreshAttempt] = useState(0);
 
@@ -70,8 +62,6 @@ export function VendorWorkspaceHome({
       .then(({ data }) => {
         if (!active) return;
         setStatus(data.vendorStatus);
-        setRejectionReason(data.rejectionReason);
-        setInformationRequest(data.informationRequest);
       })
       .catch((err) => {
         console.error(err);
@@ -121,83 +111,10 @@ export function VendorWorkspaceHome({
     );
   }
 
-  // --- UNDER REVIEW STATE ---
-  if (status === "PENDING" || status === "UNDER_REVIEW") {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-24 h-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-6">
-          <Clock className="h-12 w-12" />
-        </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-4">
-          Application Under Review
-        </h2>
-        <p className="text-slate-500 max-w-lg">
-          Your vendor application has been received and is currently being
-          reviewed by our administrative team. We will notify you once your
-          account is approved.
-        </p>
-      </div>
-    );
-  }
+  if (status === "SUSPENDED")
+    return <p role="alert">Your workspace is suspended. Contact support for help.</p>;
 
-  if (status === "NEEDS_INFO")
-    return (
-      <div className="mx-auto max-w-2xl rounded-2xl border bg-white p-6 sm:p-10 space-y-5">
-        <h2 className="text-2xl font-semibold">
-          A few more details are needed
-        </h2>
-        <p className="text-slate-600">
-          Your application is not rejected. Please address the review team’s
-          request, then resubmit it.
-        </p>
-        <div className="whitespace-pre-wrap rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900">
-          {informationRequest ||
-            "Please contact support for the requested details."}
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Button onClick={() => router.push("/vendor/onboarding")}>
-            Update & Resubmit Application
-          </Button>
-          <Link
-            className="inline-flex items-center rounded-lg border px-4 py-2 text-sm"
-            href="/vendor/documents"
-          >
-            Verification document guidance
-          </Link>
-        </div>
-      </div>
-    );
-
-  // --- REJECTED STATE ---
-  if (status === "REJECTED") {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <div className="w-24 h-24 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6">
-          <XCircle className="h-12 w-12" />
-        </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-4">
-          Application Rejected
-        </h2>
-        <p className="text-slate-500 mb-4 max-w-lg">
-          Unfortunately, your application was not approved at this time.
-        </p>
-        {rejectionReason && (
-          <div className="bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg mb-6 max-w-lg">
-            <strong>Reason:</strong> {rejectionReason}
-          </div>
-        )}
-        <Button
-          onClick={() => router.push("/vendor/onboarding")}
-          className="bg-slate-900 hover:bg-slate-800"
-        >
-          Update & Resubmit Application
-        </Button>
-      </div>
-    );
-  }
-
-  // --- APPROVED STATE (FULL DASHBOARD) ---
-  if (!business || status !== "APPROVED")
+  if (!business || !status)
     return (
       <div role="alert" className="rounded-2xl border bg-white p-6 space-y-4">
         <h2 className="text-lg font-semibold text-slate-900">

@@ -9,7 +9,8 @@ export function previewSignature(
   packages: any[],
   galleries: any[] = [],
 ) {
-  const { setupReview: _review, ...settings } = business.profileSettings || {};
+  const { setupReview: _review, profileReviewDigest: _digest, ...settings } =
+    business.profileSettings || {};
   settings.faqs = settings.faqs || settings.faq;
   delete settings.faq;
   settings.features = mapBusinessData(business)?.featureGroups || [];
@@ -132,13 +133,6 @@ export function setupProgress(
       label: "Explain your booking policy",
       href: "/vendor/business/policies",
     });
-  if (account?.vendorStatus !== "APPROVED")
-    blockers.push({
-      label: account
-        ? "Your vendor application needs approval"
-        : "Check your account status — try loading again",
-      href: "/vendor/onboarding",
-    });
   if (account && !account.emailVerified)
     blockers.push({
       label: "Verify your account email before publishing",
@@ -149,8 +143,16 @@ export function setupProgress(
       label: "Review your saved page as a customer",
       href: "/vendor/preview",
     });
+  const needsReview = account?.vendorStatus !== "APPROVED" || account.reviewStale;
+  const waitingForReview = account?.vendorStatus === "UNDER_REVIEW" && !account.reviewStale;
+  const canSubmitForReview =
+    blockers.length === 0 && account?.emailVerified && needsReview &&
+    !waitingForReview && account.vendorStatus !== "SUSPENDED";
   return {
-    canPublish: blockers.length === 0,
+    canPublish: blockers.length === 0 && !needsReview,
+    canSubmitForReview,
+    needsReview,
+    waitingForReview,
     blockers,
     steps: [
       {

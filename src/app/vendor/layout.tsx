@@ -57,6 +57,8 @@ export default function VendorLayout({
   ].includes(pathname);
 
   const [vendorStatus, setVendorStatus] = useState<string | null>(null);
+  const hasWorkspace = (status: string | null) =>
+    !!status && ["PENDING", "UNDER_REVIEW", "NEEDS_INFO", "REJECTED", "APPROVED"].includes(status);
 
   const allowedRoutes = [
     "/vendor",
@@ -103,7 +105,7 @@ export default function VendorLayout({
         setVendorStatus(data.vendorStatus);
         setIsAuthorized(true);
 
-        if (data.vendorStatus !== "APPROVED") {
+        if (!hasWorkspace(data.vendorStatus)) {
           // Check if pathname starts with any of the allowed routes, or exactly matches
           const isAllowed = allowedRoutes.some(
             (route) =>
@@ -149,7 +151,7 @@ export default function VendorLayout({
   const renderNavLinks = () => {
     // If not approved, filter out links that require approval
     const filteredNavConfig = navConfig.filter((item) => {
-      if (vendorStatus === "APPROVED") return true;
+      if (hasWorkspace(vendorStatus)) return true;
       return allowedRoutes.includes(item.href);
     });
 
@@ -231,7 +233,7 @@ export default function VendorLayout({
             </span>
           </div>
 
-          {vendorStatus === "APPROVED" && (
+          {hasWorkspace(vendorStatus) && (
             <div className="p-4 shrink-0">
               <Link href="/vendor" className="vendor-preview-link">
                 <Eye className="h-4 w-4" />

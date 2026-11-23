@@ -322,11 +322,10 @@ describe("Simplified vendor workspace", () => {
     cy.contains("SEO Optimization").should("not.exist");
   });
 
-  it("keeps pending vendors in application guidance", () => {
+  it("opens the private workspace for draft vendors", () => {
     visitVendor("/vendor", "PENDING");
-    cy.contains("Application Under Review").should("be.visible");
-    cy.contains("aside a", "Bookings").should("not.exist");
-    cy.contains("Needs your attention").should("not.exist");
+    cy.contains("Edit My Business Page").should("be.visible");
+    cy.contains("Your page is hidden.").should("be.visible");
   });
 
   it("uses photography examples instead of car-rental defaults", () => {

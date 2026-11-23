@@ -76,12 +76,17 @@ export function GuidedSetup() {
   const count = progress.steps.filter((step) => step.done).length;
   const next = progress.steps.find((step) => !step.done);
   async function publish() {
-    if (!progress.canPublish || busy) return;
+    if ((!progress.canPublish && !progress.canSubmitForReview) || busy) return;
     setBusy(true);
     setError("");
     try {
-      await api.patch("/vendor/business/publish");
-      updateBusinessLocally({ status: "ACTIVE" });
+      if (progress.canPublish) {
+        await api.patch("/vendor/business/publish");
+        updateBusinessLocally({ status: "ACTIVE" });
+      } else {
+        const { data } = await api.post("/vendor/business/profile-review");
+        setResources({ ...resources!, account: { ...resources!.account, ...data, rejectionReason: null, informationRequest: null } });
+      }
     } catch (err: any) {
       setError(
         language === "en"
@@ -193,13 +198,25 @@ export function GuidedSetup() {
               )}
               {step.title === "Publish" ? (
                 !step.done && (
-                  <button
+                  <>
+                  {progress.needsReview && (
+                    <p role="status" className="mt-3 text-sm text-slate-700">
+                      {resources.account.informationRequest || resources.account.rejectionReason ||
+                        (progress.waitingForReview
+                          ? "Your profile is under review and stays private until you publish it."
+                          : resources.account.reviewStale
+                            ? "You changed your profile. Submit the updated version for review."
+                            : "Submit your finished profile for approval before publishing.")}
+                    </p>
+                  )}
+                  {!progress.waitingForReview && <button
                     onClick={publish}
-                    disabled={!progress.canPublish || busy}
+                    disabled={(!progress.canPublish && !progress.canSubmitForReview) || busy}
                     className="mt-4 rounded-lg bg-[#183e38] px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {t(busy ? "Publishing…" : "Publish my page")}
-                  </button>
+                    {t(busy ? "Please wait…" : progress.needsReview ? "Submit for review" : "Publish my page")}
+                  </button>}
+                  </>
                 )
               ) : (
                 <Link

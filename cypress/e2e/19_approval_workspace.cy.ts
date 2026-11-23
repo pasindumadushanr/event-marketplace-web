@@ -107,7 +107,11 @@ describe("Vendor approval workspace", () => {
   it("filters, switches queues, paginates and shows waiting badges on phones", () => {
     cy.viewport(390, 844);
     cy.intercept("GET", "**/business-categories", { body: categories });
-    cy.intercept("GET", "**/admin/vendors/applications?*", (req) =>
+    cy.intercept("GET", "**/admin/vendors/applications?*", (req) => {
+      if (req.query.status === "APPROVED" && req.query.q === "Sunrise")
+        req.alias = "approvedQueue";
+      else if (req.query.q === "Sunrise")
+        req.alias = req.query.page === "2" ? "nextQueue" : "filteredQueue";
       req.reply({
         body: {
           items: [
@@ -122,8 +126,8 @@ describe("Vendor approval workspace", () => {
           pageSize: 25,
           counts: { pending: 26, approved: 2, rejected: 1 },
         },
-      }),
-    ).as("queue");
+      });
+    }).as("queue");
     cy.visit("/admin/vendors/approvals", { onBeforeLoad: (win) => auth(win) });
     cy.wait("@queue");
     cy.contains("5 days waiting").should("be.visible");
@@ -134,7 +138,7 @@ describe("Vendor approval workspace", () => {
     cy.get('[aria-label="Submitted from"]').type("2026-10-01");
     cy.get('[aria-label="Submitted to"]').type("2026-10-07");
     cy.contains("button", "Apply filters").click();
-    cy.wait("@queue").then(({ request }) =>
+    cy.wait("@filteredQueue").then(({ request }) =>
       expect(request.query).to.include({
         q: "Sunrise",
         district: "Jaffna",
@@ -145,11 +149,11 @@ describe("Vendor approval workspace", () => {
       }),
     );
     cy.contains("button", "Next").click();
-    cy.wait("@queue").then(({ request }) =>
+    cy.wait("@nextQueue").then(({ request }) =>
       expect(request.query.page).to.equal("2"),
     );
     cy.get('[role="tab"]').contains("Approved").click();
-    cy.wait("@queue").then(({ request }) =>
+    cy.wait("@approvedQueue").then(({ request }) =>
       expect(request.query).to.include({ status: "APPROVED", page: "1" }),
     );
     cy.contains("Not published").should("be.visible");
@@ -163,10 +167,10 @@ describe("Vendor approval workspace", () => {
     cy.screenshot("approval-queue-phone", { capture: "viewport" });
   });
   it("recovers from a queue error while preserving filters", () => {
-    let calls = 0;
+    let shouldFail = true;
     cy.intercept("GET", "**/business-categories", { body: categories });
     cy.intercept("GET", "**/admin/vendors/applications?*", (req) =>
-      ++calls < 2
+      shouldFail
         ? req.reply({ statusCode: 503 })
         : req.reply({
             body: {
@@ -178,7 +182,9 @@ describe("Vendor approval workspace", () => {
           }),
     );
     cy.visit("/admin/vendors/approvals", { onBeforeLoad: (win) => auth(win) });
-    cy.contains("button", "Try again").click();
+    cy.contains("button", "Try again").should("be.visible").then(() => {
+      shouldFail = false;
+    }).click();
     cy.contains("No matching applications").should("be.visible");
   });
   it("shows full details, file previews and private notes on a phone without emailing notes", () => {
@@ -295,7 +301,7 @@ describe("Vendor approval workspace", () => {
     });
     cy.wait("@detail");
     cy.get('[aria-label="Review action"]').select("approve");
-    cy.contains("vendor must complete setup and publish").should("be.visible");
+    cy.contains("It stays private until they do.").should("be.visible");
     cy.contains("button", "Approve application").click();
     cy.wait("@approve");
     cy.wait("@detail");
@@ -347,9 +353,9 @@ describe("Vendor approval workspace", () => {
     cy.contains("h3", "Application rejected").should("be.visible");
     cy.contains("Email accepted by provider").should("be.visible");
   });
-  it("lets vendors see requests, view private-document guidance and resubmit their existing application", () => {
+  it("lets vendors see requests and save their corrections privately", () => {
     const data = details("NEEDS_INFO");
-    let status = "NEEDS_INFO";
+    const status = "NEEDS_INFO";
     cy.intercept("GET", "**/vendor/business/onboarding/status", (req) =>
       req.reply({
         body: {
@@ -374,13 +380,12 @@ describe("Vendor approval workspace", () => {
         phone: "0771234567",
       });
       expect(req.body).not.to.have.property("vendorStatus");
-      status = "UNDER_REVIEW";
-      req.reply({ body: { message: "Resubmitted" } });
+      req.reply({ body: { message: "Changes saved" } });
     }).as("resubmit");
     cy.visit("/vendor", { onBeforeLoad: (win) => auth(win, "VENDOR") });
-    cy.contains("A few more details are needed").should("be.visible");
-    cy.contains("a", "Verification document guidance").click();
-    cy.location("pathname").should("eq", "/vendor/documents");
+    cy.intercept("GET", "**/vendor/gallery", { body: [] });
+    cy.intercept("GET", "**/vendor/packages", { body: [] });
+    cy.contains("Review team feedback:").should("be.visible");
     cy.visit("/vendor/onboarding");
     cy.get('[name="name"]')
       .should("have.value", "Sunrise Weddings")
@@ -390,7 +395,8 @@ describe("Vendor approval workspace", () => {
     cy.contains("button", "Submit Application").click();
     cy.wait("@resubmit");
     cy.location("pathname").should("eq", "/vendor");
-    cy.contains("Application Under Review").should("be.visible");
+    cy.contains("Edit My Business Page").should("be.visible");
+    cy.contains("Your page is hidden.").should("be.visible");
   });
   it("rejects unsafe preview URLs", () => {
     for (const url of [
