@@ -2,10 +2,25 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { InvitationContent } from "@/lib/invitations";
+import { BirthdayExperience } from "./BirthdayExperience";
+import { BirthdayRewind } from "./BirthdayRewind";
 
 // Use the supplied standalone document so its global CSS, viewport and original
 // animation code are not altered by the marketplace's Tailwind/theme styles.
-export function InvitationExperience({
+export function InvitationExperience(props: {
+  content: InvitationContent;
+  preview?: boolean;
+  demo?: boolean;
+  templateId?: string;
+}) {
+  if (props.templateId === "B02")
+    return <BirthdayRewind content={props.content} preview={props.preview || props.demo} />;
+  if (props.templateId === "B01")
+    return <BirthdayExperience content={props.content} preview={props.preview || props.demo} />;
+  return <WeddingInvitationFrame {...props} />;
+}
+
+function WeddingInvitationFrame({
   content,
   preview = false,
   demo = false,
@@ -16,6 +31,7 @@ export function InvitationExperience({
   demo?: boolean;
   templateId?: string;
 }) {
+  const sinhala = templateId === "W02";
   const frame = useRef<HTMLIFrameElement>(null);
   const send = useCallback(() => {
     frame.current?.contentWindow?.postMessage(
@@ -52,12 +68,12 @@ export function InvitationExperience({
       ref={frame}
       title={`Wedding invitation — ${templateId}`}
       src={
-        templateId === "W02"
+        sinhala
           ? "/invitation-assets/w02/index.html"
           : "/invitation-assets/w01/index.html"
       }
       onLoad={send}
-      sandbox={`allow-scripts allow-same-origin allow-downloads allow-popups allow-popups-to-escape-sandbox${templateId === "W02" ? " allow-modals" : ""}`}
+      sandbox={`allow-scripts allow-same-origin allow-downloads allow-popups allow-popups-to-escape-sandbox${sinhala ? " allow-modals" : ""}`}
       referrerPolicy="no-referrer"
       allow="clipboard-write; web-share"
       className="block w-full border-0"

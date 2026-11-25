@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 306">
+  <defs>
+    <linearGradient id="body" x2="0" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#7591ff"/><stop offset="1" stop-color="#3952be"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1" gradientUnits="objectBoundingBox">
+      <stop stop-color="#aebdff"/><stop offset=".39" stop-color="#3a55ac"/><stop offset="1" stop-color="#1a224b"/>
+    </linearGradient>
+    <pattern id="grip" width="8" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 8 8 0" stroke="#5166af" stroke-width="1.3"/>
+    </pattern>
+  </defs>
+  <path d="m49 69 5-17 5 17 17 5-17 5-5 17-5-17-17-5zM421 195l4-13 4 13 13 4-13 4-4 13-4-13-13-4z" fill="#ffb5d3" stroke="#151e47" stroke-width="2"/>
+  <path d="M403 47l12-12m-7 28 19-2m-34-7 1-19M38 234l-16 9m22 4-5 18" stroke="#22389e" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="242" cy="272" rx="164" ry="14" fill="#15295f" opacity=".16"/>
+  <g stroke="#151e47" stroke-width="5" stroke-linejoin="round">
+    <rect x="305" y="54" width="66" height="31" rx="11" fill="#ffda5e"/>
+    <path d="M109 75h54l14-32h91l16 32h87a28 28 0 0 1 28 28v125a27 27 0 0 1-27 27H108a27 27 0 0 1-27-27V102a27 27 0 0 1 28-27Z" fill="#151e47" transform="translate(6 9)"/>
+    <path d="M109 75h54l14-32h91l16 32h87a28 28 0 0 1 28 28v125a27 27 0 0 1-27 27H108a27 27 0 0 1-27-27V102a27 27 0 0 1 28-27Z" fill="url(#body)"/>
+    <path d="M81 115h318v87H81z" fill="#23346d"/>
+    <path d="M86 120h306v77H86z" stroke="none" fill="url(#grip)"/>
+    <rect x="99" y="92" width="63" height="35" rx="7" fill="#fff3c9"/>
+    <path d="M112 104h37m-37 10h37" stroke="#c59d46" stroke-width="2"/>
+    <rect x="311" y="92" width="58" height="33" rx="7" fill="#151e47"/>
+    <rect x="321" y="101" width="38" height="14" rx="2" fill="#afc1fb" stroke="none"/>
+    <circle cx="232" cy="161" r="79" fill="#18224e"/>
+    <circle cx="232" cy="161" r="64" fill="#5b73ca"/>
+    <circle cx="232" cy="161" r="51" fill="url(#glass)"/>
+    <circle cx="232" cy="161" r="31" fill="#202968" stroke="#8198ea" stroke-width="2"/>
+    <circle cx="232" cy="161" r="18" fill="#4057aa" stroke="none"/>
+    <ellipse cx="212" cy="138" rx="16" ry="8" transform="rotate(-30 212 138)" fill="#dce5ff" stroke="none" opacity=".85"/>
+    <circle cx="250" cy="181" r="6" fill="#ffb5d3" stroke="none" opacity=".8"/>
+    <rect x="326" y="174" width="47" height="11" rx="5.5" fill="#ffb5d3" stroke="none"/>
+    <rect x="326" y="191" width="28" height="6" rx="3" fill="#ffda5e" stroke="none"/>
+  </g>
+</svg>

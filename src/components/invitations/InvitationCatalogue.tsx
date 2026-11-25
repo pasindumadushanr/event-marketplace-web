@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/home/Navbar";
 import { Footer } from "@/components/home/Footer";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { invitationTemplates } from "@/lib/invitation-templates";
+import { birthdayTemplates, invitationTemplates } from "@/lib/invitation-templates";
 export function InvitationCatalogue() {
   const [phone, setPhone] = useState("");
   useEffect(() => {
@@ -44,7 +44,7 @@ export function InvitationCatalogue() {
               phone,
               `Hi! I would like ${template.id} — ${template.name}, LKR ${template.price.toLocaleString("en-LK")}. Please help me personalise my wedding invitation.`,
             );
-            const sinhala = template.id === "W02";
+            const sinhala = template.sinhala;
             return (
               <article
                 key={template.id}
@@ -74,7 +74,7 @@ export function InvitationCatalogue() {
                         </p>
                       </>
                     )}
-                    <span className="rounded-full border border-white/60 px-6 py-3 text-sm">
+                    <span className="rounded-full border border-white/60 bg-stone-950/70 px-6 py-3 text-sm">
                       Open live demo ↗
                     </span>
                   </div>
@@ -85,7 +85,7 @@ export function InvitationCatalogue() {
                     {template.id}
                   </p>
                   <h2
-                    lang={sinhala ? "si" : "en"}
+                    lang={template.id === "W02" ? "si" : "en"}
                     className="mt-3 text-4xl font-serif leading-relaxed"
                   >
                     {template.name}
@@ -94,12 +94,7 @@ export function InvitationCatalogue() {
                     LKR {template.price.toLocaleString("en-LK")}
                   </p>
                   <ul className="space-y-3 text-sm text-stone-600">
-                    <li>
-                      ♡{" "}
-                      {sinhala
-                        ? "Sinhala wording, lotus seal & traditional colours"
-                        : "Floral envelope opening"}
-                    </li>
+                    <li>♡ {template.accent}</li>
                     <li>♡ Your names, photo & wedding details</li>
                     <li>♡ Countdown, directions & WhatsApp RSVP</li>
                     <li>
@@ -150,9 +145,23 @@ export function InvitationCatalogue() {
             );
           })}
         </div>
-        <p className="mt-8 text-sm text-stone-500">
-          More designs, including simple invitations, are coming soon.
-        </p>
+        <section className="mt-14 space-y-7" aria-labelledby="birthday-cards">
+          <h2 id="birthday-cards" className="text-4xl font-serif text-[#354332]">Birthday wishes</h2>
+          {birthdayTemplates.map((birthdayTemplate) => <article key={birthdayTemplate.id} className="grid overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm md:grid-cols-2">
+          <Link href={birthdayTemplate.demo} className={`block min-h-64 ${birthdayTemplate.id === "B02" ? "bg-[#fcf2d8]" : "bg-[#f2d0c7]"}`}>
+            <img src={birthdayTemplate.image} alt={`${birthdayTemplate.name} birthday card`} className={`h-full max-h-96 w-full ${birthdayTemplate.id === "B02" ? "object-contain p-7" : "object-cover"}`} />
+          </Link>
+          <div className="p-7 sm:p-12">
+            <p className="text-xs uppercase tracking-widest text-amber-800">Birthday wishes · {birthdayTemplate.id}</p>
+            <h3 className="mt-3 text-4xl font-serif">{birthdayTemplate.name}</h3>
+            <p className="mt-4 text-sm leading-7 text-stone-600">{birthdayTemplate.description}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href={birthdayTemplate.demo} className="inline-flex min-h-12 items-center rounded-xl border px-5 text-sm font-semibold">Try the birthday demo</Link>
+              <Link href="/contact" className="inline-flex min-h-12 items-center rounded-xl bg-emerald-800 px-5 text-sm font-semibold text-white">Ask about a birthday card</Link>
+            </div>
+          </div>
+          </article>)}
+        </section>
       </main>
       <Footer />
     </div>

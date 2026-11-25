@@ -1,3 +1,5 @@
+import { isBirthdayTemplate } from "./invitation-templates";
+
 export interface InvitationContent {
   partnerOne: string;
   partnerTwo: string;
@@ -11,6 +13,8 @@ export interface InvitationContent {
   story: string;
   gallery: string[];
   music: boolean;
+  birthdayNameSi?: string;
+  birthdayMessageSi?: string;
 }
 export interface InvitationRecord {
   id: string;
@@ -67,6 +71,18 @@ export const sinhalaDemoInvitation: InvitationContent = {
     "හමුවූ දා සිට එක්ව ගෙවූ සොඳුරු මතක අතරට අලුත්ම පිටුවක් එක් කරන මේ දිනය, ඔබේ පැමිණීමෙන් තවත් සුන්දර වනු ඇත.",
   music: false,
 };
+export const birthdayDemo: InvitationContent = {
+  ...emptyInvitation,
+  partnerOne: "Amaya",
+  birthdayNameSi: "අමායා",
+  welcome: "Happy birthday, Amaya! Here’s to more laughter, new adventures and beautiful memories together.",
+  birthdayMessageSi: "සුබ උපන්දිනයක් අමායා! සිනහවෙන්, අලුත් අත්දැකීම්වලින් සහ සොඳුරු මතකවලින් පිරුණු වසරක් වේවා!",
+  gallery: ["/invitation-assets/b01/rose-envelope.webp", "/invitation-assets/b01/rose-cake.webp"],
+};
+
+export function invitationPath(templateId: string, slug: string) {
+  return `/${isBirthdayTemplate(templateId) ? "birthday" : "wedding"}/${encodeURIComponent(slug)}`;
+}
 export const studioRoles = ["SUPER_ADMIN", "INVITATION_STAFF", "ADMIN"];
 export async function studioRequest(path: string, init: RequestInit = {}) {
   const token =

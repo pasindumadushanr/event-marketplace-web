@@ -2,6 +2,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { InvitationExperience } from "@/components/invitations/InvitationExperience";
+import { isBirthdayTemplate } from "@/lib/invitation-templates";
 import { SITE_URL } from "@/lib/site-url";
 export const dynamic = "force-dynamic";
 const invitation = cache(async (slug: string) => {
@@ -12,7 +13,9 @@ const invitation = cache(async (slug: string) => {
   if (response.status === 404) notFound();
   if (!response.ok)
     throw new Error("Invitation is temporarily unavailable. Please try again.");
-  return response.json();
+  const value = await response.json();
+  if (isBirthdayTemplate(value.templateId)) notFound();
+  return value;
 });
 export async function generateMetadata({
   params,

@@ -3,10 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { invitationTemplates } from "@/lib/invitation-templates";
+import { isBirthdayTemplate, studioTemplates } from "@/lib/invitation-templates";
 import { InvitationExperience } from "@/components/invitations/InvitationExperience";
 import {
   emptyInvitation,
+  invitationPath,
   sinhalaWelcome,
   InvitationContent,
   InvitationRecord,
@@ -31,6 +32,12 @@ const inputClass =
   "mt-2 block min-h-11 w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm";
 const buttonClass =
   "inline-flex min-h-11 items-center justify-center rounded-xl border border-stone-300 px-4 py-2 text-sm font-semibold disabled:opacity-40";
+const birthdayFields: typeof fields = [
+  { key: "partnerOne", label: "Recipient’s name" },
+  { key: "birthdayNameSi", label: "Recipient’s name in Sinhala (optional)" },
+  { key: "welcome", label: "Birthday message in English", large: true },
+  { key: "birthdayMessageSi", label: "Birthday message in Sinhala", large: true },
+];
 export default function InvitationStudio() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
@@ -39,7 +46,8 @@ export default function InvitationStudio() {
   const [editing, setEditing] = useState(false);
   const [choosingTemplate, setChoosingTemplate] = useState(false);
   const [templateId, setTemplateId] = useState<string>("W01");
-  const template = invitationTemplates.find((item) => item.id === templateId);
+  const template = studioTemplates.find((item) => item.id === templateId);
+  const birthday = isBirthdayTemplate(templateId);
   const [draft, setDraft] = useState<InvitationContent>({ ...emptyInvitation });
   const [slug, setSlug] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -91,7 +99,7 @@ export default function InvitationStudio() {
     setReviewLink("");
   }
   async function choose(id?: string, newTemplateId?: string) {
-    if (!id && !invitationTemplates.some((item) => item.id === newTemplateId))
+    if (!id && !studioTemplates.some((item) => item.id === newTemplateId))
       return;
     if (dirty && !window.confirm("Discard unsaved invitation changes?")) return;
     setBusy(true);
@@ -106,7 +114,7 @@ export default function InvitationStudio() {
       setDraft(
         row?.draft || {
           ...emptyInvitation,
-          welcome: newTemplateId === "W02" ? sinhalaWelcome : "",
+          welcome: studioTemplates.find((item) => item.id === newTemplateId)?.sinhala ? sinhalaWelcome : "",
         },
       );
       setSlug(row?.slug || "");
@@ -334,7 +342,7 @@ export default function InvitationStudio() {
               </button>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {invitationTemplates.map((item) => (
+              {studioTemplates.map((item) => (
                 <article
                   key={item.id}
                   className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
@@ -342,17 +350,17 @@ export default function InvitationStudio() {
                   <div className="relative h-64 bg-[#414334]">
                     <img
                       src={item.image}
-                      alt={`${item.id} ${item.name} floral invitation design`}
+                      alt={`${item.id} ${item.name} invitation design`}
                       className="h-full w-full object-cover"
                     />
-                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-5 text-center text-[#fff5da]">
+                    {item.id === "W01" && <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-5 text-center text-[#fff5da]">
                       <span className="text-xs uppercase tracking-widest">
                         {item.id}
                       </span>
                       <span className="mt-4 text-4xl font-serif italic">
                         {item.name}
                       </span>
-                    </div>
+                    </div>}
                   </div>
                   <div className="space-y-4 p-5">
                     <div className="flex flex-wrap items-center justify-between gap-2">
@@ -360,7 +368,7 @@ export default function InvitationStudio() {
                         {item.id} · {item.name}
                       </h3>
                       <span className="text-sm font-semibold">
-                        LKR {item.price.toLocaleString()}
+                        {item.price === null ? "Birthday card" : `LKR ${item.price.toLocaleString()}`}
                       </span>
                     </div>
                     <p className="text-sm leading-6 text-stone-600">
@@ -398,13 +406,13 @@ export default function InvitationStudio() {
               <div>
                 <h2 className="text-3xl font-serif">
                   {selected
-                    ? `${draft.partnerOne || "Untitled"} & ${draft.partnerTwo || "invitation"}`
+                    ? birthday ? draft.partnerOne || "Birthday wish" : `${draft.partnerOne || "Untitled"} & ${draft.partnerTwo || "invitation"}`
                     : "Create an invitation"}
                 </h2>
                 <p className="mt-2 text-sm text-stone-500">
                   {template?.id || templateId} ·{" "}
-                  {template?.name || "Invitation"} · LKR{" "}
-                  {template?.price.toLocaleString() || "—"} ·{" "}
+                  {template?.name || "Invitation"} ·{" "}
+                  {template?.price != null && <>LKR {template.price.toLocaleString()} · </>}
                   {selected?.status || "New draft"}
                 </p>
               </div>
@@ -425,7 +433,7 @@ export default function InvitationStudio() {
                 onSubmit={save}
                 className="space-y-5 rounded-2xl border bg-white p-5 sm:p-7"
               >
-                <h3 className="text-xl font-serif">The couple & their day</h3>
+                <h3 className="text-xl font-serif">{birthday ? "Birthday wish & memories" : "The couple & their day"}</h3>
                 <label className="block text-sm font-medium">
                   Invitation link name
                   <input
@@ -436,17 +444,17 @@ export default function InvitationStudio() {
                     pattern="[a-z0-9]+(-[a-z0-9]+)*"
                     minLength={3}
                     maxLength={90}
-                    placeholder="amaya-sanjuka"
+                    placeholder={birthday ? "happy-birthday-amaya" : "amaya-sanjuka"}
                     onChange={(e) => {
                       setSlug(e.target.value);
                       setDirty(true);
                     }}
                   />
                   <span className="mt-1 block text-xs text-stone-500">
-                    /wedding/{slug || "your-link"} · Permanent after first save.
+                    {invitationPath(templateId, slug || "your-link")} · Permanent after first save.
                   </span>
                 </label>
-                {fields.map(({ key, label, large }) => (
+                {(birthday ? birthdayFields : fields).map(({ key, label, large }) => (
                   <label key={key} className="block text-sm font-medium">
                     {label}
                     {large ? (
@@ -454,13 +462,13 @@ export default function InvitationStudio() {
                         rows={key === "story" ? 5 : 3}
                         className={inputClass}
                         maxLength={key === "story" ? 3000 : 1000}
-                        value={String(draft[key])}
+                        value={String(draft[key] ?? "")}
                         onChange={(e) => update(key, e.target.value)}
                       />
                     ) : (
                       <input
                         className={inputClass}
-                        value={String(draft[key])}
+                        value={String(draft[key] ?? "")}
                         maxLength={
                           key === "mapUrl"
                             ? 2048
@@ -475,7 +483,7 @@ export default function InvitationStudio() {
                     )}
                   </label>
                 ))}
-                <label className="block text-sm font-medium">
+                {!birthday && <label className="block text-sm font-medium">
                   Wedding date & time — Sri Lanka (UTC+05:30)
                   <input
                     type="datetime-local"
@@ -488,10 +496,10 @@ export default function InvitationStudio() {
                       )
                     }
                   />
-                </label>
+                </label>}
                 <div className="space-y-3">
                   <label className="block text-sm font-medium">
-                    Couple photo · recommended 1200 × 1600 px
+                    {birthday ? "Featured photo (optional)" : "Couple photo · recommended 1200 × 1600 px"}
                     <input
                       className={inputClass}
                       type="file"
@@ -503,7 +511,7 @@ export default function InvitationStudio() {
                   {draft.couplePhoto && (
                     <img
                       src={draft.couplePhoto}
-                      alt="Couple photo preview"
+                      alt={birthday ? "Featured photo preview" : "Couple photo preview"}
                       className="h-48 w-36 rounded-t-full object-cover"
                     />
                   )}
@@ -635,17 +643,29 @@ export default function InvitationStudio() {
                   disabled={busy || dirty || !selected || !approved}
                   onClick={() => void action("publish")}
                 >
-                  Publish invitation
+                  {birthday ? "Publish birthday card" : "Publish invitation"}
                 </button>
                 {selected?.status === "PUBLISHED" && (
                   <>
                     <Link
-                      href={`/wedding/${selected.slug}`}
+                      href={invitationPath(selected.templateId, selected.slug)}
                       target="_blank"
                       className={`${buttonClass} w-full`}
                     >
-                      Open live invitation ↗
+                      {birthday ? "Open live birthday card ↗" : "Open live invitation ↗"}
                     </Link>
+                    {birthday && <button
+                      type="button"
+                      className={`${buttonClass} w-full`}
+                      onClick={async () => {
+                        try {
+                          await navigator.clipboard.writeText(`${location.origin}${invitationPath(selected.templateId, selected.slug)}`);
+                          setNotice("Birthday link copied. You can paste it into WhatsApp.");
+                        } catch {
+                          setError("Could not copy the link. Open the live card and copy its address.");
+                        }
+                      }}
+                    >Copy birthday link</button>}
                     <button
                       className={`${buttonClass} w-full`}
                       disabled={busy || dirty}
@@ -742,11 +762,11 @@ export default function InvitationStudio() {
                     {row.status}
                   </span>
                   <h3 className="my-3 text-2xl font-serif">
-                    {row.draft.partnerOne || "Untitled"} &{" "}
-                    {row.draft.partnerTwo || "invitation"}
+                    {row.draft.partnerOne || "Untitled"}
+                    {!isBirthdayTemplate(row.templateId) && ` & ${row.draft.partnerTwo || "invitation"}`}
                   </h3>
                   <p className="break-all text-xs text-stone-500">
-                    /wedding/{row.slug}
+                    {invitationPath(row.templateId, row.slug)}
                   </p>
                   <p className="mt-5 text-sm font-semibold">
                     Open invitation →
