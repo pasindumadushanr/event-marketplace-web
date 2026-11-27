@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef } from "react";
 import { InvitationContent } from "@/lib/invitations";
 import { BirthdayExperience } from "./BirthdayExperience";
 import { BirthdayRewind } from "./BirthdayRewind";
+import { ClassicWeddingInvitation } from "./ClassicWeddingInvitation";
+import { isClassicWedding } from "@/lib/invitation-templates";
 
 // Use the supplied standalone document so its global CSS, viewport and original
 // animation code are not altered by the marketplace's Tailwind/theme styles.
@@ -17,6 +19,8 @@ export function InvitationExperience(props: {
     return <BirthdayRewind content={props.content} preview={props.preview || props.demo} />;
   if (props.templateId === "B01")
     return <BirthdayExperience content={props.content} preview={props.preview || props.demo} />;
+  if (isClassicWedding(props.templateId))
+    return <ClassicWeddingInvitation content={props.content} templateId={props.templateId} demo={props.demo} preview={props.preview} />;
   return <WeddingInvitationFrame {...props} />;
 }
 

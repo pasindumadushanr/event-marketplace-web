@@ -2,7 +2,7 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { InvitationExperience } from "@/components/invitations/InvitationExperience";
-import { isBirthdayTemplate } from "@/lib/invitation-templates";
+import { isBirthdayTemplate, isClassicWedding } from "@/lib/invitation-templates";
 import { SITE_URL } from "@/lib/site-url";
 export const dynamic = "force-dynamic";
 const invitation = cache(async (slug: string) => {
@@ -32,6 +32,8 @@ export async function generateMetadata({
     templateId === "W02"
       ? c.welcome
       : `Join us to celebrate our wedding at ${c.venue}.`;
+  const shareImage = c.couplePhoto || (isClassicWedding(templateId)
+    ? `${SITE_URL}/invitation-assets/${templateId.toLowerCase()}/share.jpg` : "");
   return {
     title,
     description,
@@ -43,15 +45,15 @@ export async function generateMetadata({
       description,
       url: `${SITE_URL}/wedding/${slug}`,
       type: "website",
-      images: c.couplePhoto
-        ? [{ url: c.couplePhoto, alt: `${c.partnerOne} & ${c.partnerTwo}` }]
+      images: shareImage
+        ? [{ url: shareImage, alt: c.couplePhoto ? `${c.partnerOne} & ${c.partnerTwo}` : "Wedding invitation artwork" }]
         : [],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: c.couplePhoto ? [c.couplePhoto] : [],
+      images: shareImage ? [shareImage] : [],
     },
   };
 }

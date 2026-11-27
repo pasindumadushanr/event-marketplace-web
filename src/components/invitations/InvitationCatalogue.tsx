@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/home/Navbar";
 import { Footer } from "@/components/home/Footer";
 import { whatsappUrl } from "@/lib/whatsapp";
-import { birthdayTemplates, invitationTemplates } from "@/lib/invitation-templates";
+import { birthdayTemplates, invitationTemplates, isClassicWedding } from "@/lib/invitation-templates";
 export function InvitationCatalogue() {
   const [phone, setPhone] = useState("");
   useEffect(() => {
@@ -45,6 +45,7 @@ export function InvitationCatalogue() {
               `Hi! I would like ${template.id} — ${template.name}, LKR ${template.price.toLocaleString("en-LK")}. Please help me personalise my wedding invitation.`,
             );
             const sinhala = template.sinhala;
+            const classic = isClassicWedding(template.id);
             return (
               <article
                 key={template.id}
@@ -57,12 +58,12 @@ export function InvitationCatalogue() {
                   <img
                     src={template.image}
                     alt={`${template.id} — ${template.name} invitation design`}
-                    className="absolute inset-0 h-full w-full object-cover"
+                    className={`absolute inset-0 h-full w-full ${classic ? "object-contain" : "object-cover"}`}
                   />
                   <div
-                    className={`absolute inset-0 flex flex-col items-center ${sinhala ? "justify-end pb-5" : "justify-center bg-black/25"} p-8 text-center text-[#fff5da]`}
+                    className={`absolute inset-0 flex flex-col items-center ${sinhala || classic ? "justify-end pb-5" : "justify-center bg-black/25"} p-8 text-center text-[#fff5da]`}
                   >
-                    {!sinhala && (
+                    {!sinhala && !classic && (
                       <>
                         <p className="text-xs tracking-widest">
                           W01 · OLIVE & IVORY
@@ -81,7 +82,7 @@ export function InvitationCatalogue() {
                 </Link>
                 <div className="p-7 sm:p-12">
                   <p className="text-xs uppercase tracking-widest text-amber-800">
-                    {sinhala ? "Sinhala invitation" : "Advanced invitation"} ·{" "}
+                    {classic ? "Classic invitation" : sinhala ? "Sinhala invitation" : "Advanced invitation"} ·{" "}
                     {template.id}
                   </p>
                   <h2
@@ -95,6 +96,11 @@ export function InvitationCatalogue() {
                   </p>
                   <ul className="space-y-3 text-sm text-stone-600">
                     <li>♡ {template.accent}</li>
+                    {classic ? <>
+                      <li>♡ Opens directly to the wedding details</li>
+                      <li>♡ Optional family names, verse & photos</li>
+                      <li>♡ Directions & WhatsApp RSVP</li>
+                    </> : <>
                     <li>♡ Your names, photo & wedding details</li>
                     <li>♡ Countdown, directions & WhatsApp RSVP</li>
                     <li>
@@ -109,6 +115,7 @@ export function InvitationCatalogue() {
                         ? "Printable invitation"
                         : "Matching downloadable invitation card"}
                     </li>
+                    </>}
                   </ul>
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link

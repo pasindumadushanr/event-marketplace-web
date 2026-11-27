@@ -15,6 +15,9 @@ export interface InvitationContent {
   music: boolean;
   birthdayNameSi?: string;
   birthdayMessageSi?: string;
+  familyOne?: string;
+  familyTwo?: string;
+  weddingVerse?: string;
 }
 export interface InvitationRecord {
   id: string;

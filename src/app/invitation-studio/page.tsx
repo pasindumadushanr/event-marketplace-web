@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isBirthdayTemplate, studioTemplates } from "@/lib/invitation-templates";
+import { isBirthdayTemplate, isClassicWedding, studioTemplates } from "@/lib/invitation-templates";
 import { InvitationExperience } from "@/components/invitations/InvitationExperience";
 import {
   emptyInvitation,
@@ -48,6 +48,7 @@ export default function InvitationStudio() {
   const [templateId, setTemplateId] = useState<string>("W01");
   const template = studioTemplates.find((item) => item.id === templateId);
   const birthday = isBirthdayTemplate(templateId);
+  const classic = isClassicWedding(templateId);
   const [draft, setDraft] = useState<InvitationContent>({ ...emptyInvitation });
   const [slug, setSlug] = useState("");
   const [dirty, setDirty] = useState(false);
@@ -351,7 +352,7 @@ export default function InvitationStudio() {
                     <img
                       src={item.image}
                       alt={`${item.id} ${item.name} invitation design`}
-                      className="h-full w-full object-cover"
+                      className={`h-full w-full ${isClassicWedding(item.id) ? "object-contain p-5" : "object-cover"}`}
                     />
                     {item.id === "W01" && <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 p-5 text-center text-[#fff5da]">
                       <span className="text-xs uppercase tracking-widest">
@@ -483,6 +484,18 @@ export default function InvitationStudio() {
                     )}
                   </label>
                 ))}
+                {classic && <fieldset className="space-y-3 rounded-xl border border-stone-200 p-4">
+                  <legend className="px-2 text-sm font-semibold">Family names & verse (optional)</legend>
+                  <label className="block text-sm font-medium">First partner’s family line
+                    <input className={inputClass} dir="auto" maxLength={160} value={draft.familyOne ?? ""} onChange={(e) => update("familyOne", e.target.value)} />
+                  </label>
+                  <label className="block text-sm font-medium">Second partner’s family line
+                    <input className={inputClass} dir="auto" maxLength={160} value={draft.familyTwo ?? ""} onChange={(e) => update("familyTwo", e.target.value)} />
+                  </label>
+                  <label className="block text-sm font-medium">Verse or quote
+                    <textarea className={inputClass} dir="auto" rows={3} maxLength={400} value={draft.weddingVerse ?? ""} onChange={(e) => update("weddingVerse", e.target.value)} />
+                  </label>
+                </fieldset>}
                 {!birthday && <label className="block text-sm font-medium">
                   Wedding date & time — Sri Lanka (UTC+05:30)
                   <input
@@ -499,7 +512,7 @@ export default function InvitationStudio() {
                 </label>}
                 <div className="space-y-3">
                   <label className="block text-sm font-medium">
-                    {birthday ? "Featured photo (optional)" : "Couple photo · recommended 1200 × 1600 px"}
+                    {birthday ? "Featured photo (optional)" : classic ? "Couple photo (optional)" : "Couple photo · recommended 1200 × 1600 px"}
                     <input
                       className={inputClass}
                       type="file"
@@ -515,6 +528,7 @@ export default function InvitationStudio() {
                       className="h-48 w-36 rounded-t-full object-cover"
                     />
                   )}
+                  {classic && draft.couplePhoto && <button className={buttonClass} type="button" disabled={busy} onClick={() => update("couplePhoto", "")}>Remove couple photo</button>}
                   <p className="text-xs text-stone-500">
                     JPG, PNG or WebP · max 5 MB. Portrait display crops to fit;
                     check Preview. Uploaded photos use public image hosting.
